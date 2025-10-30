@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  web:
+    image: ${DOCKER_REPO}:${IMAGE_TAG:-latest}
+    container_name: mamcg-frontend
+    restart: unless-stopped
+    ports:
+      - "6060:3000"
+    env_file:
+      - .env
