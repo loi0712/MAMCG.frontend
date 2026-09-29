@@ -56,6 +56,16 @@ src/
 
 Gọi API: khai báo đường dẫn trong `src/api/config/endpoints.ts`, viết hàm và hook React Query trong `features/<tên>/api/`, dùng `axios` từ `@/shared/lib/axios`.
 
+## Chạy không cần backend (API giả lập)
+
+Đặt `VITE_ENABLE_MOCKS=true` trong `.env.development` rồi `yarn dev`. [MSW](https://mswjs.io) sẽ trả lời các request tới `VITE_API_URL` bằng dữ liệu trong bộ nhớ (`src/mocks/`), mô phỏng hành vi của MAMCG.Backend: phân trang, tìm kiếm, tạo/sửa/xoá, 404.
+
+- Đăng nhập bằng tên bất kỳ có trong dữ liệu giả (ví dụ `admin`) và mật khẩu bất kỳ; mật khẩu `wrong` để thử đăng nhập sai.
+- Tải lại trang sẽ khôi phục dữ liệu gốc.
+- Chỉ hoạt động khi chạy dev; bản build production không chứa mã giả lập.
+
+Màn hình quản trị đã nối API: Tài khoản, Nhóm quyền, Phân quyền, Trường dữ liệu, Panel hiển thị. Các màn hình còn lại hiện thông báo "Dữ liệu minh hoạ" cho tới khi backend có API.
+
 ## Kiểu dữ liệu API từ Swagger
 
 Khi truy cập được backend, chạy `yarn api:types` rồi commit `openapi/mamcg-api.json` và `src/api/generated/schema.ts`. Không sửa tay file sinh ra; CI chạy `yarn api:types:check` để phát hiện lệch.
