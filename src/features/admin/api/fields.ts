@@ -123,12 +123,18 @@ export const useUpdateField = () => {
 }
 
 export const useDeleteField = () => {
-  const invalidate = useInvalidateFields()
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: deleteField,
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
       toast.success('Đã xoá trường dữ liệu')
-      invalidate()
+      // Bỏ mục khỏi danh sách đã cache trước, rồi gỡ chi tiết của nó:
+      // nếu không, hàng cũ còn hiển thị sẽ gọi lại chi tiết và nhận 404
+      queryClient.setQueriesData<FieldsResponse>({ queryKey: ['admin-fields'] }, (old) =>
+        old && { ...old, fields: old.fields.filter((x) => x.id !== id), totalCount: old.totalCount - 1 }
+      )
+      queryClient.removeQueries({ queryKey: ['admin-field', id] })
+      queryClient.invalidateQueries({ queryKey: ['admin-fields'] })
     },
   })
 }

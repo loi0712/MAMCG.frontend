@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { apiUrls } from '@/api/config/endpoints'
 import { axios } from '@/shared/lib/axios'
@@ -77,11 +77,13 @@ export const usePanels = (params: PagedParams) =>
     placeholderData: keepPreviousData,
   })
 
-export const usePanel = (id: number | null) =>
-  useQuery({
-    queryKey: ['admin-panel', id],
-    queryFn: () => getPanel(id!),
-    enabled: id !== null,
+// API danh sách chỉ trả id + tên: lấy chi tiết cho các panel đang hiển thị
+export const usePanelDetails = (ids: number[]) =>
+  useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ['admin-panel', id],
+      queryFn: () => getPanel(id),
+    })),
   })
 
 const useInvalidatePanels = () => {
@@ -115,12 +117,18 @@ export const useUpdatePanel = () => {
 }
 
 export const useDeletePanel = () => {
-  const invalidate = useInvalidatePanels()
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: deletePanel,
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
       toast.success('Đã xoá panel hiển thị')
-      invalidate()
+      // Bỏ mục khỏi danh sách đã cache trước, rồi gỡ chi tiết của nó:
+      // nếu không, hàng cũ còn hiển thị sẽ gọi lại chi tiết và nhận 404
+      queryClient.setQueriesData<PanelsResponse>({ queryKey: ['admin-panels'] }, (old) =>
+        old && { ...old, panels: old.panels.filter((x) => x.id !== id), totalCount: old.totalCount - 1 }
+      )
+      queryClient.removeQueries({ queryKey: ['admin-panel', id] })
+      queryClient.invalidateQueries({ queryKey: ['admin-panels'] })
     },
   })
 }
