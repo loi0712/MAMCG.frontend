@@ -6,6 +6,6 @@ services:
     container_name: mamcg-frontend
     restart: unless-stopped
     ports:
-      - "6060:3000"
+      - "6060:8080"
     env_file:
       - .env

@@ -31,3 +31,22 @@ jobs:
         run: yarn build
         env:
           VITE_API_URL: http://localhost:5080
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: >
+          docker build
+          --build-arg VITE_API_URL=http://localhost:5080
+          --build-arg VITE_DOMAIN_URL=http://localhost:6060
+          -t mamcg-frontend:ci .
+
+      - name: Smoke test
+        run: |
+          docker run -d --name web -p 8080:8080 mamcg-frontend:ci
+          for i in $(seq 1 10); do curl -fsS http://localhost:8080/healthz && break; sleep 1; done
+          curl -fsS -o /dev/null http://localhost:8080/admin/users
+          docker exec web id -u | grep -qv '^0$'

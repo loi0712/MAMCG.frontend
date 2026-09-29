@@ -17,38 +17,27 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Biến VITE_* được nhúng vào bundle lúc build (không đọc lúc chạy container)
 ARG VITE_API_URL
 ARG VITE_DOMAIN_URL
-ARG NODE_ENV=production
 
 ENV VITE_API_URL=${VITE_API_URL}
 ENV VITE_DOMAIN_URL=${VITE_DOMAIN_URL}
-ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN yarn build && ls -la /app/dist
+RUN yarn build
 
 # ============================================
-# Stage 3: Production (serve)
+# Stage 3: Production (nginx, không chạy bằng root)
 # ============================================
-FROM node:20-alpine AS production
+FROM nginxinc/nginx-unprivileged:1.27-alpine AS production
 
-WORKDIR /app
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Install serve globally
-RUN npm install -g serve
+EXPOSE 8080
 
-# Copy built files only
-COPY --from=builder /app/dist ./dist
-
-# Expose port
-EXPOSE 3000
-
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
-
-# Start serve
-CMD ["serve", "-s", "dist", "-l", "3000"]
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/healthz || exit 1
