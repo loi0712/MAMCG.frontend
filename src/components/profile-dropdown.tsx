@@ -63,6 +63,11 @@ export function ProfileDropdown() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Nhóm mới</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin">
+                Quản trị hệ thống
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)}>
