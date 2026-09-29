@@ -158,7 +158,6 @@ const transformApiFiltersToFilterItems = (
  * Transform FilterBuilder items to form format
  */
 const transformFilterItemsToFormFilters = (filterItems: FilterItem[]) => {
-  console.log('🔄 [TRANSFORM] Input filterItems:', filterItems);
 
   const result = filterItems.map(item => ({
     // Map to your form's expected structure
@@ -169,7 +168,6 @@ const transformFilterItemsToFormFilters = (filterItems: FilterItem[]) => {
     logicalOperator: item.logicalOperator,
   }));
 
-  console.log('🔄 [TRANSFORM] Output formFilters:', result);
   return result;
 };
 
@@ -351,7 +349,6 @@ export const FoldersActionDialog = memo<FolderActionDialogProps>(
     }, [])
 
     const onSubmit = useCallback(async (values: FolderForm) => {
-      console.log('📤 Submitting folder:', values);
 
       try {
         // ✅ Double-check validation for smart folder
@@ -364,9 +361,7 @@ export const FoldersActionDialog = memo<FolderActionDialogProps>(
           return;
         }
 
-        console.log('📤 Submitting folder:', values);
         const apiData = convertToApiFormat(values);
-        console.log('📤 API data:', apiData);
 
         if (isEdit) {
           const updatedFolder = await updateFolderMutation.mutateAsync({

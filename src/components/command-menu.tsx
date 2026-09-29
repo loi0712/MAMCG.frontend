@@ -37,6 +37,7 @@ export function CommandMenu() {
           {sidebarData.navGroups.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>
               {group.items.map((navItem, i) => {
+                if (navItem.disabled) return null
                 if (navItem.url)
                   return (
                     <CommandItem

@@ -182,7 +182,6 @@ export function UsersView() {
 
   const handleAddUser = () => {
     // Add user logic
-    console.log('Adding user:', { formName, formEmail, formUsername, formRole });
     setIsAddDialogOpen(false);
     resetForm();
   };
@@ -201,7 +200,6 @@ export function UsersView() {
   };
 
   const handleSaveResetPassword = () => {
-    console.log('Reset password for user:', selectedUser?.id, newPassword);
     setIsResetPasswordDialogOpen(false);
     setSelectedUser(null);
     setNewPassword('');

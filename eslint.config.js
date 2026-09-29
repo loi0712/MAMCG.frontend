@@ -21,7 +21,8 @@ export default tseslint.config([
     },
     rules: {
       'react-refresh/only-export-components': 'off',
-      "@typescript-eslint/no-explicit-any": "off"
+      "@typescript-eslint/no-explicit-any": "off",
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
 ])

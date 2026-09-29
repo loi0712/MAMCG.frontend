@@ -19,7 +19,7 @@ export function ProfileDropdown() {
   const user = useAuthStore((state: any) => state.auth.user)
 
   const displayName = user?.fullName || 'Người dùng'
-  const email = user?.email || 'user@example.com'
+  const email = user?.email || ''
   const avatarSrc = user?.imageUrl
   const avatarFallback = displayName
     .split(' ')
@@ -47,22 +47,6 @@ export function ProfileDropdown() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem asChild>
-              <Link to="/">
-                Hồ sơ cá nhân
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/">
-                Thanh toán
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/">
-                Cài đặt
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>Nhóm mới</DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/admin">
                 Quản trị hệ thống

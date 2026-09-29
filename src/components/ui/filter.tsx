@@ -413,7 +413,6 @@ const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
     // ✅ CORRECT: Build filter query with API format
     const buildFilterQuery = useCallback((filters: FilterItem[]): FilterQuery => {
-        console.log('🔍 [DEBUG] Building filter query from:', filters);
 
         const validFilters = filters.filter(f => {
             const isValid = f.fieldId && 
@@ -421,17 +420,11 @@ const FilterBuilder: React.FC<FilterBuilderProps> = ({
                            f.operator && 
                            f.value && 
                            f.value.trim() !== '';
-            
-            if (!isValid) {
-                console.log('⚠️ [DEBUG] Skipping invalid filter:', f);
-            }
             return isValid;
         });
 
-        console.log('✅ [DEBUG] Valid filters:', validFilters);
 
         if (validFilters.length === 0) {
-            console.log('⚠️ [DEBUG] No valid filters found, returning empty query');
             return { filters: [] };
         }
 
@@ -446,7 +439,6 @@ const FilterBuilder: React.FC<FilterBuilderProps> = ({
             }))
         };
 
-        console.log('📤 [DEBUG] Final filter query:', JSON.stringify(filterQuery, null, 2));
         return filterQuery;
     }, []);
 
@@ -487,12 +479,10 @@ const FilterBuilder: React.FC<FilterBuilderProps> = ({
             value: ''
         };
 
-        console.log('➕ [DEBUG] Adding new filter:', newFilter);
         setFilters(prev => [...prev, newFilter]);
     }, [columns, operators]);
 
     const removeFilter = useCallback((columnId: string) => {
-        console.log('➖ [DEBUG] Removing filter:', columnId);
         setFilters(prev => {
             const newFilters = prev.filter(filter => filter.columnId !== columnId);
             return newFilters.length > 0 ? newFilters : [createDefaultFilter()];
@@ -500,29 +490,24 @@ const FilterBuilder: React.FC<FilterBuilderProps> = ({
     }, [createDefaultFilter]);
 
     const updateFilter = useCallback(async (columnId: string, updates: Partial<FilterItem>) => {
-        console.log('✏️ [DEBUG] Updating filter:', columnId, 'with:', updates);
         setFilters(prev => prev.map(filter =>
             filter.columnId === columnId ? { ...filter, ...updates } : filter
         ));
     }, []);
 
     const removeAllFilters = useCallback(() => {
-        console.log('🗑️ [DEBUG] Removing all filters');
         setFilters([createDefaultFilter()]);
     }, [createDefaultFilter]);
 
     const handleManualApply = useCallback(async () => {
         if (autoApply) return;
 
-        console.log('🔍 [MANUAL] Manually applying filters:', filters);
 
         try {
             setIsLoading(true);
             setError(null);
             const filterQuery = buildFilterQuery(filters);
-            console.log('📤 [MANUAL] Sending filter query:', filterQuery);
             await onFiltersApply(filterQuery).then(()=> setIsLoading(false));
-            console.log('✅ [MANUAL] Manual apply succeeded');
         } catch (err) {
             if (isMountedRef.current) {
                 setError(err instanceof Error ? err.message : 'Áp dụng bộ lọc thất bại');

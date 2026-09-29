@@ -295,7 +295,6 @@ export function FieldGroupsView() {
     }
     
     // Save logic here
-    console.log('Saving:', { id: formId, name: formName, description: formDescription, order: formOrder });
     
     // Reset and close
     setIsDialogOpen(false);

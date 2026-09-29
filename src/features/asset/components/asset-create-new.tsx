@@ -355,7 +355,6 @@ function DynamicFormComponent({ fields, onSubmit, isSubmitting }: DynamicFormPro
     const handleSubmit = async (values: FormValues) => {
         try {
             // The 'values' object already contains the 'files' array from react-hook-form
-            console.log('Form values with files:', values)
             await onSubmit(values)
         } catch (error) {
             console.error('Error submitting form:', error)
@@ -415,10 +414,8 @@ export function AssetsCreateNewDialog({
 
     const handleFormSubmit = async (values: FormValues): Promise<void> => {
         try {
-            console.log('Submitting values:', values)
 
             const transformedData = transformFormValues(values, fields)
-            console.log('Transformed ', transformedData)
 
             await createAssetMutation.mutateAsync(transformedData)
 

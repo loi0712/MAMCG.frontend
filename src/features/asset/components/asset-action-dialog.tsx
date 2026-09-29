@@ -179,7 +179,6 @@ export function AssetsActionDialog({
         // Handle file upload logic here
         if (values.image instanceof File) {
             // In a real app, you would upload the file to your server
-            console.log('Uploading file:', values.image)
         }
         
         form.reset()

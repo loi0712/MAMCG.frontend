@@ -14,7 +14,6 @@ import { AppSidebar } from "@/components/layout/App-sidebar";
 import { SkipToMain } from "@/components/skip-to-main";
 import {
   sidebarData,
-  treeFolderData,
 } from "@/components/layout/data/sidebar-data";
 import { NavGroup } from "@/components/layout/Nav-group";
 import MamcgLogo from "@/assets/images/mamcg.png";
@@ -269,11 +268,7 @@ function AuthenticatedLayoutContent({
   });
 
   useEffect(() => {
-    if (data) {
-      setTreeFolder(mapFoldersToTreeData(data));
-    } else {
-      setTreeFolder(mapFoldersToTreeData(treeFolderData));
-    }
+    setTreeFolder(data ? mapFoldersToTreeData(data) : []);
   }, [data]);
 
   useEffect(() => {

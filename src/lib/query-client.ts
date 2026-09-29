@@ -12,10 +12,6 @@ export function createQueryClientInstance() {
     defaultOptions: {
       queries: {
         retry: (failureCount, error) => {
-          if (import.meta.env.DEV) {
-            console.log('[Query Error]', { failureCount, error })
-          }
-
           // Dev: không retry
           if (failureCount >= 0 && import.meta.env.DEV) return false
 

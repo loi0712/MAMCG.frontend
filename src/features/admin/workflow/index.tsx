@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2, Search, Play, Copy } from 'lucide-react';
@@ -83,14 +84,13 @@ export function WorkflowView({ onEditWorkflow }: WorkflowViewProps) {
     wf.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = (id: string) => {
-    if (confirm('Bạn có chắc muốn xóa workflow này?')) {
-      console.log('Delete workflow:', id);
-    }
+  // Backend (WorkflowController) mới có API đọc, chưa có xoá/nhân bản
+  const handleDelete = () => {
+    toast.info('Chưa hỗ trợ xoá workflow: backend chưa có API');
   };
 
-  const handleDuplicate = (id: string) => {
-    console.log('Duplicate workflow:', id);
+  const handleDuplicate = () => {
+    toast.info('Chưa hỗ trợ nhân bản workflow: backend chưa có API');
   };
 
   return (
@@ -218,7 +218,7 @@ export function WorkflowView({ onEditWorkflow }: WorkflowViewProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDuplicate(workflow.id)}
+                          onClick={handleDuplicate}
                           title="Nhân bản"
                           className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
                         >
@@ -227,7 +227,7 @@ export function WorkflowView({ onEditWorkflow }: WorkflowViewProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(workflow.id)}
+                          onClick={handleDelete}
                           title="Xóa"
                           className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                         >
