@@ -1,6 +1,6 @@
 import {
-    GetFieldsProps,
-    TFieldsResponse,
+    type GetFieldsProps,
+    type TFieldsResponse,
     type TQueryFieldsKeys,
 } from '@/components/layout/types/index'
 

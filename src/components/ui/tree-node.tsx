@@ -1,10 +1,10 @@
 import { memo, useCallback, useMemo, useState } from "react";
-import { NodeRendererProps } from "react-arborist";
+import { type NodeRendererProps } from "react-arborist";
 import { Folder, ChevronRight } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import ContextMenu from "@/components/ui/context-menu";
 import { useFoldersAction } from "@/components/layout/Folder-provider";
-import { TreeNodeData } from "@/components/layout/Types";
+import { type TreeNodeData } from "@/components/layout/Types";
 
 const MENU_DIMENSIONS = {
   width: 160,

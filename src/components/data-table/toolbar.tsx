@@ -2,7 +2,7 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { type Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import FilterPopup from '@/components/filter-popup'
-import { type FilterQuery } from '@/components/ui/filter'
+import { type ColumnWithDataSource, type FilterQuery } from '@/components/ui/filter'
 import { DataTableViewOptions } from './view-options'
 import { useMemo, useCallback, useState } from 'react'
 import { FolderOpen, Pen } from 'lucide-react'
@@ -16,7 +16,7 @@ type DataTableToolbarProps<TData> = {
   searchKey?: string
   onFiltersApply?: (filterQuery: FilterQuery) => Promise<void>
   onAssetCreated?: () => Promise<void> // Callback khi tạo asset thành công
-  columns?: Array<{ value: string; label: string }>
+  columns?: ColumnWithDataSource[]
   operators?: Array<{ value: string; label: string }>
   filters?: {
     columnId: string
@@ -45,14 +45,17 @@ export function DataTableToolbar<TData>({
   const isFiltered =
     table.getState().columnFilters.length > 0 || table.getState().globalFilter
 
-  const defaultColumns = useMemo(() => {
+  const defaultColumns = useMemo((): ColumnWithDataSource[] => {
     if (columns.length > 0) return columns;
     
+    // id bắt đầu từ 1 vì FilterBuilder coi fieldId = 0 là chưa chọn
     return table.getAllColumns()
       .filter(column => column.getCanFilter())
-      .map(column => ({
+      .map((column, index) => ({
+        id: index + 1,
         value: column.id,
-        label: (column.columnDef.header as string) || column.id
+        label: typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id,
+        dataType: { name: 'string' },
       }));
   }, [columns, table]);
 
@@ -81,7 +84,8 @@ export function DataTableToolbar<TData>({
         table.resetColumnFilters();
         
         filterQuery.filters.forEach(filter => {
-          const column = table.getColumn(filter.field);
+          const columnKey = defaultColumns.find(c => c.id === filter.fieldId)?.value;
+          const column = columnKey ? table.getColumn(columnKey) : undefined;
           if (column) {
             switch (filter.operator) {
               case 'contains':
@@ -101,7 +105,7 @@ export function DataTableToolbar<TData>({
       console.error('Failed to apply filters:', error);
       throw error;
     }
-  }, [onFiltersApply, table]);
+  }, [onFiltersApply, table, defaultColumns]);
 
   const handleResetFilters = useCallback((): void => {
     table.resetColumnFilters();

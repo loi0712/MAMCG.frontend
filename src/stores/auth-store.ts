@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getCookie, setCookie, removeCookie } from '@/shared/lib/cookies'
-import { AuthUser } from '@/features/auth/types/auth'
+import { type AuthUser } from '@/features/auth/types/auth'
 
 const ACCESS_TOKEN = 'thisisjustarandomstring'
 const USER_INFO = 'user_info' // Thêm key cho user info

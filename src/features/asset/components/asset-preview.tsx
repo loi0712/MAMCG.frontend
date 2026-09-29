@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/drawer"
 import { ArrowRightFromLine, Loader2, Maximize2 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
-import { AssetDetailResponse, fetchAssetDetail, Field, getDisplayValue, WorkflowHistory } from "../api/get-asset"
+import { type AssetDetailResponse, fetchAssetDetail, type Field, getDisplayValue, type WorkflowHistory } from "../api/get-asset"
 import { parseDatasource } from "../api/create"
 import { env } from "@/config/env"
 import { useNavigate } from "@tanstack/react-router"

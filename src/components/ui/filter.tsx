@@ -1,7 +1,7 @@
 // FilterBuilder.tsx - CORRECTED with proper fieldId/columnId usage
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Plus, X, Trash2, Loader2 } from 'lucide-react';
-import { Field } from '../layout/api/get-folder-details';
+import { type Field } from '../layout/api/get-folder-details';
 
 // ==================== INTERFACES ====================
 

@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, AlertCircle } from 'lucide-react';
-import { NodeData } from './flowchart-node';
+import { type NodeData } from './flowchart-node';
 
 interface NodeConfigPanelProps {
   node: NodeData | null;

@@ -6,7 +6,7 @@ import {
   UserX,
 } from "lucide-react";
 import { type SidebarData } from "@/components/layout/Types";
-import { TFoldersResponse } from "../types/folders";
+import { type TFoldersResponse } from "../types/folders";
 
 export const sidebarData: SidebarData = {
   user: {

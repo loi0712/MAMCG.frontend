@@ -25,15 +25,14 @@ interface FilterPopupProps {
 
 // ==================== UTILITY FUNCTIONS ====================
 
-const generateId = 1;
-
 const createDefaultFilter = (
     columns: ColumnWithDataSource[],
     operators: Array<{ value: string; label: string }>
 ): FilterItem => ({
-    fieldId: generateId.toString(),
+    columnId: '0',
     logicalOperator: 'AND',
-    column: columns[0]?.value || '',
+    fieldId: columns[0]?.id ?? 0,
+    fieldName: columns[0]?.label ?? '',
     operator: operators[0]?.value || '',
     value: ''
 });
@@ -63,7 +62,7 @@ const FilterPopup: React.FC<FilterPopupProps> = ({
         if (initialFilters.length > 0) {
             return initialFilters.map((filter, index) => ({
                 ...filter,
-                fieldId: filter.fieldId || index.toString()
+                columnId: filter.columnId || index.toString()
             }));
         }
         
@@ -114,10 +113,11 @@ const FilterPopup: React.FC<FilterPopupProps> = ({
             setIsApplying(true);
 
             // Update local state to track applied filters
-            const newFilters = filterQuery.filters.map((f, index) => ({
-                fieldId: index.toString(),
-                logicalOperator: f.logicalOperator as 'AND' | 'OR',
-                column: f.field,
+            const newFilters: FilterItem[] = filterQuery.filters.map((f, index) => ({
+                columnId: index.toString(),
+                logicalOperator: f.logicalGroup === 'OR' ? 'OR' : 'AND',
+                fieldId: f.fieldId,
+                fieldName: columns.find(c => c.id === f.fieldId)?.label ?? '',
                 operator: f.operator,
                 value: f.value
             }));
@@ -134,12 +134,12 @@ const FilterPopup: React.FC<FilterPopupProps> = ({
         } finally {
             setIsApplying(false);
         }
-    }, [onFiltersApply, autoClose]);
+    }, [onFiltersApply, autoClose, columns]);
 
     // Calculate active filter count
     const activeFilterCount = useMemo(() => {
         return appliedFilters.filter(f => 
-            f.column && f.operator && f.value && f.value.trim() !== ''
+            f.fieldId && f.operator && f.value && f.value.trim() !== ''
         ).length;
     }, [appliedFilters]);
 

@@ -32,7 +32,7 @@ import FilterBuilder, {
   getFilterableColumns,
 
 } from '@/components/ui/filter'
-import { TCreateFolder } from '@/components/layout/types/index'
+import { type TCreateFolder } from '@/components/layout/types/index'
 import { useCallback, useMemo, useEffect, useRef, memo } from 'react'
 import { useCreateNewFolder } from '@/components/layout/api/create-folder'
 import { useNavigate } from '@tanstack/react-router'

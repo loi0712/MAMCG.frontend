@@ -1,7 +1,7 @@
 import { apiUrls } from '@/api/config/endpoints';
 import { axios } from '@/shared/lib/axios';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { Category } from '../data/categories';
+import { type Category } from '../data/categories';
 
 // ===========================================
 // TYPES

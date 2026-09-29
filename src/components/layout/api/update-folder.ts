@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiUrls } from '@/api/config/endpoints'
 import { axios } from '@/shared/lib/axios'
 import { cleanObject } from '@/utils/clean-object';
-import { TCreateFolder } from '../types/folders';
+import { type TCreateFolder } from '../types/folders';
 import { handleApiError } from '@/utils/error-handler';
 
 interface ApiErrorResponse {

@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Resolver, useForm, useFormContext } from 'react-hook-form'
+import { type Resolver, useForm, useFormContext } from 'react-hook-form'
 import { useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,7 +28,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle } from 'lucide-react'
 import {
-    DynamicField,
+    type DynamicField,
     getFieldKey,
     getSelectItems,
     transformFormValues,
@@ -155,7 +155,7 @@ function DynamicFieldRenderer({
     // Always call useEffect at the top level - handle Category reset when CategoryGroup changes
     useEffect(() => {
         if (field.fieldName === 'Category') {
-            const subscription = watch((value, { name }) => {
+            const subscription = watch((_value, { name }) => {
                 if (name === categoryGroupFieldKey) {
                     setValue(fieldKey, ''); // Clear category selection when group changes
                 }

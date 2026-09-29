@@ -50,7 +50,11 @@ export function FoldersProvider({ children }: { children: React.ReactNode }) {
         description: folder.description || '',
         parentId: folder.parentId,
         parentName: folder.parentName || '',
+        index: folder.index,
         isSmartFolder: folder.filters?.length > 0,
+        isCreateCategory: false,
+        categoryGroupId: null,
+        categoryCode: null,
         filters: folder.filters
       })
     } else if (!selectedFolderId) {
@@ -78,7 +82,11 @@ export function FoldersProvider({ children }: { children: React.ReactNode }) {
         description: folder.description || '',
         parentId: folder.parentId,
         parentName: folder.parentName || '',
+        index: folder.index,
         isSmartFolder: folder.filters?.length > 0,
+        isCreateCategory: false,
+        categoryGroupId: null,
+        categoryCode: null,
         filters: folder.filters
       })
     }

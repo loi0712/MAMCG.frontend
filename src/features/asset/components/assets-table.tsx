@@ -29,7 +29,7 @@ import {
 } from '../api/get-assets'
 import { useAssetColumns } from './assets-column'
 import { AssetTableBulkActions } from './assets-table-bulk-actions'
-import { Asset } from '../data/assets'
+import { type Asset } from '../data/assets'
 import PreviewDrawer from './asset-preview'
 import { FolderOpen } from 'lucide-react'
 import { useMenuStore } from '@/stores/menu-store'

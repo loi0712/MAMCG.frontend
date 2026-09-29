@@ -28,14 +28,14 @@ import {
   useMemo,
   memo,
 } from "react";
-import { Tree, NodeRendererProps } from "react-arborist";
-import { TreeNodeData } from "@/components/layout/Types";
+import { Tree, type NodeRendererProps } from "react-arborist";
+import { type TreeNodeData } from "@/components/layout/Types";
 import { Header } from "@/components/layout/Header";
 import { useFolders } from "@/components/layout/api/get-folders";
 import {
-  TFolder,
-  TFoldersResponse,
-  TQueryKeys,
+  type TFolder,
+  type TFoldersResponse,
+  type TQueryKeys,
 } from "@/components/layout/types/folders";
 import EmptyAreaContextMenu from "../ui/emptyAreaContextMenu";
 import { FoldersDialogs } from "./Folder-dialogs";

@@ -36,7 +36,7 @@ export const getFieldDefinition = (assets: Asset[], fieldName: string) => {
 }
 
 // Custom cell renderer based on field name and data type
-const renderCellByFieldName = (value: any, fieldName: string, dataTypeName: string, color?: string) => {
+const renderCellByFieldName = (value: any, fieldName: string, color?: string) => {
     // Handle image fields (typically Thumbnail)
     if (fieldName.toLowerCase().includes('thumbnail') || fieldName.toLowerCase().includes('image')) {
         return value ? (
@@ -173,7 +173,7 @@ export const useAssetColumns = (assets: Asset[]): ColumnDef<ParsedAsset>[] => {
                         const value = row.getValue(fieldName)
                         const field = row.original.fields?.find(f => f.fieldName === fieldName)
                         const color = field?.color || fieldDef?.color
-                        return renderCellByFieldName(value, fieldName, field?.dataType.name || '', color)
+                        return renderCellByFieldName(value, fieldName, color)
                     },
                     meta: {
                         className: isImageField ? 'w-36' : ''
