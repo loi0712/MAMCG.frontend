@@ -28,5 +28,6 @@ package-lock.json
 .env.*
 !.env.example
 *.md
+!/README.md
 *.geminiignore
 
