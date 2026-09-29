@@ -9,143 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
-import { Route as AdminStorageRouteImport } from './routes/admin/storage'
-import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
-import { Route as AdminServerStatusRouteImport } from './routes/admin/server-status'
-import { Route as AdminRolesRouteImport } from './routes/admin/roles'
-import { Route as AdminPermissionsRouteImport } from './routes/admin/permissions'
-import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
-import { Route as AdminLogsRouteImport } from './routes/admin/logs'
-import { Route as AdminFieldGroupsRouteImport } from './routes/admin/field-groups'
-import { Route as AdminDisplayPanelsRouteImport } from './routes/admin/display-panels'
-import { Route as AdminDatabaseRouteImport } from './routes/admin/database'
-import { Route as AdminDataFieldsRouteImport } from './routes/admin/data-fields'
-import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
-import { Route as AuthenticatedCategoryRouteImport } from './routes/_authenticated/category'
-import { Route as errors503RouteImport } from './routes/(errors)/503'
-import { Route as errors500RouteImport } from './routes/(errors)/500'
-import { Route as errors404RouteImport } from './routes/(errors)/404'
-import { Route as errors403RouteImport } from './routes/(errors)/403'
-import { Route as errors401RouteImport } from './routes/(errors)/401'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
-import { Route as AdminWorkflowIndexRouteImport } from './routes/admin/workflow/index'
+import { Route as errors401RouteImport } from './routes/(errors)/401'
+import { Route as errors403RouteImport } from './routes/(errors)/403'
+import { Route as errors404RouteImport } from './routes/(errors)/404'
+import { Route as errors500RouteImport } from './routes/(errors)/500'
+import { Route as errors503RouteImport } from './routes/(errors)/503'
+import { Route as AuthenticatedCategoryRouteImport } from './routes/_authenticated/category'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as AdminDataFieldsRouteImport } from './routes/admin/data-fields'
+import { Route as AdminDatabaseRouteImport } from './routes/admin/database'
+import { Route as AdminDisplayPanelsRouteImport } from './routes/admin/display-panels'
+import { Route as AdminFieldGroupsRouteImport } from './routes/admin/field-groups'
+import { Route as AdminLogsRouteImport } from './routes/admin/logs'
+import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
+import { Route as AdminPermissionsRouteImport } from './routes/admin/permissions'
+import { Route as AdminRolesRouteImport } from './routes/admin/roles'
+import { Route as AdminServerStatusRouteImport } from './routes/admin/server-status'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminStorageRouteImport } from './routes/admin/storage'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AuthenticatedAssetsIndexRouteImport } from './routes/_authenticated/assets/index'
-import { Route as AdminWorkflowWorkflowIdRouteImport } from './routes/admin_/workflow/$workflowId'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
-import { Route as AuthenticatedAssetsDetailsDetailsRouteImport } from './routes/_authenticated/assets/details/details'
+import { Route as AdminWorkflowIndexRouteImport } from './routes/admin/workflow/index'
+import { Route as AdminWorkflowWorkflowIdRouteImport } from './routes/admin_/workflow/$workflowId'
 import { Route as AuthenticatedAssetsCgDetailsRouteImport } from './routes/_authenticated/assets/cg/details'
+import { Route as AuthenticatedAssetsDetailsDetailsRouteImport } from './routes/_authenticated/assets/details/details'
 
-const AdminRouteRoute = AdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminStorageRoute = AdminStorageRouteImport.update({
-  id: '/storage',
-  path: '/storage',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminServerStatusRoute = AdminServerStatusRouteImport.update({
-  id: '/server-status',
-  path: '/server-status',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminRolesRoute = AdminRolesRouteImport.update({
-  id: '/roles',
-  path: '/roles',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminPermissionsRoute = AdminPermissionsRouteImport.update({
-  id: '/permissions',
-  path: '/permissions',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLogsRoute = AdminLogsRouteImport.update({
-  id: '/logs',
-  path: '/logs',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminFieldGroupsRoute = AdminFieldGroupsRouteImport.update({
-  id: '/field-groups',
-  path: '/field-groups',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminDisplayPanelsRoute = AdminDisplayPanelsRouteImport.update({
-  id: '/display-panels',
-  path: '/display-panels',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminDatabaseRoute = AdminDatabaseRouteImport.update({
-  id: '/database',
-  path: '/database',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminDataFieldsRoute = AdminDataFieldsRouteImport.update({
-  id: '/data-fields',
-  path: '/data-fields',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AuthenticatedCategoryRoute = AuthenticatedCategoryRouteImport.update({
-  id: '/category',
-  path: '/category',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const errors503Route = errors503RouteImport.update({
-  id: '/(errors)/503',
-  path: '/503',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const errors500Route = errors500RouteImport.update({
-  id: '/(errors)/500',
-  path: '/500',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const errors404Route = errors404RouteImport.update({
-  id: '/(errors)/404',
-  path: '/404',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const errors403Route = errors403RouteImport.update({
-  id: '/(errors)/403',
-  path: '/403',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const errors401Route = errors401RouteImport.update({
-  id: '/(errors)/401',
-  path: '/401',
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authSignInRoute = authSignInRouteImport.update({
@@ -153,9 +59,104 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminWorkflowIndexRoute = AdminWorkflowIndexRouteImport.update({
-  id: '/workflow/',
-  path: '/workflow/',
+const errors401Route = errors401RouteImport.update({
+  id: '/(errors)/401',
+  path: '/401',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const errors403Route = errors403RouteImport.update({
+  id: '/(errors)/403',
+  path: '/403',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const errors404Route = errors404RouteImport.update({
+  id: '/(errors)/404',
+  path: '/404',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const errors500Route = errors500RouteImport.update({
+  id: '/(errors)/500',
+  path: '/500',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const errors503Route = errors503RouteImport.update({
+  id: '/(errors)/503',
+  path: '/503',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCategoryRoute = AuthenticatedCategoryRouteImport.update({
+  id: '/category',
+  path: '/category',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminDataFieldsRoute = AdminDataFieldsRouteImport.update({
+  id: '/data-fields',
+  path: '/data-fields',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminDatabaseRoute = AdminDatabaseRouteImport.update({
+  id: '/database',
+  path: '/database',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminDisplayPanelsRoute = AdminDisplayPanelsRouteImport.update({
+  id: '/display-panels',
+  path: '/display-panels',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminFieldGroupsRoute = AdminFieldGroupsRouteImport.update({
+  id: '/field-groups',
+  path: '/field-groups',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPermissionsRoute = AdminPermissionsRouteImport.update({
+  id: '/permissions',
+  path: '/permissions',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminServerStatusRoute = AdminServerStatusRouteImport.update({
+  id: '/server-status',
+  path: '/server-status',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminStorageRoute = AdminStorageRouteImport.update({
+  id: '/storage',
+  path: '/storage',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AuthenticatedAssetsIndexRoute =
@@ -164,15 +165,26 @@ const AuthenticatedAssetsIndexRoute =
     path: '/assets/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedErrorsErrorRoute =
+  AuthenticatedErrorsErrorRouteImport.update({
+    id: '/errors/$error',
+    path: '/errors/$error',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AdminWorkflowIndexRoute = AdminWorkflowIndexRouteImport.update({
+  id: '/workflow/',
+  path: '/workflow/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminWorkflowWorkflowIdRoute = AdminWorkflowWorkflowIdRouteImport.update({
   id: '/admin_/workflow/$workflowId',
   path: '/admin/workflow/$workflowId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedErrorsErrorRoute =
-  AuthenticatedErrorsErrorRouteImport.update({
-    id: '/errors/$error',
-    path: '/errors/$error',
+const AuthenticatedAssetsCgDetailsRoute =
+  AuthenticatedAssetsCgDetailsRouteImport.update({
+    id: '/assets/cg/details',
+    path: '/assets/cg/details',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAssetsDetailsDetailsRoute =
@@ -181,14 +193,9 @@ const AuthenticatedAssetsDetailsDetailsRoute =
     path: '/assets/details/details',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedAssetsCgDetailsRoute =
-  AuthenticatedAssetsCgDetailsRouteImport.update({
-    id: '/assets/cg/details',
-    path: '/assets/cg/details',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/sign-in': typeof authSignInRoute
   '/401': typeof errors401Route
@@ -213,12 +220,13 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/admin/workflow/$workflowId': typeof AdminWorkflowWorkflowIdRoute
-  '/assets': typeof AuthenticatedAssetsIndexRoute
-  '/admin/workflow': typeof AdminWorkflowIndexRoute
+  '/assets/': typeof AuthenticatedAssetsIndexRoute
+  '/admin/workflow/': typeof AdminWorkflowIndexRoute
   '/assets/cg/details': typeof AuthenticatedAssetsCgDetailsRoute
   '/assets/details/details': typeof AuthenticatedAssetsDetailsDetailsRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/sign-in': typeof authSignInRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
@@ -249,6 +257,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/(auth)/sign-in': typeof authSignInRoute
@@ -282,6 +291,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/admin'
     | '/sign-in'
     | '/401'
@@ -306,12 +316,13 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/errors/$error'
     | '/admin/workflow/$workflowId'
-    | '/assets'
-    | '/admin/workflow'
+    | '/assets/'
+    | '/admin/workflow/'
     | '/assets/cg/details'
     | '/assets/details/details'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/sign-in'
     | '/401'
     | '/403'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/assets/details/details'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/admin'
     | '/(auth)/sign-in'
@@ -373,6 +385,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   authSignInRoute: typeof authSignInRoute
@@ -386,158 +399,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/storage': {
-      id: '/admin/storage'
-      path: '/storage'
-      fullPath: '/admin/storage'
-      preLoaderRoute: typeof AdminStorageRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/server-status': {
-      id: '/admin/server-status'
-      path: '/server-status'
-      fullPath: '/admin/server-status'
-      preLoaderRoute: typeof AdminServerStatusRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/roles': {
-      id: '/admin/roles'
-      path: '/roles'
-      fullPath: '/admin/roles'
-      preLoaderRoute: typeof AdminRolesRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/permissions': {
-      id: '/admin/permissions'
-      path: '/permissions'
-      fullPath: '/admin/permissions'
-      preLoaderRoute: typeof AdminPermissionsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/notifications': {
-      id: '/admin/notifications'
-      path: '/notifications'
-      fullPath: '/admin/notifications'
-      preLoaderRoute: typeof AdminNotificationsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/logs': {
-      id: '/admin/logs'
-      path: '/logs'
-      fullPath: '/admin/logs'
-      preLoaderRoute: typeof AdminLogsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/field-groups': {
-      id: '/admin/field-groups'
-      path: '/field-groups'
-      fullPath: '/admin/field-groups'
-      preLoaderRoute: typeof AdminFieldGroupsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/display-panels': {
-      id: '/admin/display-panels'
-      path: '/display-panels'
-      fullPath: '/admin/display-panels'
-      preLoaderRoute: typeof AdminDisplayPanelsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/database': {
-      id: '/admin/database'
-      path: '/database'
-      fullPath: '/admin/database'
-      preLoaderRoute: typeof AdminDatabaseRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/data-fields': {
-      id: '/admin/data-fields'
-      path: '/data-fields'
-      fullPath: '/admin/data-fields'
-      preLoaderRoute: typeof AdminDataFieldsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/dashboard': {
-      id: '/admin/dashboard'
-      path: '/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/_authenticated/category': {
-      id: '/_authenticated/category'
-      path: '/category'
-      fullPath: '/category'
-      preLoaderRoute: typeof AuthenticatedCategoryRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/(errors)/503': {
-      id: '/(errors)/503'
-      path: '/503'
-      fullPath: '/503'
-      preLoaderRoute: typeof errors503RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(errors)/500': {
-      id: '/(errors)/500'
-      path: '/500'
-      fullPath: '/500'
-      preLoaderRoute: typeof errors500RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(errors)/404': {
-      id: '/(errors)/404'
-      path: '/404'
-      fullPath: '/404'
-      preLoaderRoute: typeof errors404RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(errors)/403': {
-      id: '/(errors)/403'
-      path: '/403'
-      fullPath: '/403'
-      preLoaderRoute: typeof errors403RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(errors)/401': {
-      id: '/(errors)/401'
-      path: '/401'
-      fullPath: '/401'
-      preLoaderRoute: typeof errors401RouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/sign-in': {
@@ -547,26 +427,152 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/workflow/': {
-      id: '/admin/workflow/'
-      path: '/workflow'
-      fullPath: '/admin/workflow'
-      preLoaderRoute: typeof AdminWorkflowIndexRouteImport
+    '/(errors)/401': {
+      id: '/(errors)/401'
+      path: '/401'
+      fullPath: '/401'
+      preLoaderRoute: typeof errors401RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(errors)/403': {
+      id: '/(errors)/403'
+      path: '/403'
+      fullPath: '/403'
+      preLoaderRoute: typeof errors403RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(errors)/404': {
+      id: '/(errors)/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof errors404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(errors)/500': {
+      id: '/(errors)/500'
+      path: '/500'
+      fullPath: '/500'
+      preLoaderRoute: typeof errors500RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(errors)/503': {
+      id: '/(errors)/503'
+      path: '/503'
+      fullPath: '/503'
+      preLoaderRoute: typeof errors503RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/category': {
+      id: '/_authenticated/category'
+      path: '/category'
+      fullPath: '/category'
+      preLoaderRoute: typeof AuthenticatedCategoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/data-fields': {
+      id: '/admin/data-fields'
+      path: '/data-fields'
+      fullPath: '/admin/data-fields'
+      preLoaderRoute: typeof AdminDataFieldsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/database': {
+      id: '/admin/database'
+      path: '/database'
+      fullPath: '/admin/database'
+      preLoaderRoute: typeof AdminDatabaseRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/display-panels': {
+      id: '/admin/display-panels'
+      path: '/display-panels'
+      fullPath: '/admin/display-panels'
+      preLoaderRoute: typeof AdminDisplayPanelsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/field-groups': {
+      id: '/admin/field-groups'
+      path: '/field-groups'
+      fullPath: '/admin/field-groups'
+      preLoaderRoute: typeof AdminFieldGroupsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/permissions': {
+      id: '/admin/permissions'
+      path: '/permissions'
+      fullPath: '/admin/permissions'
+      preLoaderRoute: typeof AdminPermissionsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/server-status': {
+      id: '/admin/server-status'
+      path: '/server-status'
+      fullPath: '/admin/server-status'
+      preLoaderRoute: typeof AdminServerStatusRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/storage': {
+      id: '/admin/storage'
+      path: '/storage'
+      fullPath: '/admin/storage'
+      preLoaderRoute: typeof AdminStorageRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/_authenticated/assets/': {
       id: '/_authenticated/assets/'
       path: '/assets'
-      fullPath: '/assets'
+      fullPath: '/assets/'
       preLoaderRoute: typeof AuthenticatedAssetsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/admin_/workflow/$workflowId': {
-      id: '/admin_/workflow/$workflowId'
-      path: '/admin/workflow/$workflowId'
-      fullPath: '/admin/workflow/$workflowId'
-      preLoaderRoute: typeof AdminWorkflowWorkflowIdRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
@@ -575,18 +581,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/assets/details/details': {
-      id: '/_authenticated/assets/details/details'
-      path: '/assets/details/details'
-      fullPath: '/assets/details/details'
-      preLoaderRoute: typeof AuthenticatedAssetsDetailsDetailsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/admin/workflow/': {
+      id: '/admin/workflow/'
+      path: '/workflow'
+      fullPath: '/admin/workflow/'
+      preLoaderRoute: typeof AdminWorkflowIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin_/workflow/$workflowId': {
+      id: '/admin_/workflow/$workflowId'
+      path: '/admin/workflow/$workflowId'
+      fullPath: '/admin/workflow/$workflowId'
+      preLoaderRoute: typeof AdminWorkflowWorkflowIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/assets/cg/details': {
       id: '/_authenticated/assets/cg/details'
       path: '/assets/cg/details'
       fullPath: '/assets/cg/details'
       preLoaderRoute: typeof AuthenticatedAssetsCgDetailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/assets/details/details': {
+      id: '/_authenticated/assets/details/details'
+      path: '/assets/details/details'
+      fullPath: '/assets/details/details'
+      preLoaderRoute: typeof AuthenticatedAssetsDetailsDetailsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -653,6 +673,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   authSignInRoute: authSignInRoute,

@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -50,12 +49,6 @@ export function CreateNewDropdown() {
               Tạo thiết kế
             </DropdownMenuItem>
 
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to="/">
-                Tạo CG
-              </Link>
-            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

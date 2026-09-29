@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2, ChevronLeft, Play, Pause, ChevronRight, X } from "lucide-react"
 import {
-    AssetDetailResponse,
+    type AssetDetailResponse,
     fetchAssetDetail,
-    Field,
+    type Field,
     getDisplayValue,
-    WorkflowHistory,
+    type WorkflowHistory,
 } from "../api/get-asset"
 import { parseDatasource } from "../api/create"
 import { env } from "@/config/env"

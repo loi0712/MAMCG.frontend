@@ -15,7 +15,12 @@ export function getCookie(name: string): string | undefined {
   const parts = value.split(`; ${name}=`)
   if (parts.length === 2) {
     const cookieValue = parts.pop()?.split(';').shift()
-    return cookieValue
+    if (cookieValue === undefined) return undefined
+    try {
+      return decodeURIComponent(cookieValue)
+    } catch {
+      return cookieValue
+    }
   }
   return undefined
 }
@@ -30,7 +35,7 @@ export function setCookie(
 ): void {
   if (typeof document === 'undefined') return
 
-  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}`
+  document.cookie = `${name}=${encodeURIComponent(value)}; ${cookieAttributes(maxAge)}`
 }
 
 /**
@@ -39,5 +44,11 @@ export function setCookie(
 export function removeCookie(name: string): void {
   if (typeof document === 'undefined') return
 
-  document.cookie = `${name}=; path=/; max-age=0`
+  document.cookie = `${name}=; ${cookieAttributes(0)}`
+}
+
+// SameSite=Lax chặn gửi cookie trong request cross-site; Secure khi chạy HTTPS
+function cookieAttributes(maxAge: number): string {
+  const secure = window.location.protocol === 'https:' ? '; Secure' : ''
+  return `path=/; max-age=${maxAge}; SameSite=Lax${secure}`
 }

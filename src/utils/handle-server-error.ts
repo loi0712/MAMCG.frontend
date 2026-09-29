@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 export function handleServerError(error: unknown) {
    
-  console.log(error)
+  if (import.meta.env.DEV) console.error(error)
 
   let errMsg = 'Something went wrong!'
 

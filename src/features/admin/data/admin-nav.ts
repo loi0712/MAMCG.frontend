@@ -26,6 +26,8 @@ export type AdminNavItem = {
   icon: LucideIcon
   pageTitle: string
   pageSubtitle?: string
+  // Đã nối API thật của MAMCG.Backend; false = đang hiển thị dữ liệu minh hoạ
+  hasApi?: boolean
 }
 
 export type AdminNavSection = {
@@ -89,18 +91,21 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Tài khoản',
         url: '/admin/users',
+        hasApi: true,
         icon: Users,
         pageTitle: 'Quản lý người dùng và quyền truy cập',
       },
       {
         title: 'Nhóm quyền',
         url: '/admin/roles',
+        hasApi: true,
         icon: Shield,
         pageTitle: 'Cấu hình nhóm quyền và phân quyền',
       },
       {
         title: 'Phân quyền',
         url: '/admin/permissions',
+        hasApi: true,
         icon: Activity,
         pageTitle: 'Phân quyền chi tiết cho người dùng',
       },
@@ -132,12 +137,14 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Trường dữ liệu',
         url: '/admin/data-fields',
+        hasApi: true,
         icon: FileText,
         pageTitle: 'Cấu hình các trường dữ liệu tùy chỉnh',
       },
       {
         title: 'Panel hiển thị',
         url: '/admin/display-panels',
+        hasApi: true,
         icon: PanelLeft,
         pageTitle: 'Tùy chỉnh giao diện hiển thị',
       },

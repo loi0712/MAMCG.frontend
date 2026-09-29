@@ -25,7 +25,7 @@ export const Route = createFileRoute('/_authenticated/assets/cg/details')({
     errorComponent: ({ error }) => (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center space-y-4">
-                <p className="text-sm text-red-600">{error.message}</p>
+                <p className="text-sm text-red-600">{error instanceof Error ? error.message : "Đã xảy ra lỗi"}</p>
                 <button
                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
                     onClick={() => window.location.reload()}

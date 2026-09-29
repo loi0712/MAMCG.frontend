@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { useDeleteFolder } from './api/delete-folder'
 import { toast } from 'sonner'
-import { Folder } from './api/get-folder-details'
+import { type Folder } from './Folder-action-dialog'
 import { urls } from '@/routes/urls'
 import { useNavigate } from '@tanstack/react-router'
 

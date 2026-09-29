@@ -3,7 +3,7 @@
 // ===========================================
 
 import { axios } from "@/shared/lib/axios";
-import { DynamicField, FieldsJSONItem } from "./create";
+import { type DynamicField, type FieldsJSONItem } from "./create";
 import { apiUrls } from "@/api/config/endpoints";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -111,7 +111,7 @@ export const useUpdateAsset = () => {
     return useMutation({
         mutationFn: ({ assetId, data }: { assetId: string; data : UpdateAssetRequest }) => 
             updateAssetWithFields(assetId, data),
-        onSuccess: (data, variables) => {
+        onSuccess: (_data, variables) => {
             // Invalidate relevant queries
             queryClient.invalidateQueries({ queryKey: ['assets'] });
             queryClient.invalidateQueries({ queryKey: ['asset-detail', variables.assetId] });
@@ -201,7 +201,7 @@ export const useUpdateAssetOptimistic = () => {
         },
         
         // If mutation fails, rollback
-        onError: (err, variables, context) => {
+        onError: (_err, variables, context) => {
             if (context?.previousAsset) {
                 queryClient.setQueryData(
                     ['asset-detail', variables.assetId],
@@ -211,7 +211,7 @@ export const useUpdateAssetOptimistic = () => {
         },
         
         // Always refetch after error or success
-        onSettled: (data, error, variables) => {
+        onSettled: (_data, _error, variables) => {
             queryClient.invalidateQueries({ queryKey: ['asset-detail', variables.assetId] });
         }
     });

@@ -1,5 +1,5 @@
 import { axios } from "@/shared/lib/axios";
-import { AuthResponse } from "../../types/auth";
+import { type AuthResponse } from "../../types/auth";
 import { apiUrls } from "@/api/config/endpoints";
 
 export type LoginCredentialsDTO = {

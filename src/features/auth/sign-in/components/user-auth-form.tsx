@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
-import { LoginCredentialsDTO, loginWithEmailAndPassword } from '../api/sign-in'
+import { type LoginCredentialsDTO, loginWithEmailAndPassword } from '../api/sign-in'
 
 const formSchema = z.object({
   userName: z.string().min(1, 'Vui lòng nhập tên đăng nhập'),

@@ -1,81 +1,58 @@
-// import type { AuthResponse } from "@/features/auth/types/auth";
-import type {InternalAxiosRequestConfig } from "axios";
+import Axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import { toast } from 'sonner'
 
-import Axios from 'axios';
-
-import { env } from "@/config/env";
-import { useAuthStore } from "@/stores/auth-store";
-// import { apiUrls } from '@/api/config/endpoints';
-// import { paths } from "@/routes/path"
+import { env } from '@/config/env'
+import { apiUrls } from '@/api/config/endpoints'
+import { useAuthStore } from '@/stores/auth-store'
 
 export const axios = Axios.create({
-    baseURL: env.apiUrl,
+  baseURL: env.apiUrl,
 })
 
 const onRequestSuccess = (config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().auth.accessToken
-  
-    if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`)
-    }
-  
-    config.headers.set('Accept', 'application/json')
-  
-    return config
+  const token = useAuthStore.getState().auth.accessToken
+
+  if (token) {
+    config.headers.set('Authorization', `Bearer ${token}`)
   }
 
-// If the error status is 401 and there is no originalRequest._retry flag,
-// it means the token has expired, and we need to refresh it
-// const shouldRefreshToken = (error: AxiosError) => {
-//     const originalRequest = error.config as TOriginalRequest;
-//     const isUnauthorized = error.response?.status === 401;
-  
-//     return isUnauthorized && !originalRequest._retry;
-//   };
+  config.headers.set('Accept', 'application/json')
 
-//   type TOriginalRequest = {
-//     _retry: boolean;
-//   } & InternalAxiosRequestConfig;
+  return config
+}
 
 axios.interceptors.request.use(onRequestSuccess, (error) => Promise.reject(error))
-//   axios.interceptors.response.use(
-//     response => response,
-//     async (error: AxiosError) => {
-//       if (shouldRefreshToken(error)) {
-//         const refreshToken = storage.getRefreshToken();
-  
-//         if (window.location.pathname === paths.login) return Promise.reject(error);
-  
-//         if (refreshToken) {
-//           let originalRequest = error.config as TOriginalRequest;
-  
-//           originalRequest = {
-//             ...originalRequest,
-//             _retry: true,
-//           };
-  
-//           try {
-//             const response = await axios.post<AuthResponse>(apiUrls.auth.refreshToken, { refreshToken });
-//             const { accessToken } = response.data.data;
-  
-//             const authResponse = await handleAuthResponse(response.data);
-  
-//             queryClient.setQueryData(['authenticated-user'], authResponse);
-  
-//             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-  
-//             return axios(originalRequest);
-//           } catch (refreshError) {
-//             logoutFn();
-//             window.location.assign(window.location.origin);
-//           }
-//         } else {
-//           logoutFn();
-//           window.location.assign(window.location.origin);
-//         }
-//       }
-  
-//       return Promise.reject(error);
-//     },
-//   );
-  
+
+// Nhiều request có thể cùng trả 401: chỉ xử lý đăng xuất một lần
+let isHandlingUnauthorized = false
+
+async function handleUnauthorized() {
+  if (isHandlingUnauthorized) return
+  isHandlingUnauthorized = true
+
+  try {
+    useAuthStore.getState().auth.reset()
+    toast.error('Phiên đăng nhập đã hết hạn!')
+
+    // Import động để tránh vòng phụ thuộc với main.tsx
+    const { router } = await import('@/main')
+    const currentPath = window.location.pathname + window.location.search
+    if (window.location.pathname !== '/sign-in') {
+      await router.navigate({ to: '/sign-in', search: { redirect: currentPath } })
+    }
+  } finally {
+    isHandlingUnauthorized = false
+  }
+}
+
+// 401 cho mọi request (query lẫn mutation), trừ chính request đăng nhập
+axios.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    const isLoginRequest = error.config?.url === apiUrls.auth.login
+    if (error.response?.status === 401 && !isLoginRequest) {
+      void handleUnauthorized()
+    }
+    return Promise.reject(error)
+  }
+)

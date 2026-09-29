@@ -1,9 +1,31 @@
 import { create } from 'zustand'
 import { getCookie, setCookie, removeCookie } from '@/shared/lib/cookies'
-import { AuthUser } from '@/features/auth/types/auth'
+import { type AuthUser } from '@/features/auth/types/auth'
 
-const ACCESS_TOKEN = 'thisisjustarandomstring'
-const USER_INFO = 'user_info' // Thêm key cho user info
+const ACCESS_TOKEN = 'mamcg_access_token'
+const USER_INFO = 'mamcg_user'
+
+// Đọc JSON từ cookie; cookie hỏng thì coi như chưa có
+function readJsonCookie<T>(name: string): T | null {
+  const raw = getCookie(name)
+  if (!raw) return null
+  try {
+    return JSON.parse(raw) as T
+  } catch {
+    removeCookie(name)
+    return null
+  }
+}
+
+// JWT đã hết hạn (theo claim exp) thì không dùng lại
+export function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now()
+  } catch {
+    return false
+  }
+}
 
 interface AuthState {
   auth: {
@@ -18,13 +40,15 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()((set) => {
-  // Restore token từ cookie
-  const cookieState = getCookie(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
-  
-  // Restore user từ cookie/localStorage
-  const userState = getCookie(USER_INFO)
-  const initUser = userState ? JSON.parse(userState) : null
+  // Restore token + user từ cookie, bỏ qua token đã hết hạn
+  let initToken = readJsonCookie<string>(ACCESS_TOKEN) ?? ''
+  let initUser = readJsonCookie<AuthUser>(USER_INFO)
+  if (initToken && isTokenExpired(initToken)) {
+    removeCookie(ACCESS_TOKEN)
+    removeCookie(USER_INFO)
+    initToken = ''
+    initUser = null
+  }
   
   return {
     auth: {

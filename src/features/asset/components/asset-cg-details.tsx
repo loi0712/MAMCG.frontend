@@ -174,19 +174,6 @@ export function AssetCgDetailPage() {
             return;
         }
 
-        // Comprehensive logging
-        console.group('🎬 Form Submission');
-        console.log('Current Scene Index:', currentSceneIndex);
-        console.log('Current Scene Data:', currentSceneData);
-        console.table({
-            'Scene Name': currentSceneData.sceneName,
-            'Scene Path': currentSceneData.scenePath,
-            'Preview Path': currentSceneData.previewPath,
-            'Preview Type': currentSceneData.previewType,
-        });
-        console.log('Variables:', currentSceneData.variables);
-        console.groupEnd();
-
         previewCg(currentSceneData, {
             onSuccess: (response) => {
                 // Update the form with the new previewPath if successful

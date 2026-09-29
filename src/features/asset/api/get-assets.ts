@@ -18,6 +18,7 @@ export interface AssetField {
     id: number;
     fieldName: string;
     displayName: string;
+    dataType: string;
     value: string;
     color: string;
 }

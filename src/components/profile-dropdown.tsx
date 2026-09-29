@@ -19,13 +19,13 @@ export function ProfileDropdown() {
   const user = useAuthStore((state: any) => state.auth.user)
 
   const displayName = user?.fullName || 'Người dùng'
-  const email = user?.email || 'user@example.com'
+  const email = user?.email || ''
   const avatarSrc = user?.imageUrl
-  const avatarFallback = displayName
-    .split(' ')
-    .map((n: any) => n[0])
-    .join('')
-    .toUpperCase()
+  // Tối đa 2 chữ cái (chữ đầu của họ và tên) để vừa ảnh đại diện
+  const words = displayName.trim().split(/\s+/)
+  const avatarFallback = (
+    words.length > 1 ? words[0][0] + words[words.length - 1][0] : words[0].slice(0, 2)
+  ).toUpperCase()
 
   return (
     <>
@@ -47,22 +47,6 @@ export function ProfileDropdown() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem asChild>
-              <Link to="/">
-                Hồ sơ cá nhân
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/">
-                Thanh toán
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/">
-                Cài đặt
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>Nhóm mới</DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/admin">
                 Quản trị hệ thống

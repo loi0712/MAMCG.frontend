@@ -1,5 +1,5 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { DynamicField, getFieldKey, getSelectItems } from "../api/create"
+import { type DynamicField, getFieldKey, getSelectItems } from "../api/create"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { SelectDropdown } from "@/components/select-dropdown"

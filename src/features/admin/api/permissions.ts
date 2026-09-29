@@ -1,0 +1,86 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { apiUrls } from '@/api/config/endpoints'
+import { axios } from '@/shared/lib/axios'
+
+// ===========================================
+// TYPES (Identity: PermissionDto, UserGroupACEDto, CreateACEDto)
+// ===========================================
+
+export type TargetType = 'USER' | 'GROUP'
+
+export interface Permission {
+  id: number
+  name: string | null
+  description: string | null
+  childrens: Permission[] | null
+}
+
+export interface TargetPermission {
+  targetType: TargetType
+  targetId: string | null
+  // Danh sách id quyền, phân tách bởi dấu phẩy
+  permissionIds: string
+}
+
+export interface TargetPermissionResponse {
+  permission: TargetPermission | null
+  permissionTree: Permission[]
+}
+
+export interface SavePermissionRequest {
+  targetType: TargetType
+  targetId: string
+  // Backend parse bằng int.Parse: không được rỗng
+  permissionIds: string
+}
+
+// ===========================================
+// API FUNCTIONS
+// ===========================================
+
+export const getTargetPermissions = async (targetType: TargetType, targetId: string) => {
+  const res = await axios.get<TargetPermissionResponse>(apiUrls.permission.byTarget, {
+    params: { targetType, targetId },
+  })
+  return res.data
+}
+
+export const savePermissions = async (data: SavePermissionRequest) => {
+  const res = await axios.post<boolean>(apiUrls.permission.create, data)
+  return res.data
+}
+
+// ===========================================
+// CUSTOM HOOKS
+// ===========================================
+
+export const useTargetPermissions = (targetType: TargetType, targetId: string | null) =>
+  useQuery({
+    queryKey: ['admin-permissions', targetType, targetId],
+    queryFn: () => getTargetPermissions(targetType, targetId!),
+    enabled: !!targetId,
+  })
+
+export const useSavePermissions = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: savePermissions,
+    onSuccess: (_data, variables) => {
+      toast.success('Đã lưu phân quyền')
+      queryClient.invalidateQueries({
+        queryKey: ['admin-permissions', variables.targetType, variables.targetId],
+      })
+    },
+  })
+}
+
+// Id của mọi quyền trong cây (kể cả quyền con)
+export const flattenPermissionIds = (tree: Permission[]): number[] =>
+  tree.flatMap((p) => [p.id, ...flattenPermissionIds(p.childrens ?? [])])
+
+export const parsePermissionIds = (ids: string | null | undefined): number[] =>
+  (ids ?? '')
+    .split(',')
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n > 0)

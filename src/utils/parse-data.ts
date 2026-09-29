@@ -1,4 +1,4 @@
-import { DataSource } from "@/features/asset/api/create";
+import { type DataSource } from "@/features/asset/api/create";
 
 /**
  * Parse datasource JSON string to array of DataSource objects

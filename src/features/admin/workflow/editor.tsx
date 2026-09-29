@@ -5,9 +5,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { useState, useRef, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { FlowchartNode, NodeData } from './components/flowchart-node';
+import { FlowchartNode, type NodeData } from './components/flowchart-node';
 import { NodeConfigPanel } from './components/node-config-panel';
-import { FlowchartShapeType } from './components/flowchart-shapes';
+import { type FlowchartShapeType } from './components/flowchart-shapes';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 

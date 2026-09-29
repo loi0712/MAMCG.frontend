@@ -1,4 +1,4 @@
-import { FLOWCHART_SHAPES, FlowchartShapeType } from './flowchart-shapes';
+import { FLOWCHART_SHAPES, type FlowchartShapeType } from './flowchart-shapes';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Trash2, Copy, Link2 } from 'lucide-react';
 

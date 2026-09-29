@@ -14,7 +14,6 @@ import { AppSidebar } from "@/components/layout/App-sidebar";
 import { SkipToMain } from "@/components/skip-to-main";
 import {
   sidebarData,
-  treeFolderData,
 } from "@/components/layout/data/sidebar-data";
 import { NavGroup } from "@/components/layout/Nav-group";
 import MamcgLogo from "@/assets/images/mamcg.png";
@@ -28,14 +27,14 @@ import {
   useMemo,
   memo,
 } from "react";
-import { Tree, NodeRendererProps } from "react-arborist";
-import { TreeNodeData } from "@/components/layout/Types";
+import { Tree, type NodeRendererProps } from "react-arborist";
+import { type TreeNodeData } from "@/components/layout/Types";
 import { Header } from "@/components/layout/Header";
 import { useFolders } from "@/components/layout/api/get-folders";
 import {
-  TFolder,
-  TFoldersResponse,
-  TQueryKeys,
+  type TFolder,
+  type TFoldersResponse,
+  type TQueryKeys,
 } from "@/components/layout/types/folders";
 import EmptyAreaContextMenu from "../ui/emptyAreaContextMenu";
 import { FoldersDialogs } from "./Folder-dialogs";
@@ -269,11 +268,7 @@ function AuthenticatedLayoutContent({
   });
 
   useEffect(() => {
-    if (data) {
-      setTreeFolder(mapFoldersToTreeData(data));
-    } else {
-      setTreeFolder(mapFoldersToTreeData(treeFolderData));
-    }
+    setTreeFolder(data ? mapFoldersToTreeData(data) : []);
   }, [data]);
 
   useEffect(() => {
