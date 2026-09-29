@@ -6,6 +6,7 @@ interface ImportMetaEnv {
     readonly VITE_DEBUG_MODE: string
     readonly VITE_ENV: string
     readonly VITE_APP_NAME: string
+    readonly VITE_ENABLE_MOCKS?: string
   }
   
   interface ImportMeta {

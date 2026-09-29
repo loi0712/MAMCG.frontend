@@ -59,7 +59,15 @@ router.update({
 // ============================================================================
 const rootElement = document.getElementById('root')!
 
+// API giả lập (MSW) khi dev không có backend: VITE_ENABLE_MOCKS=true
+async function enableMocking() {
+  if (!import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCKS !== 'true') return
+  const { worker } = await import('@/mocks/browser')
+  await worker.start({ onUnhandledRequest: 'bypass' })
+}
+
 if (!rootElement.innerHTML) {
+  await enableMocking()
   const root = createRoot(rootElement)
   
   root.render(
