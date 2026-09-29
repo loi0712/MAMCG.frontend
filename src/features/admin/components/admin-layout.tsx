@@ -1,4 +1,6 @@
 import { Outlet, useLocation } from '@tanstack/react-router'
+import { Info } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { findAdminNav } from '../data/admin-nav'
 import { AdminSidebar } from './admin-sidebar'
 import { AdminTopNav } from './admin-top-nav'
@@ -24,6 +26,14 @@ export function AdminLayout() {
           ))}
 
         <main className='flex-1 overflow-auto p-4'>
+          {item && !item.hasApi && (
+            <Alert className='mb-4'>
+              <Info className='h-4 w-4' />
+              <AlertDescription>
+                Dữ liệu minh hoạ: MAMCG.Backend chưa có API cho màn hình này, các thay đổi không được lưu.
+              </AlertDescription>
+            </Alert>
+          )}
           <Outlet />
         </main>
       </div>
