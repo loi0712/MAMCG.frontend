@@ -13,12 +13,11 @@ import {
   AlertDialogHeader, 
   AlertDialogTitle 
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
 
 interface DataField {
@@ -455,25 +454,23 @@ export function FieldGroupsView() {
           </TableHeader>
           <TableBody>
             {filteredGroups.map((group) => (
-              <Collapsible
-                key={group.id}
-                open={expandedGroups.has(group.id)}
-                onOpenChange={() => group.fieldCount > 0 && toggleExpand(group.id)}
-                asChild
-              >
-                <>
+              <Fragment key={group.id}>
                   <TableRow className="border-border hover:bg-accent">
                     <TableCell>
                       {group.fieldCount > 0 ? (
-                        <CollapsibleTrigger asChild>
-                          <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="p-0 h-auto hover:bg-transparent"
+                            aria-expanded={expandedGroups.has(group.id)}
+                            onClick={() => toggleExpand(group.id)}
+                          >
                             {expandedGroups.has(group.id) ? (
                               <ChevronDown className="w-4 h-4 text-primary" />
                             ) : (
                               <ChevronRight className="w-4 h-4 text-muted-foreground" />
                             )}
                           </Button>
-                        </CollapsibleTrigger>
                       ) : (
                         <GripVertical className="w-4 h-4 text-muted-foreground cursor-move ml-1" />
                       )}
@@ -525,8 +522,7 @@ export function FieldGroupsView() {
                   </TableRow>
 
                   {/* Expanded Fields Section */}
-                  {group.fields && group.fields.length > 0 && (
-                    <CollapsibleContent asChild>
+                  {expandedGroups.has(group.id) && group.fields && group.fields.length > 0 && (
                       <tr>
                         <td colSpan={8} className="p-0">
                           <div className="bg-muted border-t border-border">
@@ -576,10 +572,8 @@ export function FieldGroupsView() {
                           </div>
                         </td>
                       </tr>
-                    </CollapsibleContent>
                   )}
-                </>
-              </Collapsible>
+              </Fragment>
             ))}
           </TableBody>
         </Table>
