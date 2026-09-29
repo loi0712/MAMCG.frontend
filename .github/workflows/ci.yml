@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint:check
+
+      # Báo lỗi khi src/api/generated/schema.ts lệch với openapi/mamcg-api.json
+      - name: Check API types
+        run: yarn api:types:check
+
+      - name: Build
+        run: yarn build
+        env:
+          VITE_API_URL: http://localhost:5080
