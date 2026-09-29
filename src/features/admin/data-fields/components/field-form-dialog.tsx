@@ -149,7 +149,7 @@ export function FieldFormDialog({ open, onOpenChange, field, dataTypes }: FieldF
                   </Select>
                   {dataTypes.length === 0 && (
                     <FormDescription>
-                      Chưa có kiểu dữ liệu nào: backend chưa có API liệt kê kiểu dữ liệu.
+                      Chưa có kiểu dữ liệu nào trong hệ thống.
                     </FormDescription>
                   )}
                   <FormMessage />

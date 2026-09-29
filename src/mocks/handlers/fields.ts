@@ -13,6 +13,8 @@ export const fieldHandlers = [
     return HttpResponse.json({ fields: page.map((f) => ({ id: f.id, name: f.displayName })), totalCount })
   }),
 
+  http.get(api(apiUrls.field.dataTypes), () => HttpResponse.json(dataTypes)),
+
   http.get(api(apiUrls.field.details(id)), ({ params }) => {
     const field = fields.find((f) => f.id === Number(params.id))
     return field ? HttpResponse.json(field) : notFound()

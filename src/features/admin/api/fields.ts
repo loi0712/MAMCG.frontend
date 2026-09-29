@@ -52,6 +52,11 @@ export const getFields = async (params: PagedParams) => {
   return res.data
 }
 
+export const getDataTypes = async () => {
+  const res = await axios.get<DataType[]>(apiUrls.field.dataTypes)
+  return res.data
+}
+
 export const getField = async (id: number) => {
   const res = await axios.get<FieldDetail>(apiUrls.field.details(id))
   return res.data
@@ -82,6 +87,9 @@ export const useFields = (params: PagedParams) =>
     queryFn: () => getFields(params),
     placeholderData: keepPreviousData,
   })
+
+export const useDataTypes = () =>
+  useQuery({ queryKey: ['admin-data-types'], queryFn: getDataTypes, staleTime: 5 * 60 * 1000 })
 
 // API danh sách chỉ trả id + tên: lấy chi tiết cho các trường đang hiển thị
 export const useFieldDetails = (ids: number[]) =>

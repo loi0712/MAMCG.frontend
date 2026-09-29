@@ -1,20 +1,13 @@
-import { FLOWCHART_SHAPES, type FlowchartShapeType } from './flowchart-shapes';
+import { FLOWCHART_SHAPES } from './flowchart-shapes';
+import type { NodeData } from './flowchart-layout';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Trash2, Copy, Link2 } from 'lucide-react';
 
-export interface NodeData {
-  id: string;
-  type: string;
-  label: string;
-  description?: string;
-  shapeType: FlowchartShapeType;
-  color: string;
-  strokeColor: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  config?: Record<string, any>;
+export type { NodeData }
+
+export interface NodeTag {
+  label: string
+  className: string
 }
 
 interface FlowchartNodeProps {
@@ -27,6 +20,8 @@ interface FlowchartNodeProps {
   onStartConnection: () => void;
   onDragStart?: (e: React.MouseEvent) => void;
   scale?: number;
+  // Nhãn nhỏ phía trên nút (vd. trạng thái bắt đầu/kết thúc, chưa liên kết)
+  tags?: NodeTag[];
 }
 
 export function FlowchartNode({
@@ -38,6 +33,7 @@ export function FlowchartNode({
   onDuplicate,
   onStartConnection,
   onDragStart,
+  tags = [],
 }: FlowchartNodeProps) {
   const ShapeComponent = FLOWCHART_SHAPES[node.shapeType];
 
@@ -67,6 +63,17 @@ export function FlowchartNode({
       >
         <GripVertical className="w-3 h-3 text-muted-foreground" />
       </div>
+
+      {/* Tags */}
+      {tags.length > 0 && (
+        <div className="absolute -top-5 left-0 flex gap-1 pointer-events-none">
+          {tags.map((tag) => (
+            <span key={tag.label} className={`rounded px-1.5 py-px text-[9px] leading-tight whitespace-nowrap ${tag.className}`}>
+              {tag.label}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Shape */}
       <div 
@@ -102,10 +109,10 @@ export function FlowchartNode({
         </div>
 
         {/* Connection points */}
-        <div className="connection-point absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Top connection" />
-        <div className="connection-point absolute top-1/2 -right-2 transform -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Right connection" />
-        <div className="connection-point absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Bottom connection" />
-        <div className="connection-point absolute top-1/2 -left-2 transform -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Left connection" />
+        <div className="connection-point absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Điểm nối" />
+        <div className="connection-point absolute top-1/2 -right-2 transform -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Điểm nối" />
+        <div className="connection-point absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Điểm nối" />
+        <div className="connection-point absolute top-1/2 -left-2 transform -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity cursor-crosshair" title="Điểm nối" />
       </div>
 
       {/* Action buttons */}

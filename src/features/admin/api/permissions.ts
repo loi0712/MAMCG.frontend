@@ -46,6 +46,16 @@ export const getTargetPermissions = async (targetType: TargetType, targetId: str
   return res.data
 }
 
+export interface MyAccess {
+  isAdmin: boolean
+}
+
+// Quyền "Quản trị hệ thống" (ADMIN) của người dùng đang đăng nhập
+export const getMyAccess = async () => {
+  const res = await axios.get<MyAccess>(apiUrls.permission.me)
+  return res.data
+}
+
 export const savePermissions = async (data: SavePermissionRequest) => {
   const res = await axios.post<boolean>(apiUrls.permission.create, data)
   return res.data
@@ -54,6 +64,9 @@ export const savePermissions = async (data: SavePermissionRequest) => {
 // ===========================================
 // CUSTOM HOOKS
 // ===========================================
+
+export const useMyAccess = () =>
+  useQuery({ queryKey: ['my-access'], queryFn: getMyAccess, staleTime: 5 * 60 * 1000 })
 
 export const useTargetPermissions = (targetType: TargetType, targetId: string | null) =>
   useQuery({

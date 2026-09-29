@@ -9,9 +9,9 @@ import { AdminListToolbar } from '../components/admin-list-toolbar'
 import { AdminPagination } from '../components/admin-pagination'
 import { AdminTableState } from '../components/admin-table-state'
 import {
-  type DataType,
   type FieldDetail,
   type FieldListItem,
+  useDataTypes,
   useDeleteField,
   useFieldDetails,
   useFields,
@@ -38,11 +38,11 @@ export function DataFieldsView() {
     return map
   }, [detailQueries])
 
-  const dataTypes = useMemo(() => {
-    const types = new Map<number, DataType>()
-    details.forEach((d) => d.dataType && types.set(d.dataType.id, d.dataType))
-    return [...types.values()].sort((a, b) => a.name.localeCompare(b.name))
-  }, [details])
+  const { data: dataTypeList } = useDataTypes()
+  const dataTypes = useMemo(
+    () => [...(dataTypeList ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+    [dataTypeList]
+  )
 
   const handleSearch = useCallback((term: string) => {
     setSearchTerm(term)

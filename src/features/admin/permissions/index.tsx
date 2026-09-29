@@ -81,7 +81,7 @@ export function PermissionsView() {
   }
 
   const save = () => {
-    if (!targetId || selected.size === 0) return
+    if (!targetId) return
     savePermissions.mutate({
       targetType,
       targetId,
@@ -128,7 +128,7 @@ export function PermissionsView() {
         <Button
           className='ms-auto'
           onClick={save}
-          disabled={!targetId || selected.size === 0 || savePermissions.isPending}
+          disabled={!targetId || savePermissions.isPending}
         >
           <Save className='h-4 w-4' />
           Lưu phân quyền
@@ -155,7 +155,7 @@ export function PermissionsView() {
               <PermissionNode key={node.id} node={node} selected={selected} onToggle={toggle} />
             ))}
             <p className='text-muted-foreground border-t px-2 pt-2 text-xs'>
-              Đã chọn {selected.size} quyền. Cần chọn ít nhất một quyền để lưu.
+              Đã chọn {selected.size} quyền. Lưu khi không chọn quyền nào sẽ thu hồi toàn bộ quyền chức năng của đối tượng này.
             </p>
           </>
         )}
