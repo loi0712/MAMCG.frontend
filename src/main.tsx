@@ -20,6 +20,9 @@ import { routeTree } from '@/routeTree.gen'
 // Styles
 import '@/styles/index.css'
 
+// Phiên đăng nhập: làm mới access token bằng refresh token
+import { ensureFreshSession, startSessionKeepAlive } from '@/shared/lib/axios'
+
 
 // ============================================================================
 // Create Router Instance & Export nó
@@ -59,15 +62,19 @@ router.update({
 // ============================================================================
 const rootElement = document.getElementById('root')!
 
-// API giả lập (MSW) khi dev không có backend: VITE_ENABLE_MOCKS=true
+// API giả lập (MSW) khi không có backend: VITE_ENABLE_MOCKS=true (dev, hoặc bản build cho E2E — yarn e2e).
+// Không bao giờ đặt biến này khi build bản triển khai.
 async function enableMocking() {
-  if (!import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCKS !== 'true') return
+  if (import.meta.env.VITE_ENABLE_MOCKS !== 'true') return
   const { worker } = await import('@/mocks/browser')
   await worker.start({ onUnhandledRequest: 'bypass' })
 }
 
 if (!rootElement.innerHTML) {
   await enableMocking()
+  // Access token hết hạn khi đóng trình duyệt: làm mới trước khi render (route guard, URL media)
+  await ensureFreshSession()
+  startSessionKeepAlive()
   const root = createRoot(rootElement)
   
   root.render(

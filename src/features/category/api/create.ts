@@ -46,16 +46,11 @@ export const useCreateCategory = () => {
   return useMutation({
     mutationFn: createCategory,
     onSuccess: () => {
-      toast.success('Tạo danh mục thành công!');
+      toast.success('Tạo chuyên mục thành công!');
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['category-group-list'] });
     },
-    onError: (error: any) => {
-      console.error('Error creating category:', error);
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-        console.error('Error status:', error.response.status);
-      }
-    },
+    // Lỗi (vd. trùng mã → 409) do onError mặc định của QueryClient thông báo
   });
 };

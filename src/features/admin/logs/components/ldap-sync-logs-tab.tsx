@@ -5,7 +5,6 @@ import { AdminPagination } from '../../components/admin-pagination'
 import { AdminTableState } from '../../components/admin-table-state'
 import { useLdapSyncLogs } from '../../api/logs'
 import {
-  downloadCsv,
   ExpandableText,
   ExportButton,
   formatDateTime,
@@ -34,18 +33,11 @@ export function LdapSyncLogsTab({ active }: { active: boolean }) {
   const { data, isLoading, isError } = useLdapSyncLogs({ pageNumber: page, pageSize: LOG_PAGE_SIZE }, active)
   const logs = data?.items ?? []
 
-  const handleExport = () =>
-    downloadCsv(
-      'nhat-ky-dong-bo-ldap',
-      ['Thời gian', 'Trạng thái', 'Người dùng', 'Nhóm', 'Nội dung'],
-      logs.map((l) => [formatDateTime(l.syncTime), l.status, l.usersSynced, l.groupsSynced, l.message])
-    )
-
   return (
     <div className='space-y-4'>
       <LogFilterCard>
         <p className='text-muted-foreground flex-1 text-sm'>Lịch sử các lần đồng bộ người dùng và nhóm từ LDAP.</p>
-        <ExportButton disabled={logs.length === 0} onClick={handleExport} />
+        <ExportButton kind='ldap-sync' params={{}} disabled={logs.length === 0} />
       </LogFilterCard>
 
       <LogTableCard>

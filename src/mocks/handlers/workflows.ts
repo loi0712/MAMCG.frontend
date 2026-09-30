@@ -11,6 +11,7 @@ import type {
   WorkflowTransition,
   WorkflowTransitionRequest,
 } from '@/features/admin/api/workflows'
+import { notificationTypes } from './notification-types'
 import { api, notFound, paginate } from './utils'
 
 // Mock quản trị quy trình (WorkflowDefinitionController): dữ liệu trong bộ nhớ,
@@ -48,15 +49,16 @@ const workflows: MockWorkflow[] = [
   { id: 2, name: 'Quy trình lưu trữ', description: null, isActive: false, usageKey: null, layoutJson: null, createdAt: now(), modifiedAt: now(), activeItemCount: 0 },
 ]
 
-const statuses: MockStatus[] = [
+// Dùng chung với mock "Công việc của tôi" (tasks.ts) và loại thông báo
+export const statuses: MockStatus[] = [
   { id: 1, workflowId: 1, name: 'Nháp', color: '#64748b', displayOrder: 1, description: null, isInitial: true, isFinal: false },
   { id: 2, workflowId: 1, name: 'Chờ duyệt', color: '#f59e0b', displayOrder: 2, description: null, isInitial: false, isFinal: false },
   { id: 3, workflowId: 1, name: 'Đã duyệt', color: '#22c55e', displayOrder: 3, description: null, isInitial: false, isFinal: true },
 ]
 
-const transitions: MockTransition[] = [
+export const transitions: MockTransition[] = [
   { id: 1, workflowId: 1, fromStatusId: null, toStatusId: 1, actionId: 1, deadlineHours: null, assignedUserGroupId: null, requireUpload: false, notificationTypeId: null },
-  { id: 2, workflowId: 1, fromStatusId: 1, toStatusId: 2, actionId: 1, deadlineHours: 24, assignedUserGroupId: '2', requireUpload: false, notificationTypeId: null },
+  { id: 2, workflowId: 1, fromStatusId: 1, toStatusId: 2, actionId: 1, deadlineHours: 24, assignedUserGroupId: '2', requireUpload: false, notificationTypeId: 1 },
   { id: 3, workflowId: 1, fromStatusId: 2, toStatusId: 3, actionId: 2, deadlineHours: null, assignedUserGroupId: '3', requireUpload: true, notificationTypeId: null },
   { id: 4, workflowId: 1, fromStatusId: 2, toStatusId: 1, actionId: 3, deadlineHours: 4, assignedUserGroupId: null, requireUpload: false, notificationTypeId: null },
 ]
@@ -157,6 +159,8 @@ const validateTransition = (workflowId: number, data: WorkflowTransitionRequest,
   if (!ids.every((sid) => statuses.some((s) => s.id === sid && s.workflowId === workflowId)))
     return error(400, 'Trạng thái nguồn/đích không thuộc quy trình này.')
   if (!actions.some((a) => a.id === data.actionId)) return error(400, `Không tìm thấy hành động ${data.actionId}.`)
+  if (data.notificationTypeId != null && !notificationTypes.some((t) => t.id === data.notificationTypeId))
+    return error(400, `Không tìm thấy loại thông báo ${data.notificationTypeId}.`)
   const others = transitions.filter((t) => t.workflowId === workflowId && t.id !== exceptId)
   if (data.fromStatusId == null) {
     if (others.some((t) => t.fromStatusId == null))

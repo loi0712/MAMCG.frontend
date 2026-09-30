@@ -31,7 +31,9 @@ import { useAssetColumns } from './assets-column'
 import { AssetTableBulkActions } from './assets-table-bulk-actions'
 import { type Asset } from '../data/assets'
 import PreviewDrawer from './asset-preview'
-import { FolderOpen } from 'lucide-react'
+import { FileSpreadsheet, FolderOpen, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useExportAssetsCsv } from '../api/export'
 import { useMenuStore } from '@/stores/menu-store'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -78,6 +80,14 @@ export function AssetsTable({ folderPath, data, search, navigate: navigateUrl, o
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
     const { menu } = useMenuStore()
     const navigate = useNavigate()
+    const exportCsv = useExportAssetsCsv()
+
+    // Xuất CSV theo đúng thư mục + bộ lọc đang xem
+    const handleExportCsv = () => {
+        const folderId = Number.parseInt(String(search.folderId ?? '0')) || 0
+        const searchTerm = typeof search.searchTerm === 'string' ? search.searchTerm : undefined
+        exportCsv.mutate({ folderId, searchTerm })
+    }
 
     // Add the handleRowClick function
     const handleRowClick = (row: any, event: React.MouseEvent) => {
@@ -237,6 +247,17 @@ export function AssetsTable({ folderPath, data, search, navigate: navigateUrl, o
                     searchPlaceholder='Tìm kiếm thiết kế...'
                     searchKey='name'
                     onAssetCreated={handleAssetCreated}
+                    actions={
+                        <Button
+                            variant='outline'
+                            className='h-8 space-x-1'
+                            onClick={handleExportCsv}
+                            disabled={exportCsv.isPending || data.totalCount === 0}
+                        >
+                            {exportCsv.isPending ? <Loader2 size={16} className='animate-spin' /> : <FileSpreadsheet size={16} />}
+                            <span>Xuất CSV</span>
+                        </Button>
+                    }
                     filters={[
                         // Static filters
                         {

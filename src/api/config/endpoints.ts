@@ -2,7 +2,18 @@ const baseUrl = '/api'
 
 export const apiUrls = {
     auth : {
-        login: `${baseUrl}/Auth/login`
+        login: `${baseUrl}/Auth/login`,
+        refresh: `${baseUrl}/Auth/refresh`,
+        logout: `${baseUrl}/Auth/logout`,
+        forgotPassword: `${baseUrl}/Auth/forgot-password`,
+        resetPassword: `${baseUrl}/Auth/reset-password`
+    },
+    account: {
+        me: `${baseUrl}/Account/me`,
+        changePassword: `${baseUrl}/Account/change-password`,
+        sessions: `${baseUrl}/Account/sessions`,
+        revokeSession: (id: string) => `${baseUrl}/Account/sessions/${id}`,
+        revokeOtherSessions: `${baseUrl}/Account/sessions/revoke-others`
     },
     folder: {
         list: `${baseUrl}/Folder/folder-tree`,
@@ -39,13 +50,20 @@ export const apiUrls = {
         details: (id: string) => `${baseUrl}/User/${id}`,
         create: `${baseUrl}/User/create`,
         update: (id: string) => `${baseUrl}/User/update/${id}`,
-        delete: (id: string) => `${baseUrl}/User/delete/${id}`
+        delete: (id: string) => `${baseUrl}/User/delete/${id}`,
+        export: `${baseUrl}/User/export`
     },
     department: {
-        list: `${baseUrl}/Department/paged`
+        list: `${baseUrl}/Department/paged`,
+        create: `${baseUrl}/Department/create`,
+        update: (id: number) => `${baseUrl}/Department/update/${id}`,
+        delete: (id: number) => `${baseUrl}/Department/delete/${id}`
     },
     position: {
-        list: `${baseUrl}/Position/paged`
+        list: `${baseUrl}/Position/paged`,
+        create: `${baseUrl}/Position/create`,
+        update: (id: number) => `${baseUrl}/Position/update/${id}`,
+        delete: (id: number) => `${baseUrl}/Position/delete/${id}`
     },
     group: {
         list: `${baseUrl}/Group/paged`,
@@ -58,7 +76,9 @@ export const apiUrls = {
         tree: `${baseUrl}/Permission/get-list`,
         byTarget: `${baseUrl}/Permission/get-by-target`,
         create: `${baseUrl}/Permission/create`,
-        me: `${baseUrl}/Permission/me`
+        me: `${baseUrl}/Permission/me`,
+        folder: (folderId: string) => `${baseUrl}/Permission/folder/${folderId}`,
+        folderSave: `${baseUrl}/Permission/folder/create`
     },
     setting: {
         list: `${baseUrl}/Setting`,
@@ -139,7 +159,12 @@ export const apiUrls = {
         cgServer: `${baseUrl}/Log/cg-server`,
         ldapSync: `${baseUrl}/Log/ldap-sync`,
         purge: (kind: string) => `${baseUrl}/Log/${kind}`,
-        deleteOne: (kind: string, id: number) => `${baseUrl}/Log/${kind}/${id}`
+        deleteOne: (kind: string, id: number) => `${baseUrl}/Log/${kind}/${id}`,
+        // Nhật ký kiểm toán + xuất CSV theo bộ lọc
+        audit: `${baseUrl}/Log/audit`,
+        auditDetails: (id: number) => `${baseUrl}/Log/audit/${id}`,
+        auditEntityTypes: `${baseUrl}/Log/audit/entity-types`,
+        export: (kind: string) => `${baseUrl}/Log/${kind}/export`
     },
     notification: {
         mine: `${baseUrl}/Notification/me`,
@@ -165,6 +190,22 @@ export const apiUrls = {
         actions: `${baseUrl}/WorkflowDefinition/actions`,
         action: (id: number) => `${baseUrl}/WorkflowDefinition/actions/${id}`
     },
+    // Nhóm C: công việc của tôi, lịch sử/phiên bản nội dung, loại thông báo, hub realtime
+    workflowTask: {
+        myTasks: `${baseUrl}/Workflow/my-tasks`,
+        summary: `${baseUrl}/Workflow/my-tasks/summary`,
+        history: (itemId: number) => `${baseUrl}/Workflow/item/${itemId}/history`,
+        versions: (itemId: number) => `${baseUrl}/Workflow/item/${itemId}/versions`,
+        version: (itemId: number, version: number) => `${baseUrl}/Workflow/item/${itemId}/versions/${version}`
+    },
+    notificationType: {
+        list: `${baseUrl}/NotificationType/paged`,
+        create: `${baseUrl}/NotificationType`,
+        details: (id: number) => `${baseUrl}/NotificationType/${id}`
+    },
+    realtime: {
+        notificationsHub: '/hubs/notifications'
+    },
     systemStatus: {
         dashboard: `${baseUrl}/SystemStatus/dashboard`,
         server: `${baseUrl}/SystemStatus/server`,
@@ -177,14 +218,39 @@ export const apiUrls = {
         uploadInfo: `${baseUrl}/Asset/upload-info`,
         create: `${baseUrl}/Asset/upload`,
         update: (assetId: string) => `${baseUrl}/Asset/update/${assetId}`,
-        delete: (assetId: string) => `${baseUrl}/Asset/delete/${assetId}`
+        delete: (assetId: string) => `${baseUrl}/Asset/delete/${assetId}`,
+        // Thao tác hàng loạt, xuất CSV, thùng rác
+        bulkDelete: `${baseUrl}/Asset/bulk/delete`,
+        bulkAvailableActions: `${baseUrl}/Asset/bulk/available-actions`,
+        bulkAction: `${baseUrl}/Asset/bulk/action`,
+        bulkDownload: `${baseUrl}/Asset/bulk/download`,
+        export: `${baseUrl}/Asset/export`,
+        trash: `${baseUrl}/Asset/trash`,
+        restore: (id: number) => `${baseUrl}/Asset/restore/${id}`,
+        purge: (id: number) => `${baseUrl}/Asset/purge/${id}`
     },
     category: {
         create: `${baseUrl}/Category/create`,
         list: `${baseUrl}/Category/paged`,
-        details: (id: number) => `${baseUrl}/Category/${id}`
+        details: (id: number) => `${baseUrl}/Category/${id}`,
+        update: (id: number) => `${baseUrl}/Category/update/${id}`,
+        delete: (id: number) => `${baseUrl}/Category/delete/${id}`
+    },
+    categoryGroup: {
+        list: `${baseUrl}/CategoryGroup/paged`,
+        details: (id: number) => `${baseUrl}/CategoryGroup/${id}`,
+        create: `${baseUrl}/CategoryGroup/create`,
+        update: (id: number) => `${baseUrl}/CategoryGroup/update/${id}`,
+        delete: (id: number) => `${baseUrl}/CategoryGroup/delete/${id}`
     },
     cg: {
         preview: `${baseUrl}/CGCommand/PreviewCGScene`
+    },
+    cgScene: {
+        list: `${baseUrl}/CGScene/paged`,
+        details: (id: number) => `${baseUrl}/CGScene/${id}`,
+        create: `${baseUrl}/CGScene/create`,
+        approval: (id: number) => `${baseUrl}/CGScene/approval/${id}`,
+        templates: `${baseUrl}/CGTemplate/all`
     }
 }

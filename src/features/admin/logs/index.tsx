@@ -1,20 +1,22 @@
 import { useState } from 'react'
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
-import { Monitor, RefreshCw, Server, Trash2, UserRound, Users } from 'lucide-react'
+import { History, Monitor, RefreshCw, Server, Trash2, UserRound, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { LogKind } from '../api/logs'
 import { ActivityLogsTab } from './components/activity-logs-tab'
+import { AuditLogsTab } from './components/audit-logs-tab'
 import { CGServerLogsTab } from './components/cg-server-logs-tab'
 import { LdapSyncLogsTab } from './components/ldap-sync-logs-tab'
 import { PurgeLogsDialog } from './components/purge-logs-dialog'
 import { SystemLogsTab } from './components/system-logs-tab'
 
-type LogTab = 'activities' | 'system' | 'cg-servers' | 'ldap-sync'
+type LogTab = 'activities' | 'audit' | 'system' | 'cg-servers' | 'ldap-sync'
 
 // Tab → loại nhật ký của API xoá /api/Log/{kind}
 const TAB_KIND: Record<LogTab, LogKind> = {
   activities: 'activities',
+  audit: 'audit',
   system: 'system',
   'cg-servers': 'cg-server',
   'ldap-sync': 'ldap-sync',
@@ -35,6 +37,10 @@ export function LogsView() {
           <TabsTrigger value='activities'>
             <UserRound className='mr-2 h-4 w-4' />
             Hoạt động người dùng
+          </TabsTrigger>
+          <TabsTrigger value='audit'>
+            <History className='mr-2 h-4 w-4' />
+            Kiểm toán
           </TabsTrigger>
           <TabsTrigger value='system'>
             <Monitor className='mr-2 h-4 w-4' />
@@ -77,6 +83,9 @@ export function LogsView() {
       {/* forceMount giữ bộ lọc/trang khi chuyển tab; chỉ tab đang mở mới gọi API */}
       <TabsContent value='activities' forceMount hidden={activeTab !== 'activities'}>
         <ActivityLogsTab active={activeTab === 'activities'} />
+      </TabsContent>
+      <TabsContent value='audit' forceMount hidden={activeTab !== 'audit'}>
+        <AuditLogsTab active={activeTab === 'audit'} />
       </TabsContent>
       <TabsContent value='system' forceMount hidden={activeTab !== 'system'}>
         <SystemLogsTab active={activeTab === 'system'} />

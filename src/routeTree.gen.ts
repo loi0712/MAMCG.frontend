@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-password'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
@@ -19,6 +21,8 @@ import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AuthenticatedCategoryRouteImport } from './routes/_authenticated/category'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminDataFieldsRouteImport } from './routes/admin/data-fields'
@@ -27,6 +31,7 @@ import { Route as AdminDisplayPanelsRouteImport } from './routes/admin/display-p
 import { Route as AdminFieldGroupsRouteImport } from './routes/admin/field-groups'
 import { Route as AdminLogsRouteImport } from './routes/admin/logs'
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
+import { Route as AdminOrgUnitsRouteImport } from './routes/admin/org-units'
 import { Route as AdminPermissionsRouteImport } from './routes/admin/permissions'
 import { Route as AdminRolesRouteImport } from './routes/admin/roles'
 import { Route as AdminServerStatusRouteImport } from './routes/admin/server-status'
@@ -34,6 +39,10 @@ import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminStorageRouteImport } from './routes/admin/storage'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AuthenticatedAssetsIndexRouteImport } from './routes/_authenticated/assets/index'
+import { Route as AuthenticatedAssetsTrashRouteImport } from './routes/_authenticated/assets/trash'
+import { Route as AuthenticatedCgScenesIndexRouteImport } from './routes/_authenticated/cg-scenes/index'
+import { Route as AuthenticatedCgScenesCreateRouteImport } from './routes/_authenticated/cg-scenes/create'
+import { Route as AuthenticatedCgScenesDetailsRouteImport } from './routes/_authenticated/cg-scenes/details'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AdminWorkflowIndexRouteImport } from './routes/admin/workflow/index'
 import { Route as AdminWorkflowWorkflowIdRouteImport } from './routes/admin_/workflow/$workflowId'
@@ -52,6 +61,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
+  id: '/(auth)/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authResetPasswordRoute = authResetPasswordRouteImport.update({
+  id: '/(auth)/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authSignInRoute = authSignInRouteImport.update({
@@ -87,6 +106,16 @@ const errors503Route = errors503RouteImport.update({
 const AuthenticatedCategoryRoute = AuthenticatedCategoryRouteImport.update({
   id: '/category',
   path: '/category',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -129,6 +158,11 @@ const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminOrgUnitsRoute = AdminOrgUnitsRouteImport.update({
+  id: '/org-units',
+  path: '/org-units',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminPermissionsRoute = AdminPermissionsRouteImport.update({
   id: '/permissions',
   path: '/permissions',
@@ -165,6 +199,30 @@ const AuthenticatedAssetsIndexRoute =
     path: '/assets/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAssetsTrashRoute =
+  AuthenticatedAssetsTrashRouteImport.update({
+    id: '/assets/trash',
+    path: '/assets/trash',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCgScenesIndexRoute =
+  AuthenticatedCgScenesIndexRouteImport.update({
+    id: '/cg-scenes/',
+    path: '/cg-scenes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCgScenesCreateRoute =
+  AuthenticatedCgScenesCreateRouteImport.update({
+    id: '/cg-scenes/create',
+    path: '/cg-scenes/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCgScenesDetailsRoute =
+  AuthenticatedCgScenesDetailsRouteImport.update({
+    id: '/cg-scenes/details',
+    path: '/cg-scenes/details',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
@@ -197,6 +255,8 @@ const AuthenticatedAssetsDetailsDetailsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
@@ -204,6 +264,8 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/category': typeof AuthenticatedCategoryRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
   '/admin/database': typeof AdminDatabaseRoute
@@ -211,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/admin/field-groups': typeof AdminFieldGroupsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/org-units': typeof AdminOrgUnitsRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/server-status': typeof AdminServerStatusRoute
@@ -218,15 +281,21 @@ export interface FileRoutesByFullPath {
   '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/assets/trash': typeof AuthenticatedAssetsTrashRoute
+  '/cg-scenes/create': typeof AuthenticatedCgScenesCreateRoute
+  '/cg-scenes/details': typeof AuthenticatedCgScenesDetailsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/admin/workflow/$workflowId': typeof AdminWorkflowWorkflowIdRoute
   '/assets/': typeof AuthenticatedAssetsIndexRoute
+  '/cg-scenes/': typeof AuthenticatedCgScenesIndexRoute
   '/admin/workflow/': typeof AdminWorkflowIndexRoute
   '/assets/cg/details': typeof AuthenticatedAssetsCgDetailsRoute
   '/assets/details/details': typeof AuthenticatedAssetsDetailsDetailsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
@@ -234,6 +303,8 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/category': typeof AuthenticatedCategoryRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
   '/admin/database': typeof AdminDatabaseRoute
@@ -241,6 +312,7 @@ export interface FileRoutesByTo {
   '/admin/field-groups': typeof AdminFieldGroupsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/org-units': typeof AdminOrgUnitsRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/server-status': typeof AdminServerStatusRoute
@@ -248,9 +320,13 @@ export interface FileRoutesByTo {
   '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
+  '/assets/trash': typeof AuthenticatedAssetsTrashRoute
+  '/cg-scenes/create': typeof AuthenticatedCgScenesCreateRoute
+  '/cg-scenes/details': typeof AuthenticatedCgScenesDetailsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/admin/workflow/$workflowId': typeof AdminWorkflowWorkflowIdRoute
   '/assets': typeof AuthenticatedAssetsIndexRoute
+  '/cg-scenes': typeof AuthenticatedCgScenesIndexRoute
   '/admin/workflow': typeof AdminWorkflowIndexRoute
   '/assets/cg/details': typeof AuthenticatedAssetsCgDetailsRoute
   '/assets/details/details': typeof AuthenticatedAssetsDetailsDetailsRoute
@@ -260,6 +336,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
+  '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/reset-password': typeof authResetPasswordRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(errors)/401': typeof errors401Route
   '/(errors)/403': typeof errors403Route
@@ -267,6 +345,8 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/category': typeof AuthenticatedCategoryRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
   '/admin/database': typeof AdminDatabaseRoute
@@ -274,6 +354,7 @@ export interface FileRoutesById {
   '/admin/field-groups': typeof AdminFieldGroupsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/org-units': typeof AdminOrgUnitsRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/server-status': typeof AdminServerStatusRoute
@@ -281,9 +362,13 @@ export interface FileRoutesById {
   '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/_authenticated/assets/trash': typeof AuthenticatedAssetsTrashRoute
+  '/_authenticated/cg-scenes/create': typeof AuthenticatedCgScenesCreateRoute
+  '/_authenticated/cg-scenes/details': typeof AuthenticatedCgScenesDetailsRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/admin_/workflow/$workflowId': typeof AdminWorkflowWorkflowIdRoute
   '/_authenticated/assets/': typeof AuthenticatedAssetsIndexRoute
+  '/_authenticated/cg-scenes/': typeof AuthenticatedCgScenesIndexRoute
   '/admin/workflow/': typeof AdminWorkflowIndexRoute
   '/_authenticated/assets/cg/details': typeof AuthenticatedAssetsCgDetailsRoute
   '/_authenticated/assets/details/details': typeof AuthenticatedAssetsDetailsDetailsRoute
@@ -293,6 +378,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/forgot-password'
+    | '/reset-password'
     | '/sign-in'
     | '/401'
     | '/403'
@@ -300,6 +387,8 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/category'
+    | '/profile'
+    | '/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
     | '/admin/database'
@@ -307,6 +396,7 @@ export interface FileRouteTypes {
     | '/admin/field-groups'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/org-units'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/server-status'
@@ -314,15 +404,21 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/admin/users'
     | '/admin/'
+    | '/assets/trash'
+    | '/cg-scenes/create'
+    | '/cg-scenes/details'
     | '/errors/$error'
     | '/admin/workflow/$workflowId'
     | '/assets/'
+    | '/cg-scenes/'
     | '/admin/workflow/'
     | '/assets/cg/details'
     | '/assets/details/details'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
+    | '/reset-password'
     | '/sign-in'
     | '/401'
     | '/403'
@@ -330,6 +426,8 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/category'
+    | '/profile'
+    | '/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
     | '/admin/database'
@@ -337,6 +435,7 @@ export interface FileRouteTypes {
     | '/admin/field-groups'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/org-units'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/server-status'
@@ -344,9 +443,13 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/admin/users'
     | '/admin'
+    | '/assets/trash'
+    | '/cg-scenes/create'
+    | '/cg-scenes/details'
     | '/errors/$error'
     | '/admin/workflow/$workflowId'
     | '/assets'
+    | '/cg-scenes'
     | '/admin/workflow'
     | '/assets/cg/details'
     | '/assets/details/details'
@@ -355,6 +458,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/admin'
+    | '/(auth)/forgot-password'
+    | '/(auth)/reset-password'
     | '/(auth)/sign-in'
     | '/(errors)/401'
     | '/(errors)/403'
@@ -362,6 +467,8 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/category'
+    | '/_authenticated/profile'
+    | '/_authenticated/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
     | '/admin/database'
@@ -369,6 +476,7 @@ export interface FileRouteTypes {
     | '/admin/field-groups'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/org-units'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/server-status'
@@ -376,9 +484,13 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/admin/users'
     | '/admin/'
+    | '/_authenticated/assets/trash'
+    | '/_authenticated/cg-scenes/create'
+    | '/_authenticated/cg-scenes/details'
     | '/_authenticated/errors/$error'
     | '/admin_/workflow/$workflowId'
     | '/_authenticated/assets/'
+    | '/_authenticated/cg-scenes/'
     | '/admin/workflow/'
     | '/_authenticated/assets/cg/details'
     | '/_authenticated/assets/details/details'
@@ -388,6 +500,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authResetPasswordRoute: typeof authResetPasswordRoute
   authSignInRoute: typeof authSignInRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
@@ -418,6 +532,20 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/forgot-password': {
+      id: '/(auth)/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof authForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/reset-password': {
+      id: '/(auth)/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof authResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/sign-in': {
@@ -467,6 +595,20 @@ declare module '@tanstack/react-router' {
       path: '/category'
       fullPath: '/category'
       preLoaderRoute: typeof AuthenticatedCategoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tasks': {
+      id: '/_authenticated/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/admin/': {
@@ -525,6 +667,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNotificationsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/org-units': {
+      id: '/admin/org-units'
+      path: '/org-units'
+      fullPath: '/admin/org-units'
+      preLoaderRoute: typeof AdminOrgUnitsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/permissions': {
       id: '/admin/permissions'
       path: '/permissions'
@@ -574,6 +723,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAssetsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/assets/trash': {
+      id: '/_authenticated/assets/trash'
+      path: '/assets/trash'
+      fullPath: '/assets/trash'
+      preLoaderRoute: typeof AuthenticatedAssetsTrashRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cg-scenes/': {
+      id: '/_authenticated/cg-scenes/'
+      path: '/cg-scenes'
+      fullPath: '/cg-scenes/'
+      preLoaderRoute: typeof AuthenticatedCgScenesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cg-scenes/create': {
+      id: '/_authenticated/cg-scenes/create'
+      path: '/cg-scenes/create'
+      fullPath: '/cg-scenes/create'
+      preLoaderRoute: typeof AuthenticatedCgScenesCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cg-scenes/details': {
+      id: '/_authenticated/cg-scenes/details'
+      path: '/cg-scenes/details'
+      fullPath: '/cg-scenes/details'
+      preLoaderRoute: typeof AuthenticatedCgScenesDetailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -614,16 +791,28 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCategoryRoute: typeof AuthenticatedCategoryRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
+  AuthenticatedAssetsTrashRoute: typeof AuthenticatedAssetsTrashRoute
+  AuthenticatedCgScenesCreateRoute: typeof AuthenticatedCgScenesCreateRoute
+  AuthenticatedCgScenesDetailsRoute: typeof AuthenticatedCgScenesDetailsRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAssetsIndexRoute: typeof AuthenticatedAssetsIndexRoute
+  AuthenticatedCgScenesIndexRoute: typeof AuthenticatedCgScenesIndexRoute
   AuthenticatedAssetsCgDetailsRoute: typeof AuthenticatedAssetsCgDetailsRoute
   AuthenticatedAssetsDetailsDetailsRoute: typeof AuthenticatedAssetsDetailsDetailsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCategoryRoute: AuthenticatedCategoryRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedTasksRoute: AuthenticatedTasksRoute,
+  AuthenticatedAssetsTrashRoute: AuthenticatedAssetsTrashRoute,
+  AuthenticatedCgScenesCreateRoute: AuthenticatedCgScenesCreateRoute,
+  AuthenticatedCgScenesDetailsRoute: AuthenticatedCgScenesDetailsRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAssetsIndexRoute: AuthenticatedAssetsIndexRoute,
+  AuthenticatedCgScenesIndexRoute: AuthenticatedCgScenesIndexRoute,
   AuthenticatedAssetsCgDetailsRoute: AuthenticatedAssetsCgDetailsRoute,
   AuthenticatedAssetsDetailsDetailsRoute:
     AuthenticatedAssetsDetailsDetailsRoute,
@@ -640,6 +829,7 @@ interface AdminRouteRouteChildren {
   AdminFieldGroupsRoute: typeof AdminFieldGroupsRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminOrgUnitsRoute: typeof AdminOrgUnitsRoute
   AdminPermissionsRoute: typeof AdminPermissionsRoute
   AdminRolesRoute: typeof AdminRolesRoute
   AdminServerStatusRoute: typeof AdminServerStatusRoute
@@ -658,6 +848,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminFieldGroupsRoute: AdminFieldGroupsRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminOrgUnitsRoute: AdminOrgUnitsRoute,
   AdminPermissionsRoute: AdminPermissionsRoute,
   AdminRolesRoute: AdminRolesRoute,
   AdminServerStatusRoute: AdminServerStatusRoute,
@@ -676,6 +867,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  authForgotPasswordRoute: authForgotPasswordRoute,
+  authResetPasswordRoute: authResetPasswordRoute,
   authSignInRoute: authSignInRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,

@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/App-sidebar";
 import { SkipToMain } from "@/components/skip-to-main";
-import {
-  sidebarData,
-} from "@/components/layout/data/sidebar-data";
-import { NavGroup } from "@/components/layout/Nav-group";
+import { WorkTasksNav } from "@/features/tasks/components/work-tasks-nav";
 import MamcgLogo from "@/assets/images/mamcg.png";
 import NavigationMenuWithActiveItem from "@/components/customized/navigation-menu/navigation-menu-05";
 import {
@@ -44,6 +41,7 @@ import {
 } from "@/components/layout/Folder-provider";
 import { useMenuStore } from "@/stores/menu-store";
 import { TreeNode } from "../ui/tree-node";
+import { SidebarQuickLinks } from "./Sidebar-quick-links";
 
 const DEFAULT_MENU = "Đồ hoạ";
 const CG_MENU = "CG";
@@ -193,17 +191,15 @@ const SidebarContentWrapper = memo<{
     const windowHeight = useWindowHeight();
 
     if (menu === WORK_MENU) {
-      return (
-        <>
-          {sidebarData.navGroups.map((props) => (
-            <NavGroup key={props.title} {...props} />
-          ))}
-        </>
-      );
+      return <WorkTasksNav />;
     }
 
     return (
       <div className="w-full h-full" onContextMenu={onEmptyAreaContextMenu}>
+        {/* Lối tắt: chuyên mục, thùng rác, CG scene */}
+        <div onContextMenu={(e) => e.stopPropagation()}>
+          <SidebarQuickLinks menu={menu} />
+        </div>
         <Tree
           data={treeFolder}
           openByDefault={false}
@@ -277,6 +273,10 @@ function AuthenticatedLayoutContent({
   // Đồng bộ menu theo URL (mở link trực tiếp/F5) — không tự điều hướng khi mount
   const location = useRouterState({ select: (st) => st.location });
   useEffect(() => {
+    if (location.pathname === "/tasks") {
+      if (useMenuStore.getState().menu !== WORK_MENU) setMenu(WORK_MENU);
+      return;
+    }
     if (location.pathname !== "/assets") return;
     const term = String((location.search as { searchTerm?: unknown }).searchTerm ?? "");
     const isCg = term === CG_SEARCH_TERM;
@@ -350,7 +350,9 @@ function AuthenticatedLayoutContent({
   const changeMenu = useCallback(
     (newMenu: string) => {
       setMenu(newMenu);
-      if (newMenu === CG_MENU || newMenu === DEFAULT_MENU) {
+      if (newMenu === WORK_MENU) {
+        navigate({ to: "/tasks" });
+      } else if (newMenu === CG_MENU || newMenu === DEFAULT_MENU) {
         navigate({
           to: "/assets",
           search: {

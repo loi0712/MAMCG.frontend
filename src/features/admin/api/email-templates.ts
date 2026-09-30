@@ -53,6 +53,8 @@ export const RECIPIENT_GROUP_LABEL: Record<string, string> = {
   admin: 'Quản trị viên',
   tech: 'Kỹ thuật',
   security: 'Bảo mật',
+  // Gửi thẳng tới chính người dùng liên quan (vd. email đặt lại mật khẩu), không theo quy tắc thông báo
+  user: 'Chính người dùng',
 }
 
 // Mức độ mặc định của sự kiện (low | medium | high | critical)

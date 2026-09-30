@@ -18,14 +18,8 @@ type DataTableBulkActionsProps<TData> = {
 }
 
 /**
- * A modular toolbar for displaying bulk actions when table rows are selected.
- *
- * @template TData The type of data in the table.
- * @param {object} props The component props.
- * @param {Table<TData>} props.table The react-table instance.
- * @param {string} props.entityName The name of the entity being acted upon (e.g., "task", "user").
- * @param {React.ReactNode} props.children The action buttons to be rendered inside the toolbar.
- * @returns {React.ReactNode | null} The rendered component or null if no rows are selected.
+ * Thanh thao tác hàng loạt nổi ở cuối màn hình, chỉ hiện khi có hàng được chọn.
+ * Hỗ trợ phím mũi tên/Home/End để chuyển nút, Esc để bỏ chọn.
  */
 export function DataTableBulkActions<TData>({
   table,
@@ -40,7 +34,7 @@ export function DataTableBulkActions<TData>({
   // Announce selection changes to screen readers
   useEffect(() => {
     if (selectedCount > 0) {
-      const message = `${selectedCount} ${entityName}${selectedCount > 1 ? 's' : ''} selected. Bulk actions toolbar is available.`
+      const message = `Đã chọn ${selectedCount} ${entityName}. Có thể dùng thanh thao tác hàng loạt.`
       setAnnouncement(message)
 
       // Clear announcement after a delay
@@ -134,7 +128,7 @@ export function DataTableBulkActions<TData>({
       <div
         ref={toolbarRef}
         role='toolbar'
-        aria-label={`Bulk actions for ${selectedCount} selected ${entityName}${selectedCount > 1 ? 's' : ''}`}
+        aria-label={`Thao tác hàng loạt cho ${selectedCount} ${entityName} đã chọn`}
         aria-describedby='bulk-actions-description'
         tabIndex={-1}
         onKeyDown={handleKeyDown}
@@ -159,15 +153,13 @@ export function DataTableBulkActions<TData>({
                 size='icon'
                 onClick={handleClearSelection}
                 className='size-6 rounded-full'
-                aria-label='Clear selection'
-                title='Clear selection (Escape)'
+                aria-label='Bỏ chọn'
               >
                 <X />
-                <span className='sr-only'>Clear selection</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Clear selection (Escape)</p>
+              <p>Bỏ chọn (Esc)</p>
             </TooltipContent>
           </Tooltip>
 
@@ -181,18 +173,15 @@ export function DataTableBulkActions<TData>({
             className='flex items-center gap-x-1 text-sm'
             id='bulk-actions-description'
           >
+            <span>Đã chọn</span>{' '}
             <Badge
               variant='default'
               className='min-w-8 rounded-lg'
-              aria-label={`${selectedCount} selected`}
+              aria-label={`Đã chọn ${selectedCount}`}
             >
               {selectedCount}
             </Badge>{' '}
-            <span className='hidden sm:inline'>
-              {entityName}
-              {selectedCount > 1 ? 's' : ''}
-            </span>{' '}
-            selected
+            <span className='hidden sm:inline'>{entityName}</span>
           </div>
 
           <Separator

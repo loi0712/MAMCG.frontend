@@ -14,7 +14,7 @@ export interface CategoriesQueryParams {
 }
 
 export interface TCategoriesResponse {
-  data: Category[];
+  categories: Category[];
   totalCount: number;
 }
 

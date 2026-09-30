@@ -16,10 +16,12 @@ import {
   useUpdateWorkflowTransition,
   useWorkflowActions,
 } from '../../api/workflows'
+import { ALL_NOTIFICATION_TYPES, useNotificationTypes } from '../../api/notification-types'
 import { AssigneePicker, splitAssignees } from './assignee-picker'
 import { type Connection, type NodeData, endpointStatus } from './flowchart-layout'
 
 const MAX_DEADLINE_HOURS = 24 * 365
+const NO_NOTIFICATION = 'none'
 
 interface TransitionConfigPanelProps {
   workflowId: number
@@ -107,6 +109,10 @@ function TransitionForm({ workflowId, connection, transition, fromStatusId, toSt
   const [deadline, setDeadline] = useState(transition?.deadlineHours != null ? String(transition.deadlineHours) : '')
   const [assignees, setAssignees] = useState(splitAssignees(transition?.assignedUserGroupId))
   const [requireUpload, setRequireUpload] = useState(transition?.requireUpload ?? false)
+  const [notificationTypeId, setNotificationTypeId] = useState(
+    transition?.notificationTypeId != null ? String(transition.notificationTypeId) : NO_NOTIFICATION
+  )
+  const { data: notificationTypes, isError: notificationTypesError } = useNotificationTypes(ALL_NOTIFICATION_TYPES)
   const [error, setError] = useState('')
   const { data: actions, isLoading: actionsLoading, isError: actionsError } = useWorkflowActions()
   const addTransition = useAddWorkflowTransition()
@@ -125,8 +131,7 @@ function TransitionForm({ workflowId, connection, transition, fromStatusId, toSt
       deadlineHours: deadline ? Number(deadline) : null,
       assignedUserGroupId: assignees.length ? assignees.join(',') : null,
       requireUpload,
-      // Chưa có API danh mục loại thông báo: giữ nguyên giá trị hiện có
-      notificationTypeId: transition?.notificationTypeId ?? null,
+      notificationTypeId: notificationTypeId === NO_NOTIFICATION ? null : Number(notificationTypeId),
     }
     try {
       const saved = transition
@@ -189,6 +194,31 @@ function TransitionForm({ workflowId, connection, transition, fromStatusId, toSt
           <p className='text-muted-foreground text-[10px]'>Phải đính kèm file khi thực hiện</p>
         </div>
         <Switch checked={requireUpload} onCheckedChange={setRequireUpload} />
+      </div>
+
+      <div>
+        <Label className='text-foreground text-xs'>Thông báo cho người được giao</Label>
+        <Select value={notificationTypeId} onValueChange={setNotificationTypeId}>
+          <SelectTrigger className='bg-muted border-border text-foreground mt-1 w-full' aria-label='Loại thông báo'>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={NO_NOTIFICATION}>Không gửi thông báo</SelectItem>
+            {notificationTypes?.notificationTypes.map((t) => (
+              <SelectItem key={t.id} value={String(t.id)}>
+                {t.name}
+              </SelectItem>
+            ))}
+            {/* Loại đang gắn nhưng không còn trong danh mục (đã xoá) */}
+            {notificationTypeId !== NO_NOTIFICATION &&
+              notificationTypes &&
+              !notificationTypes.notificationTypes.some((t) => String(t.id) === notificationTypeId) && (
+                <SelectItem value={notificationTypeId}>Loại thông báo #{notificationTypeId}</SelectItem>
+              )}
+          </SelectContent>
+        </Select>
+        {notificationTypesError && <p className='text-destructive mt-1 text-xs'>Không tải được danh sách loại thông báo.</p>}
+        <p className='text-muted-foreground mt-1 text-[10px]'>Quản lý mẫu tại Thông báo › Loại thông báo</p>
       </div>
 
       {error && <p className='text-destructive text-xs'>{error}</p>}

@@ -23,7 +23,7 @@ type PermissionNodeProps = {
   depth?: number
 }
 
-function PermissionNode({ node, selected, onToggle, depth = 0 }: PermissionNodeProps) {
+export function PermissionNode({ node, selected, onToggle, depth = 0 }: PermissionNodeProps) {
   const children = node.childrens ?? []
   return (
     <div>

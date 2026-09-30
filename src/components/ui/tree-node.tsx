@@ -5,6 +5,7 @@ import { cn } from "@/shared/lib/utils";
 import ContextMenu from "@/components/ui/context-menu";
 import { useFoldersAction } from "@/components/layout/Folder-provider";
 import { type TreeNodeData } from "@/components/layout/Types";
+import { useMyAccess } from "@/features/admin/api/permissions";
 
 const MENU_DIMENSIONS = {
   width: 160,
@@ -51,7 +52,9 @@ export const TreeNode = memo<
     onClick: (nodeId: string, nodeName: string) => void;
   }
 >(({ node, style, dragHandle, cmState, setCmState, onClick }) => {
-  const { setOpen, fetchFolderById } = useFoldersAction();
+  const { setOpen, fetchFolderById, setPermissionFolder } = useFoldersAction();
+  // Phân quyền thư mục chỉ dành cho quản trị viên
+  const { data: access } = useMyAccess();
   const [isHovered, setIsHovered] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -131,8 +134,10 @@ export const TreeNode = memo<
   }, [node.data.id, fetchFolderById, setOpen, closeMenu]);
 
   const handlePermissions = useCallback(() => {
+    setPermissionFolder({ id: node.data.id, name: node.data.name });
+    setOpen("permissions");
     closeMenu();
-  }, [closeMenu]);
+  }, [node.data.id, node.data.name, setPermissionFolder, setOpen, closeMenu]);
 
   const handleDelete = useCallback(async () => {
     try {
@@ -238,7 +243,7 @@ export const TreeNode = memo<
           onClose={closeMenu}
           onAddSubItem={handleAddSub}
           onEdit={handleEdit}
-          onPermissions={handlePermissions}
+          onPermissions={access?.isAdmin ? handlePermissions : undefined}
           onDelete={handleDelete}
         />
       )}
