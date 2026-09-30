@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Pencil, Plus, TestTube, Trash2 } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Pencil, Plus, RefreshCw, TestTube, Trash2, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -9,12 +10,16 @@ import { AdminPagination } from '../../components/admin-pagination'
 import { AdminTableState } from '../../components/admin-table-state'
 import {
   formatDateTime,
+  formatSyncInterval,
+  isLdapSyncStatusFailed,
   type LdapConfiguration,
   useDeleteLdapConfiguration,
   useLdapConfigurations,
 } from '../../api/settings'
 import { LdapFormDialog } from './ldap-form-dialog'
+import { LdapSyncDialog } from './ldap-sync-dialog'
 import { LdapTestDialog } from './ldap-test-dialog'
+import { LdapUsersDialog } from './ldap-users-dialog'
 
 const PAGE_SIZE = 10
 
@@ -24,6 +29,8 @@ export function ADLDAPSettings() {
   const [editing, setEditing] = useState<LdapConfiguration | null>(null)
   const [testing, setTesting] = useState<LdapConfiguration | null>(null)
   const [deleting, setDeleting] = useState<LdapConfiguration | null>(null)
+  const [syncing, setSyncing] = useState<LdapConfiguration | null>(null)
+  const [previewing, setPreviewing] = useState<LdapConfiguration | null>(null)
 
   const { data, isLoading, isError } = useLdapConfigurations({ pageNumber: page, pageSize: PAGE_SIZE })
   const configs = data?.items ?? []
@@ -67,6 +74,15 @@ export function ADLDAPSettings() {
       <Card className='bg-card border-border p-4 text-sm text-muted-foreground'>
         Khi đăng nhập, hệ thống xác thực qua cấu hình <span className='text-foreground'>đang kích hoạt</span> có ID nhỏ
         nhất (được đánh dấu “Đang dùng”). Dùng nút kiểm tra để thử kết nối và thử đăng nhập một tài khoản.
+        <p className='mt-2'>
+          Đồng bộ người dùng tạo/cập nhật tài khoản hệ thống từ LDAP theo ánh xạ thuộc tính. Người dùng đồng bộ đăng nhập
+          bằng <span className='text-foreground'>mật khẩu LDAP</span>; tài khoản nội bộ trùng tên đăng nhập được bỏ qua.
+          Nên <span className='text-foreground'>xem trước</span> trước khi đồng bộ thật. Lịch sử đồng bộ xem tại{' '}
+          <Link to='/admin/logs' className='text-primary underline underline-offset-2'>
+            Nhật ký
+          </Link>
+          .
+        </p>
       </Card>
 
       {/* Table */}
@@ -80,13 +96,14 @@ export function ADLDAPSettings() {
               <TableHead className='text-muted-foreground'>Bind DN</TableHead>
               <TableHead className='text-muted-foreground'>SSL</TableHead>
               <TableHead className='text-muted-foreground'>Trạng thái</TableHead>
+              <TableHead className='text-muted-foreground'>Đồng bộ</TableHead>
               <TableHead className='text-muted-foreground'>Cập nhật</TableHead>
               <TableHead className='text-muted-foreground text-right'>Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <AdminTableState
-              colSpan={8}
+              colSpan={9}
               isLoading={isLoading}
               isError={isError}
               isEmpty={configs.length === 0}
@@ -125,6 +142,33 @@ export function ADLDAPSettings() {
                     )}
                   </div>
                 </TableCell>
+                <TableCell className='text-sm max-w-64'>
+                  <div className='flex flex-wrap items-center gap-1'>
+                    {config.syncEnabled && (config.syncIntervalMinutes ?? 0) > 0 ? (
+                      <Badge variant='outline' className='border-primary text-primary'>
+                        Tự động · {formatSyncInterval(config.syncIntervalMinutes)}
+                      </Badge>
+                    ) : (
+                      <Badge variant='outline' className='border-border text-muted-foreground'>
+                        Thủ công
+                      </Badge>
+                    )}
+                  </div>
+                  {config.lastSyncAt ? (
+                    <div className='mt-1' title={config.lastSyncStatus ?? undefined}>
+                      <div className='text-muted-foreground text-xs'>Lần cuối: {formatDateTime(config.lastSyncAt)}</div>
+                      <div
+                        className={`text-xs truncate ${
+                          isLdapSyncStatusFailed(config.lastSyncStatus) ? 'text-red-400' : 'text-green-500'
+                        }`}
+                      >
+                        {config.lastSyncStatus || '—'}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='text-muted-foreground text-xs mt-1'>Chưa đồng bộ</div>
+                  )}
+                </TableCell>
                 <TableCell className='text-muted-foreground text-sm'>{formatDateTime(config.modifiedAt)}</TableCell>
                 <TableCell>
                   <div className='flex gap-2 justify-end'>
@@ -137,6 +181,26 @@ export function ADLDAPSettings() {
                       onClick={() => setTesting(config)}
                     >
                       <TestTube className='w-4 h-4' />
+                    </Button>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      aria-label='Xem người dùng LDAP'
+                      title='Xem người dùng LDAP'
+                      className='text-primary hover:text-primary/80 hover:bg-accent'
+                      onClick={() => setPreviewing(config)}
+                    >
+                      <Users className='w-4 h-4' />
+                    </Button>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      aria-label='Xem trước đồng bộ'
+                      title='Xem trước đồng bộ'
+                      className='text-primary hover:text-primary/80 hover:bg-accent'
+                      onClick={() => setSyncing(config)}
+                    >
+                      <RefreshCw className='w-4 h-4' />
                     </Button>
                     <Button
                       variant='ghost'
@@ -169,6 +233,14 @@ export function ADLDAPSettings() {
       <LdapFormDialog open={formOpen} onOpenChange={setFormOpen} config={editing} />
 
       <LdapTestDialog key={testing?.id ?? 0} config={testing} onOpenChange={(open) => !open && setTesting(null)} />
+
+      <LdapSyncDialog key={`sync-${syncing?.id ?? 0}`} config={syncing} onOpenChange={(open) => !open && setSyncing(null)} />
+
+      <LdapUsersDialog
+        key={`users-${previewing?.id ?? 0}`}
+        config={previewing}
+        onOpenChange={(open) => !open && setPreviewing(null)}
+      />
 
       <ConfirmDialog
         open={!!deleting}

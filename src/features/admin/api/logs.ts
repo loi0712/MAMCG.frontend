@@ -1,4 +1,5 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { apiUrls } from '@/api/config/endpoints'
 import type { components } from '@/api/generated/schema'
 import { axios } from '@/shared/lib/axios'
@@ -50,6 +51,18 @@ export interface CGServerLogParams extends LogPageParams, LogRangeParams {
 
 export type LdapSyncLogParams = LogPageParams
 
+// Loại nhật ký — trùng đường dẫn /api/Log/{kind}
+export type LogKind = 'activities' | 'system' | 'cg-server' | 'ldap-sync'
+
+export const LOG_KIND_LABELS: Record<LogKind, string> = {
+  activities: 'Hoạt động người dùng',
+  system: 'Hệ thống',
+  'cg-server': 'CG Server',
+  'ldap-sync': 'Đồng bộ LDAP',
+}
+
+export type LogPurgeResult = Schemas['LogPurgeResultDto']
+
 // Mức log mà backend ghi (DatabaseLoggerProvider: Warning trở lên)
 export const SYSTEM_LOG_LEVELS = ['Warning', 'Error', 'Critical'] as const
 
@@ -91,6 +104,16 @@ export const getLdapSyncLogs = async (params: LdapSyncLogParams) => {
   return toPage(res.data)
 }
 
+// Xoá nhật ký có thời điểm tạo trước `before` (ISO không kèm múi giờ; không được ở tương lai)
+export const purgeLogs = async ({ kind, before }: { kind: LogKind; before: string }) => {
+  const res = await axios.delete<LogPurgeResult>(apiUrls.log.purge(kind), { params: { before } })
+  return res.data
+}
+
+export const deleteLog = async ({ kind, id }: { kind: LogKind; id: number }) => {
+  await axios.delete(apiUrls.log.deleteOne(kind, id))
+}
+
 // ===========================================
 // CUSTOM HOOKS
 // ===========================================
@@ -129,3 +152,32 @@ export const useLdapSyncLogs = (params: LdapSyncLogParams, enabled = true) =>
     placeholderData: keepPreviousData,
     enabled,
   })
+
+const useInvalidateLogs = () => {
+  const queryClient = useQueryClient()
+  return () => queryClient.invalidateQueries({ queryKey: ['admin-logs'] })
+}
+
+export const usePurgeLogs = () => {
+  const invalidate = useInvalidateLogs()
+  return useMutation({
+    mutationFn: purgeLogs,
+    onSuccess: (result, { kind }) => {
+      const deleted = result?.deleted ?? 0
+      if (deleted > 0) toast.success(`Đã xoá ${deleted.toLocaleString('vi-VN')} dòng nhật ký ${LOG_KIND_LABELS[kind]}`)
+      else toast.info(`Không có nhật ký ${LOG_KIND_LABELS[kind]} nào trước thời điểm đã chọn`)
+      invalidate()
+    },
+  })
+}
+
+export const useDeleteLog = () => {
+  const invalidate = useInvalidateLogs()
+  return useMutation({
+    mutationFn: deleteLog,
+    onSuccess: () => {
+      toast.success('Đã xoá dòng nhật ký')
+      invalidate()
+    },
+  })
+}

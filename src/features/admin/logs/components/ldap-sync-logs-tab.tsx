@@ -12,6 +12,7 @@ import {
   LOG_PAGE_SIZE,
   LogFilterCard,
   LogTableCard,
+  DeleteLogButton,
 } from './log-shared'
 
 function StatusBadge({ status }: { status?: string | null }) {
@@ -56,11 +57,12 @@ export function LdapSyncLogsTab({ active }: { active: boolean }) {
               <TableHead className='text-muted-foreground w-28 text-right'>Người dùng</TableHead>
               <TableHead className='text-muted-foreground w-28 text-right'>Nhóm</TableHead>
               <TableHead className='text-muted-foreground'>Nội dung</TableHead>
+              <TableHead className='text-muted-foreground w-12' aria-label='Thao tác' />
             </TableRow>
           </TableHeader>
           <TableBody>
             <AdminTableState
-              colSpan={5}
+              colSpan={6}
               isLoading={isLoading}
               isError={isError}
               isEmpty={logs.length === 0}
@@ -76,6 +78,9 @@ export function LdapSyncLogsTab({ active }: { active: boolean }) {
                 <TableCell className='text-foreground text-right'>{log.groupsSynced ?? '—'}</TableCell>
                 <TableCell className='text-foreground text-sm whitespace-normal'>
                   <ExpandableText text={log.message} />
+                </TableCell>
+                <TableCell className='text-right'>
+                  <DeleteLogButton kind='ldap-sync' id={log.id} summary={`${formatDateTime(log.syncTime)} • ${log.status ?? ''} • ${log.message ?? ''}`} />
                 </TableCell>
               </TableRow>
             ))}

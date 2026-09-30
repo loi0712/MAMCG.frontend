@@ -1,9 +1,11 @@
-import { Loader2, Mail, Server } from 'lucide-react'
+import { FileText, History, Loader2, Mail, Server } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { EMAIL_PREFIX, useSettings } from '../../api/settings'
+import { EmailLogList } from './email-log-list'
 import { EmailNotificationSettings } from './email-notification-settings'
+import { EmailTemplateList } from './email-template-list'
 import { SmtpSettingsForm } from './smtp-settings-form'
 
 export function EmailSettings() {
@@ -47,6 +49,20 @@ export function EmailSettings() {
             <Mail className='w-4 h-4 mr-2' />
             Thông báo
           </TabsTrigger>
+          <TabsTrigger
+            value='templates'
+            className='data-[state=active]:bg-muted data-[state=active]:text-primary text-muted-foreground'
+          >
+            <FileText className='w-4 h-4 mr-2' />
+            Mẫu email
+          </TabsTrigger>
+          <TabsTrigger
+            value='logs'
+            className='data-[state=active]:bg-muted data-[state=active]:text-primary text-muted-foreground'
+          >
+            <History className='w-4 h-4 mr-2' />
+            Nhật ký email
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value='smtp' className='space-y-6 mt-6'>
@@ -55,6 +71,14 @@ export function EmailSettings() {
 
         <TabsContent value='notifications' className='space-y-6 mt-6'>
           <EmailNotificationSettings settings={data} />
+        </TabsContent>
+
+        <TabsContent value='templates' className='space-y-6 mt-6'>
+          <EmailTemplateList />
+        </TabsContent>
+
+        <TabsContent value='logs' className='space-y-6 mt-6'>
+          <EmailLogList />
         </TabsContent>
       </Tabs>
     </div>

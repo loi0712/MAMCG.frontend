@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Database, Loader2, Pencil, Play, Settings2, Square, TestTube, Trash2 } from 'lucide-react'
+import { Database, HardDrive, Loader2, Pencil, Play, Settings2, Square, TestTube, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { AdminListToolbar } from '../components/admin-list-toolbar'
 import { AdminPagination } from '../components/admin-pagination'
@@ -23,6 +24,7 @@ import {
   useTestDatabase,
   useUpdateDatabase,
 } from '../api/configuration'
+import { BackupTab } from './components/backup-tab'
 import { DatabaseFormDialog } from './components/database-form-dialog'
 import { DATABASE_TYPES } from './components/database-types'
 
@@ -65,10 +67,35 @@ const describeConnection = (cs: string | null | undefined) => {
 const typeLabel = (type: string | null | undefined) =>
   DATABASE_TYPES.find((t) => t.value.toLowerCase() === (type ?? '').toLowerCase())?.label ?? type ?? '—'
 
+const tabTrigger = 'data-[state=active]:bg-accent data-[state=active]:text-primary text-foreground'
+
 const formatDateTime = (value: Date | string | null | undefined) =>
   value ? new Date(value).toLocaleString('vi-VN') : '—'
 
 export function DatabaseView() {
+  return (
+    <Tabs defaultValue='connections' className='w-full'>
+      <TabsList className='bg-card border-border border'>
+        <TabsTrigger value='connections' className={tabTrigger}>
+          <Database className='mr-2 h-4 w-4' />
+          Kết nối Database
+        </TabsTrigger>
+        <TabsTrigger value='backup' className={tabTrigger}>
+          <HardDrive className='mr-2 h-4 w-4' />
+          Backup
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value='connections' className='mt-4'>
+        <DatabaseConnections />
+      </TabsContent>
+      <TabsContent value='backup' className='mt-4'>
+        <BackupTab />
+      </TabsContent>
+    </Tabs>
+  )
+}
+
+function DatabaseConnections() {
   const [page, setPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [formOpen, setFormOpen] = useState(false)

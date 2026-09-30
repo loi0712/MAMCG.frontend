@@ -9,12 +9,29 @@ import { ALL_ITEMS } from '../../api/common'
 import {
   CG_SERVER_STATUS,
   type CGServer,
+  hasCGMetrics,
   useCGServers,
   useCheckCGServer,
   useDeleteCGServer,
 } from '../../api/cg-servers'
 import { formatDateTime } from '../../api/settings'
 import { CGServerFormDialog } from './cg-server-form-dialog'
+
+// Độ trễ: xanh < 50 ms, vàng < 200 ms, đỏ từ 200 ms
+const latencyClass = (ms: number) => (ms < 50 ? 'text-green-400' : ms < 200 ? 'text-yellow-500' : 'text-red-400')
+
+function ChannelsCell({ server }: { server: CGServer }) {
+  if (!hasCGMetrics(server)) return <span className='text-muted-foreground text-xs'>Chưa có số liệu</span>
+  const total = server.channelCount ?? server.channels?.length ?? 0
+  const active = server.activeChannels ?? 0
+  const names = (server.channels ?? []).map((c) => `${c.name || `Kênh ${c.id}`}: ${c.state ?? '—'}`).join('\n')
+  return (
+    <span className='text-foreground' title={names || undefined}>
+      <span className={active > 0 ? 'text-green-400' : undefined}>{active}</span>/{total}
+      <span className='text-muted-foreground text-xs'> đang phát</span>
+    </span>
+  )
+}
 
 const STATUS_CLASS: Record<number, string> = {
   [CG_SERVER_STATUS.online]: 'border-green-500 text-green-400',
@@ -100,13 +117,15 @@ export function CGServerSettings() {
               <TableHead className='text-muted-foreground'>Port</TableHead>
               <TableHead className='text-muted-foreground'>Phiên bản</TableHead>
               <TableHead className='text-muted-foreground'>Trạng thái</TableHead>
+              <TableHead className='text-muted-foreground text-right'>Độ trễ</TableHead>
+              <TableHead className='text-muted-foreground'>Kênh</TableHead>
               <TableHead className='text-muted-foreground'>Kiểm tra gần nhất</TableHead>
               <TableHead className='text-muted-foreground text-right'>Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <AdminTableState
-              colSpan={9}
+              colSpan={11}
               isLoading={isLoading}
               isError={isError}
               isEmpty={servers.length === 0}
@@ -136,6 +155,16 @@ export function CGServerSettings() {
                   >
                     {server.statusName ?? '—'}
                   </Badge>
+                </TableCell>
+                <TableCell className='text-right font-mono text-sm'>
+                  {server.latencyMs != null ? (
+                    <span className={latencyClass(server.latencyMs)}>{server.latencyMs} ms</span>
+                  ) : (
+                    <span className='text-muted-foreground'>—</span>
+                  )}
+                </TableCell>
+                <TableCell className='text-sm'>
+                  <ChannelsCell server={server} />
                 </TableCell>
                 <TableCell className='text-muted-foreground text-sm'>{formatDateTime(server.lastChecked)}</TableCell>
                 <TableCell>

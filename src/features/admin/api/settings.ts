@@ -17,6 +17,58 @@ export type ConnectionTestResult = Schemas['ConnectionTestResult']
 export type LdapConfiguration = Schemas['LdapConfigurationDto']
 export type LdapConfigurationRequest = Schemas['SaveLdapConfigurationDto']
 export type LdapTestRequest = Schemas['TestLdapDto']
+export type LdapSyncResult = Schemas['LdapSyncResultDto']
+export type LdapSyncChange = Schemas['LdapSyncChangeDto']
+export type LdapUserRecord = Schemas['LdapUserRecord']
+export type LdapSyncAction = 'create' | 'update' | 'deactivate' | 'skip'
+
+// Ánh xạ thuộc tính LDAP -> người dùng (mặc định của backend = Active Directory)
+export type LdapAttributeMapping = {
+  attrUsername: string
+  attrFullName: string
+  attrEmail: string
+  attrPhone: string
+  attrDepartment: string
+  attrTitle: string
+}
+
+export const LDAP_ATTRIBUTE_PRESETS = {
+  activeDirectory: {
+    attrUsername: 'sAMAccountName',
+    attrFullName: 'displayName',
+    attrEmail: 'mail',
+    attrPhone: 'telephoneNumber',
+    attrDepartment: 'department',
+    attrTitle: 'title',
+  },
+  openLdap: {
+    attrUsername: 'uid',
+    attrFullName: 'cn',
+    attrEmail: 'mail',
+    attrPhone: 'telephoneNumber',
+    attrDepartment: 'departmentNumber',
+    attrTitle: 'title',
+  },
+} as const satisfies Record<string, LdapAttributeMapping>
+
+// Tên thuộc tính LDAP hợp lệ (giống kiểm tra phía backend)
+export const LDAP_ATTRIBUTE_PATTERN = /^[A-Za-z][A-Za-z0-9-]{0,99}$/
+
+// Bộ lọc mặc định khi để trống bộ lọc đồng bộ
+export const LDAP_DEFAULT_SYNC_FILTER = '(|(&(objectCategory=person)(objectClass=user))(objectClass=inetOrgPerson))'
+
+export const LDAP_SYNC_MAX_INTERVAL = 10080
+
+// lastSyncStatus là thông điệp kết quả; lần lỗi bắt đầu bằng "Không đọc được..." hoặc chứa "thất bại"/"lỗi"
+export const isLdapSyncStatusFailed = (status: string | null | undefined) =>
+  !!status && /^không đọc được|thất bại|lỗi/i.test(status)
+
+export const formatSyncInterval = (minutes: number | undefined) => {
+  if (!minutes) return 'Thủ công'
+  if (minutes % 1440 === 0) return `Mỗi ${minutes / 1440} ngày`
+  if (minutes % 60 === 0) return `Mỗi ${minutes / 60} giờ`
+  return `Mỗi ${minutes} phút`
+}
 
 export interface LdapConfigurationsResponse {
   items: LdapConfiguration[]
@@ -93,6 +145,16 @@ export const deleteLdapConfiguration = async (id: number) => {
 
 export const testLdapConfiguration = async ({ id, data }: { id: number; data?: LdapTestRequest }) => {
   const res = await axios.post<ConnectionTestResult>(apiUrls.ldap.test(id), data ?? {})
+  return res.data
+}
+
+export const syncLdapConfiguration = async ({ id, dryRun }: { id: number; dryRun: boolean }) => {
+  const res = await axios.post<LdapSyncResult>(apiUrls.ldap.sync(id), null, { params: { dryRun } })
+  return res.data
+}
+
+export const getLdapUsers = async (id: number, limit = 20) => {
+  const res = await axios.get<LdapUserRecord[]>(apiUrls.ldap.users(id), { params: { limit } })
   return res.data
 }
 
@@ -177,4 +239,29 @@ export const useTestLdapConfiguration = () =>
       if (result.success) toast.success(`${result.message ?? 'Kết nối LDAP thành công'} (${result.elapsedMs ?? 0} ms)`)
       else toast.error(result.message ?? 'Kết nối LDAP thất bại')
     },
+  })
+
+// Đồng bộ người dùng từ LDAP; dryRun=true chỉ xem trước, không lưu (409 khi đang có lượt đồng bộ khác)
+export const useSyncLdapConfiguration = () => {
+  const invalidate = useInvalidateLdap()
+  return useMutation({
+    mutationFn: syncLdapConfiguration,
+    onSuccess: (result, { dryRun }) => {
+      if (dryRun) return
+      if (result.success) toast.success(result.message ?? 'Đồng bộ LDAP hoàn tất')
+      else toast.error(result.message ?? 'Đồng bộ LDAP thất bại')
+      invalidate()
+    },
+  })
+}
+
+// Xem thử người dùng đọc được từ LDAP theo ánh xạ thuộc tính
+export const useLdapUsers = (id: number | undefined, limit = 20) =>
+  useQuery({
+    queryKey: ['admin-ldap-users', id, limit],
+    queryFn: () => getLdapUsers(id ?? 0, limit),
+    enabled: !!id,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
   })

@@ -17,6 +17,7 @@ import {
   LogSearchInput,
   LogTableCard,
   toRangeParams,
+  DeleteLogButton,
 } from './log-shared'
 
 type OutcomeFilter = 'all' | NonNullable<ActivityLogParams['outcome']>
@@ -156,11 +157,12 @@ export function ActivityLogsTab({ active }: { active: boolean }) {
               <TableHead className='text-muted-foreground w-24 text-right'>Thời lượng</TableHead>
               <TableHead className='text-muted-foreground w-32'>IP</TableHead>
               <TableHead className='text-muted-foreground w-32'>Thiết bị</TableHead>
+              <TableHead className='text-muted-foreground w-12' aria-label='Thao tác' />
             </TableRow>
           </TableHeader>
           <TableBody>
             <AdminTableState
-              colSpan={8}
+              colSpan={9}
               isLoading={isLoading}
               isError={isError}
               isEmpty={logs.length === 0}
@@ -205,6 +207,9 @@ export function ActivityLogsTab({ active }: { active: boolean }) {
                   ) : (
                     '—'
                   )}
+                </TableCell>
+                <TableCell className='text-right'>
+                  <DeleteLogButton kind='activities' id={log.id} summary={`${formatDateTime(log.createdAt)} • ${log.userName ?? ''} • ${log.actionDetail ?? ''}`} />
                 </TableCell>
               </TableRow>
             ))}

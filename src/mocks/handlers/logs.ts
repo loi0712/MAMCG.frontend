@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { apiUrls } from '@/api/config/endpoints'
 import type { ActionType, ActivityLog, CGServerLog, LdapSyncLog, SystemLog } from '@/features/admin/api/logs'
-import { api, paginate } from './utils'
+import { api, notFound, paginate } from './utils'
 
 // Thời điểm cách hiện tại `minutes` phút, định dạng như backend (không kèm múi giờ)
 const ago = (minutes: number) => {
@@ -93,6 +93,16 @@ const inRange = (value: string | undefined, url: URL) => {
   return (!from || t >= new Date(from).getTime()) && (!to || t <= new Date(to).getTime())
 }
 
+// Kho theo loại (/api/Log/{kind}) cho API xoá; ldap-sync so theo syncTime
+const stores: Record<string, { items: Array<{ id?: number }>; time: (index: number) => string | null | undefined }> = {
+  activities: { items: activities, time: (i) => activities[i]?.createdAt },
+  system: { items: systemLogs, time: (i) => systemLogs[i]?.createdAt },
+  'cg-server': { items: cgServerLogs, time: (i) => cgServerLogs[i]?.createdAt },
+  'ldap-sync': { items: ldapSyncLogs, time: (i) => ldapSyncLogs[i]?.syncTime },
+}
+
+const badRequest = (title: string) => HttpResponse.json({ title, status: 400 }, { status: 400 })
+
 export const logHandlers = [
   http.get(api(apiUrls.log.activities), ({ request }) => {
     const url = new URL(request.url)
@@ -130,5 +140,33 @@ export const logHandlers = [
   http.get(api(apiUrls.log.ldapSync), ({ request }) => {
     const { page, totalCount } = paginate(ldapSyncLogs, new URL(request.url), () => '')
     return HttpResponse.json({ items: page, totalCount })
+  }),
+
+  // Xoá một dòng — khai báo trước route purge để khớp đường dẫn dài hơn
+  http.delete(api(apiUrls.log.deleteOne(':kind', ':id' as unknown as number)), ({ params }) => {
+    const store = stores[String(params.kind)]
+    if (!store) return badRequest(`Loại nhật ký không hợp lệ: '${params.kind}'`)
+    const index = store.items.findIndex((l) => l.id === Number(params.id))
+    if (index < 0) return notFound()
+    store.items.splice(index, 1)
+    return HttpResponse.json(true)
+  }),
+
+  // Xoá các dòng tạo trước `before` (bắt buộc, không được ở tương lai)
+  http.delete(api(apiUrls.log.purge(':kind')), ({ params, request }) => {
+    const store = stores[String(params.kind)]
+    if (!store) return badRequest(`Loại nhật ký không hợp lệ: '${params.kind}'`)
+    const raw = new URL(request.url).searchParams.get('before')
+    const before = raw ? new Date(raw).getTime() : NaN
+    if (Number.isNaN(before)) return badRequest('Thiếu tham số before (xoá nhật ký trước thời điểm này)')
+    if (before > Date.now()) return badRequest('Thời điểm before không được ở tương lai')
+    let deleted = 0
+    for (let i = store.items.length - 1; i >= 0; i--) {
+      if (new Date(store.time(i) ?? 0).getTime() < before) {
+        store.items.splice(i, 1)
+        deleted++
+      }
+    }
+    return HttpResponse.json({ deleted })
   }),
 ]

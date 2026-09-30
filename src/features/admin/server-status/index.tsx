@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Activity, Clock, Cpu, HardDrive, Loader2, PlugZap, RefreshCw, Server, Timer, Wrench } from 'lucide-react'
+import { Activity, BarChart3, Clock, Cpu, Gauge, HardDrive, Loader2, Play, PlugZap, RefreshCw, Server, Timer, Wrench } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,7 @@ import { AdminTableState } from '../components/admin-table-state'
 import {
   type CGServer,
   type CGServerCheckResult,
+  CG_SERVER_REFRESH_MS,
   CG_SERVER_STATUS,
   checkCGServer,
   useCGServers,
@@ -28,6 +29,8 @@ import {
   useServerInfo,
   useServiceHealth,
 } from '../api/system'
+import { CGServerMetricsDialog } from './components/cg-server-metrics-dialog'
+import { CGServerMetricsPanel } from './components/cg-server-metrics-panel'
 import { ServiceStatusBadge } from './components/service-status-badge'
 
 function InfoRow({ label, children, last }: { label: string; children: ReactNode; last?: boolean }) {
@@ -212,7 +215,9 @@ function SystemTab() {
 
 function CGServersTab() {
   const queryClient = useQueryClient()
-  const { data, isLoading, isError, isFetching, refetch } = useCGServers(ALL_ITEMS)
+  // Backend giám sát mỗi 60 giây → tự làm mới danh sách để thấy trạng thái/số liệu mới
+  const { data, isLoading, isError, isFetching, refetch } = useCGServers(ALL_ITEMS, { refetchInterval: CG_SERVER_REFRESH_MS })
+  const [detailsId, setDetailsId] = useState<number | null>(null)
   const checkOne = useCheckCGServer()
   const [checkingIds, setCheckingIds] = useState<Set<number>>(new Set())
   const [checkingAll, setCheckingAll] = useState(false)
@@ -220,6 +225,17 @@ function CGServersTab() {
 
   const servers = data?.items ?? []
   const count = (statusId: number) => servers.filter((s) => s.statusId === statusId).length
+  const detailsServer = servers.find((s) => s.id === detailsId) ?? null
+
+  // Tổng kênh đang phát / tổng kênh của các server có báo số liệu
+  const reporting = servers.filter((s) => s.channelCount != null || s.activeChannels != null)
+  const activeChannels = reporting.reduce((sum, s) => sum + (s.activeChannels ?? 0), 0)
+  const totalChannels = reporting.reduce((sum, s) => sum + (s.channelCount ?? s.channels?.length ?? 0), 0)
+  // Độ trễ trung bình của các server đang online có số đo
+  const latencies = servers
+    .filter((s) => s.statusId === CG_SERVER_STATUS.online && s.latencyMs != null)
+    .map((s) => s.latencyMs as number)
+  const avgLatency = latencies.length ? Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length) : null
 
   const markChecking = (id: number, on: boolean) =>
     setCheckingIds((prev) => {
@@ -275,7 +291,7 @@ function CGServersTab() {
   return (
     <div className='space-y-4'>
       {/* CG Servers Overview */}
-      <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+      <div className='grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4'>
         <MetricCard title='Tổng Servers' icon={<Server className='w-4 h-4 text-primary' />} value={isLoading ? '—' : (data?.totalCount ?? servers.length)} />
         <MetricCard
           title='Online'
@@ -292,6 +308,24 @@ function CGServersTab() {
           icon={<Wrench className='w-4 h-4 text-yellow-400' />}
           value={<span className='text-yellow-400'>{isLoading ? '—' : count(CG_SERVER_STATUS.maintenance)}</span>}
         />
+        <MetricCard
+          title='Kênh đang phát'
+          icon={<Play className='w-4 h-4 text-primary' />}
+          value={isLoading || reporting.length === 0 ? '—' : `${activeChannels}/${totalChannels}`}
+        >
+          <div className='text-xs text-muted-foreground'>
+            {reporting.length === 0 ? 'Chưa có số liệu' : `Từ ${reporting.length} server có báo số liệu`}
+          </div>
+        </MetricCard>
+        <MetricCard
+          title='Độ trễ TB'
+          icon={<Gauge className='w-4 h-4 text-primary' />}
+          value={isLoading || avgLatency == null ? '—' : `${avgLatency} ms`}
+        >
+          <div className='text-xs text-muted-foreground'>
+            {latencies.length === 0 ? 'Chưa có số đo' : `${latencies.length} server online`}
+          </div>
+        </MetricCard>
       </div>
 
       {/* CG Servers List */}
@@ -301,6 +335,7 @@ function CGServersTab() {
             <Server className='w-5 h-5 text-primary' />
             <h3 className='text-primary'>Server CG</h3>
             <span className='text-xs text-muted-foreground'>Kiểm tra gần nhất: {formatDateTime(lastChecked)}</span>
+            <span className='text-xs text-muted-foreground hidden md:inline'>• Tự làm mới mỗi 30 giây</span>
           </div>
           <div className='flex items-center gap-2'>
             <Button
@@ -370,10 +405,14 @@ function CGServersTab() {
                       )}
                     >
                       {result.reachable
-                        ? `Kết nối được (${result.elapsedMs ?? 0} ms)`
+                        ? `Kết nối được (${result.latencyMs ?? result.elapsedMs ?? 0} ms)${result.metricsAvailable ? ' • đã cập nhật số liệu' : ' • CG app không trả số liệu'}`
                         : (result.message ?? 'Không kết nối được')}
                     </div>
                   )}
+
+                  <div className='mb-3'>
+                    <CGServerMetricsPanel server={server} />
+                  </div>
 
                   {/* Last check */}
                   <div className='flex items-center justify-between pt-3 border-t border-border'>
@@ -381,16 +420,27 @@ function CGServersTab() {
                       <Clock className='w-3 h-3' />
                       Kiểm tra lần cuối: {server.lastChecked ? formatDateTime(server.lastChecked) : 'Chưa kiểm tra'}
                     </div>
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='text-muted-foreground hover:text-foreground hover:bg-accent'
-                      onClick={() => handleCheck(id)}
-                      disabled={checking || checkingAll}
-                    >
-                      {checking ? <Loader2 className='w-3 h-3 mr-1 animate-spin' /> : <PlugZap className='w-3 h-3 mr-1' />}
-                      Kiểm tra
-                    </Button>
+                    <div className='flex items-center gap-1'>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-muted-foreground hover:text-foreground hover:bg-accent'
+                        onClick={() => setDetailsId(id)}
+                      >
+                        <BarChart3 className='w-3 h-3 mr-1' />
+                        Chi tiết
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-muted-foreground hover:text-foreground hover:bg-accent'
+                        onClick={() => handleCheck(id)}
+                        disabled={checking || checkingAll}
+                      >
+                        {checking ? <Loader2 className='w-3 h-3 mr-1 animate-spin' /> : <PlugZap className='w-3 h-3 mr-1' />}
+                        Kiểm tra
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )
@@ -398,6 +448,8 @@ function CGServersTab() {
           </div>
         )}
       </Card>
+
+      <CGServerMetricsDialog server={detailsServer} onOpenChange={(open) => !open && setDetailsId(null)} />
     </div>
   )
 }

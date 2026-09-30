@@ -17,6 +17,7 @@ import {
   LogSearchInput,
   LogTableCard,
   toRangeParams,
+  DeleteLogButton,
 } from './log-shared'
 
 const LEVEL_STYLE: Record<string, string> = {
@@ -109,11 +110,12 @@ export function SystemLogsTab({ active }: { active: boolean }) {
               <TableHead className='text-muted-foreground w-36'>Dịch vụ</TableHead>
               <TableHead className='text-muted-foreground w-56'>Nguồn</TableHead>
               <TableHead className='text-muted-foreground'>Nội dung</TableHead>
+              <TableHead className='text-muted-foreground w-12' aria-label='Thao tác' />
             </TableRow>
           </TableHeader>
           <TableBody>
             <AdminTableState
-              colSpan={5}
+              colSpan={6}
               isLoading={isLoading}
               isError={isError}
               isEmpty={logs.length === 0}
@@ -131,6 +133,9 @@ export function SystemLogsTab({ active }: { active: boolean }) {
                 </TableCell>
                 <TableCell className='text-foreground max-w-xl text-sm whitespace-normal'>
                   <ExpandableText text={log.message} />
+                </TableCell>
+                <TableCell className='text-right'>
+                  <DeleteLogButton kind='system' id={log.id} summary={`${formatDateTime(log.createdAt)} • ${log.message ?? ''}`} />
                 </TableCell>
               </TableRow>
             ))}

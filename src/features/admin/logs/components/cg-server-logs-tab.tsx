@@ -19,6 +19,7 @@ import {
   LogFilterCard,
   LogTableCard,
   toRangeParams,
+  DeleteLogButton,
 } from './log-shared'
 
 // Backend ghi "[OK] ..." khi kết nối được, "[LỖI] ..." khi không
@@ -116,11 +117,12 @@ export function CGServerLogsTab({ active }: { active: boolean }) {
               <TableHead className='text-muted-foreground w-32'>Kết quả</TableHead>
               <TableHead className='text-muted-foreground w-56'>Server</TableHead>
               <TableHead className='text-muted-foreground'>Nội dung</TableHead>
+              <TableHead className='text-muted-foreground w-12' aria-label='Thao tác' />
             </TableRow>
           </TableHeader>
           <TableBody>
             <AdminTableState
-              colSpan={4}
+              colSpan={5}
               isLoading={isLoading}
               isError={isError}
               isEmpty={logs.length === 0}
@@ -140,6 +142,9 @@ export function CGServerLogsTab({ active }: { active: boolean }) {
                 </TableCell>
                 <TableCell className='text-foreground text-sm whitespace-normal'>
                   <ExpandableText text={stripPrefix(log.message)} />
+                </TableCell>
+                <TableCell className='text-right'>
+                  <DeleteLogButton kind='cg-server' id={log.id} summary={`${formatDateTime(log.createdAt)} • ${serverName(log.serverId)} • ${stripPrefix(log.message) ?? ''}`} />
                 </TableCell>
               </TableRow>
             ))}

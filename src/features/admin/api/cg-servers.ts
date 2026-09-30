@@ -15,6 +15,15 @@ export type CGServer = Schemas['CGServerAdminDto']
 export type CGServerStatus = Schemas['CGServerStatusDto']
 export type CGServerCheckResult = Schemas['CGServerCheckResultDto']
 export type CGServerRequest = Schemas['SaveCGServerDto']
+export type CGChannel = Schemas['CGChannelDto']
+export type CGServerMetricPoint = Schemas['CGServerMetricPointDto']
+
+export interface CGServerMetricsParams {
+  // Thời điểm ISO không kèm múi giờ (giờ Việt Nam như backend)
+  from?: string
+  to?: string
+  limit?: number
+}
 
 export interface CGServersResponse {
   items: CGServer[]
@@ -23,6 +32,21 @@ export interface CGServersResponse {
 
 // Id trạng thái cố định phía backend (CGServerStatusIds)
 export const CG_SERVER_STATUS = { online: 1, offline: 2, maintenance: 3 } as const
+
+// Backend giám sát CG server mỗi 60 giây: màn trạng thái tự làm mới mỗi 30 giây
+export const CG_SERVER_REFRESH_MS = 30_000
+
+// Trạng thái kênh được tính là đang phát (khớp CGServerMetrics.IsActiveState phía backend)
+const ACTIVE_CHANNEL_STATES = ['playing', 'play', 'onair', 'on-air', 'on_air', 'live', 'running']
+export const isActiveChannelState = (state?: string | null) =>
+  !!state && ACTIVE_CHANNEL_STATES.includes(state.trim().toLowerCase())
+
+// CG app có báo số liệu (lệnh status hoặc heartbeat) hay chưa
+export const hasCGMetrics = (server: CGServer) => !!server.metricsUpdatedAt
+
+// Date → ISO giờ địa phương, không kèm múi giờ (backend lưu giờ Việt Nam)
+export const toLocalIso = (date: Date) =>
+  new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().replace('Z', '')
 
 // ===========================================
 // API FUNCTIONS
@@ -57,15 +81,43 @@ export const checkCGServer = async (id: number) => {
   return res.data
 }
 
+export const getCGServerMetrics = async (id: number, params: CGServerMetricsParams) => {
+  const res = await axios.get<CGServerMetricPoint[]>(apiUrls.cgServer.metrics(id), { params })
+  return res.data ?? []
+}
+
 // ===========================================
 // CUSTOM HOOKS
 // ===========================================
 
-export const useCGServers = (params: PagedParams) =>
+export const useCGServers = (params: PagedParams, options?: { refetchInterval?: number }) =>
   useQuery({
     queryKey: ['admin-cg-servers', params],
     queryFn: () => getCGServers(params),
     placeholderData: keepPreviousData,
+    refetchInterval: options?.refetchInterval,
+  })
+
+// Lịch sử số liệu (tăng dần theo thời gian) trong `rangeMs` gần nhất; mốc from tính lúc gọi API
+// để tự làm mới luôn lấy đúng khoảng. Backend trả tối đa `limit` điểm mới nhất (≤ 5000).
+export const CG_METRICS_MAX_LIMIT = 5000
+
+export const useCGServerMetrics = (
+  id: number | undefined,
+  rangeMs: number,
+  options?: { limit?: number; refetchInterval?: number }
+) =>
+  useQuery({
+    queryKey: ['admin-cg-servers', 'metrics', id, rangeMs, options?.limit],
+    queryFn: () =>
+      getCGServerMetrics(id as number, {
+        from: toLocalIso(new Date(Date.now() - rangeMs)),
+        limit: options?.limit ?? CG_METRICS_MAX_LIMIT,
+      }),
+    enabled: id != null,
+    // Giữ dữ liệu cũ khi đổi khoảng thời gian, nhưng không lẫn sang server khác
+    placeholderData: (prev, prevQuery) => (prevQuery?.queryKey[2] === id ? prev : undefined),
+    refetchInterval: options?.refetchInterval,
   })
 
 export const useCGServerStatuses = () =>
@@ -115,8 +167,12 @@ export const useCheckCGServer = () => {
   return useMutation({
     mutationFn: checkCGServer,
     onSuccess: (result) => {
-      if (result.reachable) toast.success(`Kết nối được ${result.server?.serverName ?? "CG server"} (${result.elapsedMs} ms)`)
-      else toast.error(result.message ?? `Không kết nối được ${result.server?.serverName ?? "CG server"}`)
+      const name = result.server?.serverName ?? 'CG server'
+      if (result.reachable)
+        toast.success(`Kết nối được ${name} (${result.latencyMs ?? result.elapsedMs} ms)`, {
+          description: result.metricsAvailable ? 'Đã cập nhật số liệu từ CG app' : 'CG app không trả số liệu (lệnh status)',
+        })
+      else toast.error(result.message ?? `Không kết nối được ${name}`)
       invalidate()
     },
   })
