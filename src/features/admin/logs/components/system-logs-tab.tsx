@@ -8,7 +8,6 @@ import { SYSTEM_LOG_LEVELS, useSystemLogs } from '../../api/logs'
 import {
   type DateRange,
   DateRangeFilter,
-  downloadCsv,
   ExpandableText,
   ExportButton,
   formatDateTime,
@@ -41,29 +40,15 @@ export function SystemLogsTab({ active }: { active: boolean }) {
   const [level, setLevel] = useState('all')
   const [range, setRange] = useState<DateRange>({ from: '', to: '' })
 
-  const { data, isLoading, isError } = useSystemLogs(
-    {
-      pageNumber: page,
-      pageSize: LOG_PAGE_SIZE,
-      searchTerm,
-      logLevel: level === 'all' ? undefined : level,
-      ...toRangeParams(range),
-    },
-    active
-  )
+  // Bộ lọc dùng chung cho danh sách và xuất CSV
+  const filters = { searchTerm, logLevel: level === 'all' ? undefined : level, ...toRangeParams(range) }
+  const { data, isLoading, isError } = useSystemLogs({ pageNumber: page, pageSize: LOG_PAGE_SIZE, ...filters }, active)
   const logs = data?.items ?? []
 
   const handleSearch = useCallback((term: string) => {
     setSearchTerm(term)
     setPage(1)
   }, [])
-
-  const handleExport = () =>
-    downloadCsv(
-      'nhat-ky-he-thong',
-      ['Thời gian', 'Mức độ', 'Dịch vụ', 'Nguồn', 'Nội dung'],
-      logs.map((l) => [formatDateTime(l.createdAt), l.logLevel, l.serviceName, l.source, l.message])
-    )
 
   return (
     <div className='space-y-4'>
@@ -98,7 +83,7 @@ export function SystemLogsTab({ active }: { active: boolean }) {
           }}
         />
 
-        <ExportButton disabled={logs.length === 0} onClick={handleExport} />
+        <ExportButton kind='system' params={filters} disabled={logs.length === 0} />
       </LogFilterCard>
 
       <LogTableCard>

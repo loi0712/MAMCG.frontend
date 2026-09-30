@@ -11,7 +11,6 @@ import { useCGServerLogs } from '../../api/logs'
 import {
   type DateRange,
   DateRangeFilter,
-  downloadCsv,
   ExpandableText,
   ExportButton,
   formatDateTime,
@@ -56,23 +55,10 @@ export function CGServerLogsTab({ active }: { active: boolean }) {
   const servers = useMemo(() => serversData?.items ?? [], [serversData])
   const serverName = (id?: number) => servers.find((s) => s.id === id)?.serverName ?? `Server #${id ?? '?'}`
 
-  const { data, isLoading, isError } = useCGServerLogs(
-    {
-      pageNumber: page,
-      pageSize: LOG_PAGE_SIZE,
-      serverId: serverId === 'all' ? undefined : Number(serverId),
-      ...toRangeParams(range),
-    },
-    active
-  )
+  // Bộ lọc dùng chung cho danh sách và xuất CSV
+  const filters = { serverId: serverId === 'all' ? undefined : Number(serverId), ...toRangeParams(range) }
+  const { data, isLoading, isError } = useCGServerLogs({ pageNumber: page, pageSize: LOG_PAGE_SIZE, ...filters }, active)
   const logs = data?.items ?? []
-
-  const handleExport = () =>
-    downloadCsv(
-      'nhat-ky-cg-server',
-      ['Thời gian', 'Server', 'Nội dung'],
-      logs.map((l) => [formatDateTime(l.createdAt), serverName(l.serverId), l.message])
-    )
 
   return (
     <div className='space-y-4'>
@@ -106,7 +92,7 @@ export function CGServerLogsTab({ active }: { active: boolean }) {
         />
 
         <div className='flex-1' />
-        <ExportButton disabled={logs.length === 0} onClick={handleExport} />
+        <ExportButton kind='cg-server' params={filters} disabled={logs.length === 0} />
       </LogFilterCard>
 
       <LogTableCard>

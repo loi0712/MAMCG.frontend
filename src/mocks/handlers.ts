@@ -1,4 +1,5 @@
 import { appHandlers } from './handlers/app'
+import { assetHandlers } from './handlers/assets'
 import { authHandlers } from './handlers/auth'
 import { backupHandlers } from './handlers/backup'
 import { cgServerHandlers } from './handlers/cg-servers'
@@ -33,5 +34,7 @@ export const handlers = [
   ...notificationHandlers,
   ...workflowHandlers,
   ...systemHandlers,
+  // Tài sản mẫu: trước appHandlers (danh sách rỗng)
+  ...assetHandlers,
   ...appHandlers,
 ]

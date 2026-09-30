@@ -139,7 +139,12 @@ export const apiUrls = {
         cgServer: `${baseUrl}/Log/cg-server`,
         ldapSync: `${baseUrl}/Log/ldap-sync`,
         purge: (kind: string) => `${baseUrl}/Log/${kind}`,
-        deleteOne: (kind: string, id: number) => `${baseUrl}/Log/${kind}/${id}`
+        deleteOne: (kind: string, id: number) => `${baseUrl}/Log/${kind}/${id}`,
+        // Nhật ký kiểm toán + xuất CSV theo bộ lọc
+        audit: `${baseUrl}/Log/audit`,
+        auditDetails: (id: number) => `${baseUrl}/Log/audit/${id}`,
+        auditEntityTypes: `${baseUrl}/Log/audit/entity-types`,
+        export: (kind: string) => `${baseUrl}/Log/${kind}/export`
     },
     notification: {
         mine: `${baseUrl}/Notification/me`,
