@@ -5,9 +5,10 @@
 export interface Category {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   groupId: number;
   code: string;
+  groupName?: string | null;
 }
 
 // ===========================================

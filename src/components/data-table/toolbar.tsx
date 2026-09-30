@@ -16,6 +16,7 @@ type DataTableToolbarProps<TData> = {
   searchKey?: string
   onFiltersApply?: (filterQuery: FilterQuery) => Promise<void>
   onAssetCreated?: () => Promise<void> // Callback khi tạo asset thành công
+  actions?: React.ReactNode // Nút bổ sung đặt trước nút "Tạo thiết kế" (vd. Xuất CSV)
   columns?: ColumnWithDataSource[]
   operators?: Array<{ value: string; label: string }>
   filters?: {
@@ -35,6 +36,7 @@ export function DataTableToolbar<TData>({
   table,
   onFiltersApply,
   onAssetCreated,
+  actions,
   columns = [],
   operators = [],
   // filters = [],
@@ -173,6 +175,8 @@ export function DataTableToolbar<TData>({
             </Button>
           )}
           
+          {actions}
+
           <Button 
             className='space-x-1 h-8' 
             onClick={handleCreateAsset}

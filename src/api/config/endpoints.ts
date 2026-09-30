@@ -177,14 +177,39 @@ export const apiUrls = {
         uploadInfo: `${baseUrl}/Asset/upload-info`,
         create: `${baseUrl}/Asset/upload`,
         update: (assetId: string) => `${baseUrl}/Asset/update/${assetId}`,
-        delete: (assetId: string) => `${baseUrl}/Asset/delete/${assetId}`
+        delete: (assetId: string) => `${baseUrl}/Asset/delete/${assetId}`,
+        // Thao tác hàng loạt, xuất CSV, thùng rác
+        bulkDelete: `${baseUrl}/Asset/bulk/delete`,
+        bulkAvailableActions: `${baseUrl}/Asset/bulk/available-actions`,
+        bulkAction: `${baseUrl}/Asset/bulk/action`,
+        bulkDownload: `${baseUrl}/Asset/bulk/download`,
+        export: `${baseUrl}/Asset/export`,
+        trash: `${baseUrl}/Asset/trash`,
+        restore: (id: number) => `${baseUrl}/Asset/restore/${id}`,
+        purge: (id: number) => `${baseUrl}/Asset/purge/${id}`
     },
     category: {
         create: `${baseUrl}/Category/create`,
         list: `${baseUrl}/Category/paged`,
-        details: (id: number) => `${baseUrl}/Category/${id}`
+        details: (id: number) => `${baseUrl}/Category/${id}`,
+        update: (id: number) => `${baseUrl}/Category/update/${id}`,
+        delete: (id: number) => `${baseUrl}/Category/delete/${id}`
+    },
+    categoryGroup: {
+        list: `${baseUrl}/CategoryGroup/paged`,
+        details: (id: number) => `${baseUrl}/CategoryGroup/${id}`,
+        create: `${baseUrl}/CategoryGroup/create`,
+        update: (id: number) => `${baseUrl}/CategoryGroup/update/${id}`,
+        delete: (id: number) => `${baseUrl}/CategoryGroup/delete/${id}`
     },
     cg: {
         preview: `${baseUrl}/CGCommand/PreviewCGScene`
+    },
+    cgScene: {
+        list: `${baseUrl}/CGScene/paged`,
+        details: (id: number) => `${baseUrl}/CGScene/${id}`,
+        create: `${baseUrl}/CGScene/create`,
+        approval: (id: number) => `${baseUrl}/CGScene/approval/${id}`,
+        templates: `${baseUrl}/CGTemplate/all`
     }
 }

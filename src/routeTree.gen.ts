@@ -34,6 +34,10 @@ import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminStorageRouteImport } from './routes/admin/storage'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AuthenticatedAssetsIndexRouteImport } from './routes/_authenticated/assets/index'
+import { Route as AuthenticatedAssetsTrashRouteImport } from './routes/_authenticated/assets/trash'
+import { Route as AuthenticatedCgScenesIndexRouteImport } from './routes/_authenticated/cg-scenes/index'
+import { Route as AuthenticatedCgScenesCreateRouteImport } from './routes/_authenticated/cg-scenes/create'
+import { Route as AuthenticatedCgScenesDetailsRouteImport } from './routes/_authenticated/cg-scenes/details'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AdminWorkflowIndexRouteImport } from './routes/admin/workflow/index'
 import { Route as AdminWorkflowWorkflowIdRouteImport } from './routes/admin_/workflow/$workflowId'
@@ -165,6 +169,30 @@ const AuthenticatedAssetsIndexRoute =
     path: '/assets/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAssetsTrashRoute =
+  AuthenticatedAssetsTrashRouteImport.update({
+    id: '/assets/trash',
+    path: '/assets/trash',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCgScenesIndexRoute =
+  AuthenticatedCgScenesIndexRouteImport.update({
+    id: '/cg-scenes/',
+    path: '/cg-scenes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCgScenesCreateRoute =
+  AuthenticatedCgScenesCreateRouteImport.update({
+    id: '/cg-scenes/create',
+    path: '/cg-scenes/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCgScenesDetailsRoute =
+  AuthenticatedCgScenesDetailsRouteImport.update({
+    id: '/cg-scenes/details',
+    path: '/cg-scenes/details',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
@@ -218,9 +246,13 @@ export interface FileRoutesByFullPath {
   '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/assets/trash': typeof AuthenticatedAssetsTrashRoute
+  '/cg-scenes/create': typeof AuthenticatedCgScenesCreateRoute
+  '/cg-scenes/details': typeof AuthenticatedCgScenesDetailsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/admin/workflow/$workflowId': typeof AdminWorkflowWorkflowIdRoute
   '/assets/': typeof AuthenticatedAssetsIndexRoute
+  '/cg-scenes/': typeof AuthenticatedCgScenesIndexRoute
   '/admin/workflow/': typeof AdminWorkflowIndexRoute
   '/assets/cg/details': typeof AuthenticatedAssetsCgDetailsRoute
   '/assets/details/details': typeof AuthenticatedAssetsDetailsDetailsRoute
@@ -248,9 +280,13 @@ export interface FileRoutesByTo {
   '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
+  '/assets/trash': typeof AuthenticatedAssetsTrashRoute
+  '/cg-scenes/create': typeof AuthenticatedCgScenesCreateRoute
+  '/cg-scenes/details': typeof AuthenticatedCgScenesDetailsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/admin/workflow/$workflowId': typeof AdminWorkflowWorkflowIdRoute
   '/assets': typeof AuthenticatedAssetsIndexRoute
+  '/cg-scenes': typeof AuthenticatedCgScenesIndexRoute
   '/admin/workflow': typeof AdminWorkflowIndexRoute
   '/assets/cg/details': typeof AuthenticatedAssetsCgDetailsRoute
   '/assets/details/details': typeof AuthenticatedAssetsDetailsDetailsRoute
@@ -281,9 +317,13 @@ export interface FileRoutesById {
   '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/_authenticated/assets/trash': typeof AuthenticatedAssetsTrashRoute
+  '/_authenticated/cg-scenes/create': typeof AuthenticatedCgScenesCreateRoute
+  '/_authenticated/cg-scenes/details': typeof AuthenticatedCgScenesDetailsRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/admin_/workflow/$workflowId': typeof AdminWorkflowWorkflowIdRoute
   '/_authenticated/assets/': typeof AuthenticatedAssetsIndexRoute
+  '/_authenticated/cg-scenes/': typeof AuthenticatedCgScenesIndexRoute
   '/admin/workflow/': typeof AdminWorkflowIndexRoute
   '/_authenticated/assets/cg/details': typeof AuthenticatedAssetsCgDetailsRoute
   '/_authenticated/assets/details/details': typeof AuthenticatedAssetsDetailsDetailsRoute
@@ -314,9 +354,13 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/admin/users'
     | '/admin/'
+    | '/assets/trash'
+    | '/cg-scenes/create'
+    | '/cg-scenes/details'
     | '/errors/$error'
     | '/admin/workflow/$workflowId'
     | '/assets/'
+    | '/cg-scenes/'
     | '/admin/workflow/'
     | '/assets/cg/details'
     | '/assets/details/details'
@@ -344,9 +388,13 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/admin/users'
     | '/admin'
+    | '/assets/trash'
+    | '/cg-scenes/create'
+    | '/cg-scenes/details'
     | '/errors/$error'
     | '/admin/workflow/$workflowId'
     | '/assets'
+    | '/cg-scenes'
     | '/admin/workflow'
     | '/assets/cg/details'
     | '/assets/details/details'
@@ -376,9 +424,13 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/admin/users'
     | '/admin/'
+    | '/_authenticated/assets/trash'
+    | '/_authenticated/cg-scenes/create'
+    | '/_authenticated/cg-scenes/details'
     | '/_authenticated/errors/$error'
     | '/admin_/workflow/$workflowId'
     | '/_authenticated/assets/'
+    | '/_authenticated/cg-scenes/'
     | '/admin/workflow/'
     | '/_authenticated/assets/cg/details'
     | '/_authenticated/assets/details/details'
@@ -574,6 +626,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAssetsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/assets/trash': {
+      id: '/_authenticated/assets/trash'
+      path: '/assets/trash'
+      fullPath: '/assets/trash'
+      preLoaderRoute: typeof AuthenticatedAssetsTrashRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cg-scenes/': {
+      id: '/_authenticated/cg-scenes/'
+      path: '/cg-scenes'
+      fullPath: '/cg-scenes/'
+      preLoaderRoute: typeof AuthenticatedCgScenesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cg-scenes/create': {
+      id: '/_authenticated/cg-scenes/create'
+      path: '/cg-scenes/create'
+      fullPath: '/cg-scenes/create'
+      preLoaderRoute: typeof AuthenticatedCgScenesCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cg-scenes/details': {
+      id: '/_authenticated/cg-scenes/details'
+      path: '/cg-scenes/details'
+      fullPath: '/cg-scenes/details'
+      preLoaderRoute: typeof AuthenticatedCgScenesDetailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -614,16 +694,24 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCategoryRoute: typeof AuthenticatedCategoryRoute
+  AuthenticatedAssetsTrashRoute: typeof AuthenticatedAssetsTrashRoute
+  AuthenticatedCgScenesCreateRoute: typeof AuthenticatedCgScenesCreateRoute
+  AuthenticatedCgScenesDetailsRoute: typeof AuthenticatedCgScenesDetailsRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAssetsIndexRoute: typeof AuthenticatedAssetsIndexRoute
+  AuthenticatedCgScenesIndexRoute: typeof AuthenticatedCgScenesIndexRoute
   AuthenticatedAssetsCgDetailsRoute: typeof AuthenticatedAssetsCgDetailsRoute
   AuthenticatedAssetsDetailsDetailsRoute: typeof AuthenticatedAssetsDetailsDetailsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCategoryRoute: AuthenticatedCategoryRoute,
+  AuthenticatedAssetsTrashRoute: AuthenticatedAssetsTrashRoute,
+  AuthenticatedCgScenesCreateRoute: AuthenticatedCgScenesCreateRoute,
+  AuthenticatedCgScenesDetailsRoute: AuthenticatedCgScenesDetailsRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAssetsIndexRoute: AuthenticatedAssetsIndexRoute,
+  AuthenticatedCgScenesIndexRoute: AuthenticatedCgScenesIndexRoute,
   AuthenticatedAssetsCgDetailsRoute: AuthenticatedAssetsCgDetailsRoute,
   AuthenticatedAssetsDetailsDetailsRoute:
     AuthenticatedAssetsDetailsDetailsRoute,

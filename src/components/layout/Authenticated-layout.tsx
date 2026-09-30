@@ -44,6 +44,7 @@ import {
 } from "@/components/layout/Folder-provider";
 import { useMenuStore } from "@/stores/menu-store";
 import { TreeNode } from "../ui/tree-node";
+import { SidebarQuickLinks } from "./Sidebar-quick-links";
 
 const DEFAULT_MENU = "Đồ hoạ";
 const CG_MENU = "CG";
@@ -204,6 +205,10 @@ const SidebarContentWrapper = memo<{
 
     return (
       <div className="w-full h-full" onContextMenu={onEmptyAreaContextMenu}>
+        {/* Lối tắt: chuyên mục, thùng rác, CG scene */}
+        <div onContextMenu={(e) => e.stopPropagation()}>
+          <SidebarQuickLinks menu={menu} />
+        </div>
         <Tree
           data={treeFolder}
           openByDefault={false}

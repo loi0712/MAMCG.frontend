@@ -1,104 +1,93 @@
 // components/assets/asset-multi-delete-dialog.tsx
-'use client'
-
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { type Table } from '@tanstack/react-table'
-import { AlertTriangle } from 'lucide-react'
-import { toast } from 'sonner'
-import { sleep } from '@/lib/utils'
+import { AlertTriangle, Loader2 } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { ConfirmDialog } from '@/components/confirm-dialog'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { type ParsedAsset } from '../api/get-assets'
+import { BULK_LIMITS, type BulkResult, useBulkDeleteAssets } from '../api/bulk'
+import { AssetsBulkResult, buildAssetLabels } from './assets-bulk-result'
 
 type AssetMultiDeleteDialogProps<TData> = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  table: Table<TData>
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    table: Table<TData>
 }
 
-const CONFIRM_WORD = 'DELETE'
+export function AssetMultiDeleteDialog<TData>({ open, onOpenChange, table }: AssetMultiDeleteDialogProps<TData>) {
+    const [result, setResult] = useState<BulkResult | null>(null)
+    const bulkDelete = useBulkDeleteAssets()
 
-export function AssetMultiDeleteDialog<TData>({
-  open,
-  onOpenChange,
-  table,
-}: AssetMultiDeleteDialogProps<TData>) {
-  const [value, setValue] = useState('')
+    const selectedRows = table.getFilteredSelectedRowModel().rows
+    const assets = useMemo(() => selectedRows.map((row) => row.original as ParsedAsset), [selectedRows])
+    // Giữ nhãn theo lúc bấm xoá: sau khi xoá danh sách tải lại, các hàng đã chọn không còn
+    const [labels, setLabels] = useState(new Map<number, string>())
+    const overLimit = assets.length > BULK_LIMITS.delete
 
-  const selectedRows = table.getFilteredSelectedRowModel().rows
-
-  const handleDelete = () => {
-    if (value.trim() !== CONFIRM_WORD) {
-      toast.error(`Please type "${CONFIRM_WORD}" to confirm.`)
-      return
+    const handleDelete = async () => {
+        setLabels(buildAssetLabels(assets))
+        try {
+            const res = await bulkDelete.mutateAsync(assets.map((a) => a.id))
+            setResult(res)
+            if (res.failed === 0) handleOpenChange(false)
+            table.resetRowSelection()
+        } catch {
+            // Lỗi đã được thông báo chung
+        }
     }
 
-    onOpenChange(false)
-
-    toast.promise(sleep(2000), {
-      loading: 'Deleting assets...',
-      success: () => {
-        table.resetRowSelection()
-        return `Deleted ${selectedRows.length} ${
-          selectedRows.length > 1 ? 'assets' : 'asset'
-        }`
-      },
-      error: 'Error deleting assets',
-    })
-  }
-
-  const handleOpenChange = (newOpen: boolean) => {
-    onOpenChange(newOpen)
-    // Reset input when dialog closes
-    if (!newOpen) {
-      setValue('')
+    const handleOpenChange = (next: boolean) => {
+        onOpenChange(next)
+        if (!next) setTimeout(() => setResult(null), 300)
     }
-  }
 
-  return (
-    <ConfirmDialog
-      open={open}
-      onOpenChange={handleOpenChange}
-      handleConfirm={handleDelete}
-      disabled={value.trim() !== CONFIRM_WORD}
-      title={
-        <span className='text-destructive'>
-          <AlertTriangle
-            className='stroke-destructive me-1 inline-block'
-            size={18}
-          />{' '}
-          Delete {selectedRows.length}{' '}
-          {selectedRows.length > 1 ? 'assets' : 'asset'}
-        </span>
-      }
-      desc={
-        <div className='space-y-4'>
-          <p className='mb-2'>
-            Are you sure you want to delete the selected assets? <br />
-            This action will permanently remove the files and cannot be undone.
-          </p>
+    return (
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogContent className='sm:max-w-lg'>
+                <DialogHeader>
+                    <DialogTitle className='text-destructive flex items-center gap-2'>
+                        <AlertTriangle className='h-5 w-5' />
+                        {result ? 'Kết quả xoá thiết kế' : `Xoá ${assets.length} thiết kế`}
+                    </DialogTitle>
+                    {!result && (
+                        <DialogDescription>
+                            Các thiết kế đã chọn sẽ được chuyển vào thùng rác. Quản trị viên có thể khôi phục hoặc xoá vĩnh viễn
+                            trong mục Thùng rác.
+                        </DialogDescription>
+                    )}
+                </DialogHeader>
 
-          <Label className='my-4 flex flex-col items-start gap-1.5'>
-            <span className=''>Confirm by typing "{CONFIRM_WORD}":</span>
-            <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={`Type "${CONFIRM_WORD}" to confirm.`}
-              autoComplete="off"
-            />
-          </Label>
+                {result ? (
+                    <AssetsBulkResult result={result} labels={labels} />
+                ) : overLimit ? (
+                    <Alert variant='destructive'>
+                        <AlertTitle>Vượt quá giới hạn</AlertTitle>
+                        <AlertDescription>
+                            Chỉ được xoá tối đa {BULK_LIMITS.delete} thiết kế mỗi lần. Hãy bỏ chọn bớt.
+                        </AlertDescription>
+                    </Alert>
+                ) : (
+                    <Alert>
+                        <AlertTitle>Lưu ý</AlertTitle>
+                        <AlertDescription>
+                            Thiết kế trong thùng rác sẽ bị xoá vĩnh viễn (kể cả file gốc) sau thời hạn lưu do quản trị viên cấu hình.
+                        </AlertDescription>
+                    </Alert>
+                )}
 
-          <Alert variant='destructive'>
-            <AlertTitle>Warning!</AlertTitle>
-            <AlertDescription>
-              This will permanently delete the selected assets and their files. This operation cannot be rolled back.
-            </AlertDescription>
-          </Alert>
-        </div>
-      }
-      confirmText='Delete Assets'
-      destructive
-    />
-  )
+                <DialogFooter>
+                    <Button variant='outline' onClick={() => handleOpenChange(false)} disabled={bulkDelete.isPending}>
+                        {result ? 'Đóng' : 'Huỷ'}
+                    </Button>
+                    {!result && (
+                        <Button variant='destructive' onClick={handleDelete} disabled={bulkDelete.isPending || overLimit || assets.length === 0}>
+                            {bulkDelete.isPending && <Loader2 className='h-4 w-4 animate-spin' />}
+                            Chuyển vào thùng rác
+                        </Button>
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
 }
