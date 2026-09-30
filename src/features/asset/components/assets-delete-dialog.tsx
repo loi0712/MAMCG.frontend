@@ -57,26 +57,26 @@ export function AssetsDeleteDialog({
                         Bạn có chắc chắn muốn xóa bản thiết kế{' '}
                         <span className='font-bold'>{currentRow.assetId} </span>?
                         <br />
-                        Hành động này sẽ xóa vĩnh viễn bản thiết kế thuộc loại{' '}
+                        Bản thiết kế thuộc loại{' '}
                         <span className='font-bold'>
                             {currentRow.type?.toUpperCase() || 'KHÔNG XÁC ĐỊNH'}
                         </span>{' '}
-                        khỏi hệ thống. Điều này không thể hoàn tác.
+                        sẽ được chuyển vào thùng rác; quản trị viên có thể khôi phục hoặc xoá vĩnh viễn.
                     </p>
 
                     <Label className='my-2'>
-                        Tên thiết kế:
+                        Mã thiết kế:
                         <Input
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
-                            placeholder='Nhập tên thiết kế để xác nhận xóa.'
+                            placeholder='Nhập mã thiết kế để xác nhận xóa.'
                         />
                     </Label>
 
                     <Alert variant='destructive'>
                         <AlertTitle>Cảnh báo!</AlertTitle>
                         <AlertDescription>
-                            Hãy cẩn thận, thao tác này không thể hoàn tác.
+                            Thiết kế trong thùng rác sẽ bị xoá vĩnh viễn (kể cả file gốc) sau thời hạn lưu do quản trị viên cấu hình.
                         </AlertDescription>
                     </Alert>
                 </div>
