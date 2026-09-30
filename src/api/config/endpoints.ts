@@ -2,7 +2,18 @@ const baseUrl = '/api'
 
 export const apiUrls = {
     auth : {
-        login: `${baseUrl}/Auth/login`
+        login: `${baseUrl}/Auth/login`,
+        refresh: `${baseUrl}/Auth/refresh`,
+        logout: `${baseUrl}/Auth/logout`,
+        forgotPassword: `${baseUrl}/Auth/forgot-password`,
+        resetPassword: `${baseUrl}/Auth/reset-password`
+    },
+    account: {
+        me: `${baseUrl}/Account/me`,
+        changePassword: `${baseUrl}/Account/change-password`,
+        sessions: `${baseUrl}/Account/sessions`,
+        revokeSession: (id: string) => `${baseUrl}/Account/sessions/${id}`,
+        revokeOtherSessions: `${baseUrl}/Account/sessions/revoke-others`
     },
     folder: {
         list: `${baseUrl}/Folder/folder-tree`,
@@ -39,13 +50,20 @@ export const apiUrls = {
         details: (id: string) => `${baseUrl}/User/${id}`,
         create: `${baseUrl}/User/create`,
         update: (id: string) => `${baseUrl}/User/update/${id}`,
-        delete: (id: string) => `${baseUrl}/User/delete/${id}`
+        delete: (id: string) => `${baseUrl}/User/delete/${id}`,
+        export: `${baseUrl}/User/export`
     },
     department: {
-        list: `${baseUrl}/Department/paged`
+        list: `${baseUrl}/Department/paged`,
+        create: `${baseUrl}/Department/create`,
+        update: (id: number) => `${baseUrl}/Department/update/${id}`,
+        delete: (id: number) => `${baseUrl}/Department/delete/${id}`
     },
     position: {
-        list: `${baseUrl}/Position/paged`
+        list: `${baseUrl}/Position/paged`,
+        create: `${baseUrl}/Position/create`,
+        update: (id: number) => `${baseUrl}/Position/update/${id}`,
+        delete: (id: number) => `${baseUrl}/Position/delete/${id}`
     },
     group: {
         list: `${baseUrl}/Group/paged`,
@@ -58,7 +76,9 @@ export const apiUrls = {
         tree: `${baseUrl}/Permission/get-list`,
         byTarget: `${baseUrl}/Permission/get-by-target`,
         create: `${baseUrl}/Permission/create`,
-        me: `${baseUrl}/Permission/me`
+        me: `${baseUrl}/Permission/me`,
+        folder: (folderId: string) => `${baseUrl}/Permission/folder/${folderId}`,
+        folderSave: `${baseUrl}/Permission/folder/create`
     },
     setting: {
         list: `${baseUrl}/Setting`,

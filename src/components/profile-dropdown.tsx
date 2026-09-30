@@ -48,6 +48,11 @@ export function ProfileDropdown() {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
+              <Link to="/profile">
+                Hồ sơ
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to="/admin">
                 Quản trị hệ thống
               </Link>

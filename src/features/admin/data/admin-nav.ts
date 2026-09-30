@@ -1,6 +1,7 @@
 import {
   Activity,
   Bell,
+  Building2,
   Database,
   FileText,
   GitBranch,
@@ -99,6 +100,13 @@ export const adminNav: AdminNavSection[] = [
         hasApi: true,
         icon: Users,
         pageTitle: 'Quản lý người dùng và quyền truy cập',
+      },
+      {
+        title: 'Phòng ban & chức vụ',
+        url: '/admin/org-units',
+        hasApi: true,
+        icon: Building2,
+        pageTitle: 'Quản lý phòng ban và chức vụ',
       },
       {
         title: 'Nhóm quyền',

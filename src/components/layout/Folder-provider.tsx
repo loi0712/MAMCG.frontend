@@ -4,7 +4,10 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { type Folder } from '@/components/layout/Folder-action-dialog'
 import { useFolderDetailsRaw } from '@/components/layout/api/get-folder-details'
 
-type FoldersDialogType = 'addChildFolder' | 'edit' | 'delete' | 'addParent'
+type FoldersDialogType = 'addChildFolder' | 'edit' | 'delete' | 'addParent' | 'permissions'
+
+// Thư mục đang mở dialog phân quyền (chỉ cần id + tên, không tải chi tiết)
+export type PermissionFolder = { id: string; name: string }
 
 type FoldersContextType = {
   open: FoldersDialogType | null
@@ -16,6 +19,8 @@ type FoldersContextType = {
   fetchFolderById: (id: string) => Promise<void>
   refetchFolder: () => void
   clearError: () => void
+  permissionFolder: PermissionFolder | null
+  setPermissionFolder: (folder: PermissionFolder | null) => void
 }
 
 const FoldersContext = React.createContext<FoldersContextType | null>(null)
@@ -24,6 +29,7 @@ export function FoldersProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<FoldersDialogType>(null)
   const [currentRow, setCurrentRow] = useState<Folder | null>(null)
   const [selectedFolderId, setSelectedFolderId] = useState<string>('')
+  const [permissionFolder, setPermissionFolder] = useState<PermissionFolder | null>(null)
 
   const {
     data,
@@ -114,7 +120,9 @@ export function FoldersProvider({ children }: { children: React.ReactNode }) {
     error,
     fetchFolderById,
     refetchFolder,
-    clearError
+    clearError,
+    permissionFolder,
+    setPermissionFolder
   }), [
     open, 
     setOpen, 
@@ -124,7 +132,8 @@ export function FoldersProvider({ children }: { children: React.ReactNode }) {
     error, 
     fetchFolderById, 
     refetchFolder, 
-    clearError
+    clearError,
+    permissionFolder
   ])
 
   return (

@@ -8,7 +8,8 @@ type ContextMenuProps = {
     onClose: () => void;
     onAddSubItem: () => void;
     onEdit: () => void;
-    onPermissions: () => void;
+    // Không truyền: ẩn mục phân quyền (người dùng không phải quản trị viên)
+    onPermissions?: () => void;
     onDelete: () => void;
 };
 
@@ -45,13 +46,15 @@ const ContextMenu: React.FC<ContextMenuProps & { nodeType?: 'folder' | 'file' }>
                 <Edit size={16} />
                 <span>Chỉnh sửa</span>
             </div>
-            <div
-                className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-sm text-gray-700"
-                onClick={onPermissions}
-            >
-                <Shield size={16} />
-                <span>Phân quyền</span>
-            </div>
+            {onPermissions && (
+                <div
+                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-sm text-gray-700"
+                    onClick={onPermissions}
+                >
+                    <Shield size={16} />
+                    <span>Phân quyền thư mục</span>
+                </div>
+            )}
             <hr className="my-1 border-gray-100" />
             <div
                 className="px-4 py-2 hover:bg-red-50 cursor-pointer flex items-center gap-2 text-sm text-red-600 hover:text-red-700"

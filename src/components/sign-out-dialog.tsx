@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { logoutSession } from '@/shared/lib/axios'
 
 interface SignOutDialogProps {
   open: boolean
@@ -12,7 +13,9 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
   const location = useLocation()
   const { auth } = useAuthStore()
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    // Thu hồi phiên phía máy chủ trước khi xoá token ở trình duyệt
+    await logoutSession()
     auth.reset()
     const currentPath = location.href
     navigate({

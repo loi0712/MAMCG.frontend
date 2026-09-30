@@ -20,6 +20,9 @@ import { routeTree } from '@/routeTree.gen'
 // Styles
 import '@/styles/index.css'
 
+// Phiên đăng nhập: làm mới access token bằng refresh token
+import { ensureFreshSession, startSessionKeepAlive } from '@/shared/lib/axios'
+
 
 // ============================================================================
 // Create Router Instance & Export nó
@@ -68,6 +71,9 @@ async function enableMocking() {
 
 if (!rootElement.innerHTML) {
   await enableMocking()
+  // Access token hết hạn khi đóng trình duyệt: làm mới trước khi render (route guard, URL media)
+  await ensureFreshSession()
+  startSessionKeepAlive()
   const root = createRoot(rootElement)
   
   root.render(

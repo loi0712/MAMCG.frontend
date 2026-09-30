@@ -31,11 +31,12 @@ export function getCookie(name: string): string | undefined {
 export function setCookie(
   name: string,
   value: string,
-  maxAge: number = DEFAULT_MAX_AGE
+  maxAge: number = DEFAULT_MAX_AGE,
+  sameSite: 'Lax' | 'Strict' = 'Lax'
 ): void {
   if (typeof document === 'undefined') return
 
-  document.cookie = `${name}=${encodeURIComponent(value)}; ${cookieAttributes(maxAge)}`
+  document.cookie = `${name}=${encodeURIComponent(value)}; ${cookieAttributes(maxAge, sameSite)}`
 }
 
 /**
@@ -48,7 +49,7 @@ export function removeCookie(name: string): void {
 }
 
 // SameSite=Lax chặn gửi cookie trong request cross-site; Secure khi chạy HTTPS
-function cookieAttributes(maxAge: number): string {
+function cookieAttributes(maxAge: number, sameSite: 'Lax' | 'Strict' = 'Lax'): string {
   const secure = window.location.protocol === 'https:' ? '; Secure' : ''
-  return `path=/; max-age=${maxAge}; SameSite=Lax${secure}`
+  return `path=/; max-age=${maxAge}; SameSite=${sameSite}${secure}`
 }

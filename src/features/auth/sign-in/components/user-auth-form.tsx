@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Loader2, LogIn } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
@@ -60,7 +60,7 @@ export function UserAuthForm({
       
       // Set user và token
       auth.setUser(res.user)
-      auth.setAccessToken(res.token)
+      auth.setTokens(res.token, res.refreshToken)
 
       // Toast success
       toast.success(`Chào mừng bạn trở lại, ${res.user.username}!`)
@@ -111,7 +111,15 @@ export function UserAuthForm({
           name='password'
           render={({ field }) => (
             <FormItem className='relative'>
-              <FormLabel>Mật khẩu</FormLabel>
+              <div className='flex items-center justify-between'>
+                <FormLabel>Mật khẩu</FormLabel>
+                <Link
+                  to='/forgot-password'
+                  className='text-muted-foreground hover:text-primary text-sm font-medium'
+                >
+                  Quên mật khẩu?
+                </Link>
+              </div>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
