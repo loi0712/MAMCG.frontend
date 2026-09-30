@@ -4,11 +4,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { PASSWORD_POLICY_HINT, passwordSchema } from '@/features/auth/password/api'
 import { useDepartments, usePositions } from '../../api/lookups'
 import { type User, useCreateUser, useUpdateUser } from '../../api/users'
 
@@ -77,6 +78,12 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
       form.setError('password', { message: 'Vui lòng nhập mật khẩu' })
       return
     }
+    // Cùng chính sách độ mạnh với máy chủ (8 ký tự, có chữ và số)
+    const passwordCheck = values.password ? passwordSchema.safeParse(values.password) : null
+    if (passwordCheck && !passwordCheck.success) {
+      form.setError('password', { message: passwordCheck.error.issues[0]?.message })
+      return
+    }
 
     const common = {
       fullName: values.fullName,
@@ -130,6 +137,7 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
                   <FormControl>
                     <PasswordInput {...field} autoComplete='new-password' />
                   </FormControl>
+                  <FormDescription>{PASSWORD_POLICY_HINT}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

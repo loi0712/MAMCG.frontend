@@ -62,6 +62,23 @@ export const updateUser = async ({ id, data }: { id: string; data: UpdateUserReq
   return res.data
 }
 
+// CSV (UTF-8 BOM) do máy chủ tạo; lấy tên file từ Content-Disposition
+export const exportUsers = async (searchTerm?: string) => {
+  const res = await axios.get<Blob>(apiUrls.user.export, {
+    params: searchTerm ? { searchTerm } : undefined,
+    responseType: 'blob',
+  })
+  const disposition = String(res.headers['content-disposition'] ?? '')
+  const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(disposition)
+  const fileName = match ? decodeURIComponent(match[1] ?? match[2]) : `nguoi-dung_${new Date().toISOString().split('T')[0]}.csv`
+  const url = URL.createObjectURL(res.data)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 export const deleteUser = async (id: string) => {
   const res = await axios.delete<boolean>(apiUrls.user.delete(id))
   return res.data
@@ -104,6 +121,12 @@ export const useUpdateUser = () => {
     },
   })
 }
+
+export const useExportUsers = () =>
+  useMutation({
+    mutationFn: exportUsers,
+    onSuccess: () => toast.success('Đã xuất danh sách người dùng'),
+  })
 
 export const useDeleteUser = () => {
   const invalidate = useInvalidateUsers()

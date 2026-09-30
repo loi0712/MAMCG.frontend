@@ -48,6 +48,8 @@ const EVENT_ROWS: EventRow[] = [
   ['user-deleted', 'Xoá tài khoản', 'Người dùng', 'security', 'medium', { target: 'd3f1…', actor: 'admin', ip: '10.0.0.15' }],
   ['user-login-failed', 'Đăng nhập thất bại', 'Người dùng', 'security', 'medium', { username: 'nv.an', ip: '10.0.0.15' }],
   ['user-password-changed', 'Đổi mật khẩu', 'Người dùng', 'security', 'low', { username: 'nv.an', actor: 'nv.an' }],
+  // Gửi thẳng tới chính người dùng, không theo quy tắc email.notify.*
+  ['password-reset', 'Đặt lại mật khẩu', 'Người dùng', 'user', 'low', { full_name: 'Nguyễn Văn An', username: 'nv.an', reset_link: 'https://mamcg.example.com/reset-password?token=...', expires_minutes: '30' }],
   ['workflow-started', 'Workflow bắt đầu', 'Workflow', 'admin', 'low', { workflow: 'Quy trình tin', item: 'Bản tin 18h' }],
   ['workflow-completed', 'Workflow hoàn tất', 'Workflow', 'admin', 'low', { workflow: 'Quy trình tin', approved_by: 'tt.binh' }],
   ['workflow-failed', 'Workflow thất bại', 'Workflow', 'admin', 'high', { workflow: 'Quy trình tin', error: 'Quá hạn xử lý' }],

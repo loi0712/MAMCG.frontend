@@ -165,7 +165,8 @@ export function EmailNotificationSettings({ settings }: EmailNotificationSetting
   const triggerEvent = useTriggerTestEvent()
   const [outcomes, setOutcomes] = useState<Record<string, NotifyOutcome>>({})
 
-  const events = useMemo(() => eventsQuery.data ?? [], [eventsQuery.data])
+  // Sự kiện gửi thẳng cho người dùng (vd. đặt lại mật khẩu) luôn gửi, không bật/tắt ở đây
+  const events = useMemo(() => (eventsQuery.data ?? []).filter((e) => e.recipientGroup !== 'user'), [eventsQuery.data])
   const categories = useMemo(() => groupByCategory(events), [events])
   const map = useMemo(() => {
     const m = toSettingMap(settings)

@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-password'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
@@ -19,6 +21,7 @@ import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AuthenticatedCategoryRouteImport } from './routes/_authenticated/category'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
@@ -28,6 +31,7 @@ import { Route as AdminDisplayPanelsRouteImport } from './routes/admin/display-p
 import { Route as AdminFieldGroupsRouteImport } from './routes/admin/field-groups'
 import { Route as AdminLogsRouteImport } from './routes/admin/logs'
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
+import { Route as AdminOrgUnitsRouteImport } from './routes/admin/org-units'
 import { Route as AdminPermissionsRouteImport } from './routes/admin/permissions'
 import { Route as AdminRolesRouteImport } from './routes/admin/roles'
 import { Route as AdminServerStatusRouteImport } from './routes/admin/server-status'
@@ -53,6 +57,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
+  id: '/(auth)/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authResetPasswordRoute = authResetPasswordRouteImport.update({
+  id: '/(auth)/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authSignInRoute = authSignInRouteImport.update({
@@ -88,6 +102,11 @@ const errors503Route = errors503RouteImport.update({
 const AuthenticatedCategoryRoute = AuthenticatedCategoryRouteImport.update({
   id: '/category',
   path: '/category',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
@@ -133,6 +152,11 @@ const AdminLogsRoute = AdminLogsRouteImport.update({
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminOrgUnitsRoute = AdminOrgUnitsRouteImport.update({
+  id: '/org-units',
+  path: '/org-units',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPermissionsRoute = AdminPermissionsRouteImport.update({
@@ -203,6 +227,8 @@ const AuthenticatedAssetsDetailsDetailsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
@@ -210,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/category': typeof AuthenticatedCategoryRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
@@ -218,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/admin/field-groups': typeof AdminFieldGroupsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/org-units': typeof AdminOrgUnitsRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/server-status': typeof AdminServerStatusRoute
@@ -234,6 +262,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
@@ -241,6 +271,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/category': typeof AuthenticatedCategoryRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
@@ -249,6 +280,7 @@ export interface FileRoutesByTo {
   '/admin/field-groups': typeof AdminFieldGroupsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/org-units': typeof AdminOrgUnitsRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/server-status': typeof AdminServerStatusRoute
@@ -268,6 +300,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
+  '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/reset-password': typeof authResetPasswordRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(errors)/401': typeof errors401Route
   '/(errors)/403': typeof errors403Route
@@ -275,6 +309,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/category': typeof AuthenticatedCategoryRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
@@ -283,6 +318,7 @@ export interface FileRoutesById {
   '/admin/field-groups': typeof AdminFieldGroupsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/org-units': typeof AdminOrgUnitsRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/server-status': typeof AdminServerStatusRoute
@@ -302,6 +338,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/forgot-password'
+    | '/reset-password'
     | '/sign-in'
     | '/401'
     | '/403'
@@ -309,6 +347,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/category'
+    | '/profile'
     | '/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
@@ -317,6 +356,7 @@ export interface FileRouteTypes {
     | '/admin/field-groups'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/org-units'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/server-status'
@@ -333,6 +373,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
+    | '/reset-password'
     | '/sign-in'
     | '/401'
     | '/403'
@@ -340,6 +382,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/category'
+    | '/profile'
     | '/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
@@ -348,6 +391,7 @@ export interface FileRouteTypes {
     | '/admin/field-groups'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/org-units'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/server-status'
@@ -366,6 +410,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/admin'
+    | '/(auth)/forgot-password'
+    | '/(auth)/reset-password'
     | '/(auth)/sign-in'
     | '/(errors)/401'
     | '/(errors)/403'
@@ -373,6 +419,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/category'
+    | '/_authenticated/profile'
     | '/_authenticated/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
@@ -381,6 +428,7 @@ export interface FileRouteTypes {
     | '/admin/field-groups'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/org-units'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/server-status'
@@ -400,6 +448,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authResetPasswordRoute: typeof authResetPasswordRoute
   authSignInRoute: typeof authSignInRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
@@ -430,6 +480,20 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/forgot-password': {
+      id: '/(auth)/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof authForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/reset-password': {
+      id: '/(auth)/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof authResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/sign-in': {
@@ -479,6 +543,13 @@ declare module '@tanstack/react-router' {
       path: '/category'
       fullPath: '/category'
       preLoaderRoute: typeof AuthenticatedCategoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks': {
@@ -542,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/admin/notifications'
       preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/org-units': {
+      id: '/admin/org-units'
+      path: '/org-units'
+      fullPath: '/admin/org-units'
+      preLoaderRoute: typeof AdminOrgUnitsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/permissions': {
@@ -633,6 +711,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCategoryRoute: typeof AuthenticatedCategoryRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAssetsIndexRoute: typeof AuthenticatedAssetsIndexRoute
@@ -642,6 +721,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCategoryRoute: AuthenticatedCategoryRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAssetsIndexRoute: AuthenticatedAssetsIndexRoute,
@@ -661,6 +741,7 @@ interface AdminRouteRouteChildren {
   AdminFieldGroupsRoute: typeof AdminFieldGroupsRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminOrgUnitsRoute: typeof AdminOrgUnitsRoute
   AdminPermissionsRoute: typeof AdminPermissionsRoute
   AdminRolesRoute: typeof AdminRolesRoute
   AdminServerStatusRoute: typeof AdminServerStatusRoute
@@ -679,6 +760,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminFieldGroupsRoute: AdminFieldGroupsRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminOrgUnitsRoute: AdminOrgUnitsRoute,
   AdminPermissionsRoute: AdminPermissionsRoute,
   AdminRolesRoute: AdminRolesRoute,
   AdminServerStatusRoute: AdminServerStatusRoute,
@@ -697,6 +779,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  authForgotPasswordRoute: authForgotPasswordRoute,
+  authResetPasswordRoute: authResetPasswordRoute,
   authSignInRoute: authSignInRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,

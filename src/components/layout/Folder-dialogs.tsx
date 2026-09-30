@@ -1,11 +1,22 @@
 import { FoldersActionDialog } from '@/components/layout/Folder-action-dialog'
 import { useFoldersAction } from './Folder-provider'
 import { FoldersDeleteDialog } from '@/components/layout/Folder-delete-dialog'
+import { FolderPermissionDialog } from '@/components/layout/Folder-permission-dialog'
 
 export function FoldersDialogs() {
-  const { open, setOpen, currentRow, setCurrentRow } = useFoldersAction()
+  const { open, setOpen, currentRow, setCurrentRow, permissionFolder, setPermissionFolder } = useFoldersAction()
   return (
     <>
+      <FolderPermissionDialog
+        open={open === 'permissions' && !!permissionFolder}
+        onOpenChange={(value) => {
+          if (value) return
+          setOpen(null)
+          setPermissionFolder(null)
+        }}
+        folder={permissionFolder}
+      />
+
       <FoldersActionDialog
         key='addParent'
         open={open === 'addParent'}

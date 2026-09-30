@@ -35,6 +35,28 @@ export interface SavePermissionRequest {
   permissionIds: string
 }
 
+// Quyền trên một thư mục (Identity: FolderACEDto, GetFolderPermissionsResponseDto, CreateFolderPermissionDto)
+export interface FolderPermissionEntry {
+  targetType: TargetType
+  targetId: string | null
+  permissionIds: string
+  objectId?: number | null
+}
+
+export interface FolderPermissionsResponse {
+  folderPermission: FolderPermissionEntry[]
+  // Cây quyền gán được theo thư mục (máy chủ đã bỏ quyền quản trị hệ thống)
+  permissionTree: Permission[]
+  users: Array<{ id: string; username: string | null; fullName: string | null; isActive: boolean }>
+  groups: Array<{ id: number; name: string | null }>
+}
+
+export interface SaveFolderPermissionsRequest {
+  folderId: number
+  // Danh sách rỗng = gỡ hết quyền trên thư mục
+  permissions: Array<{ targetType: TargetType; targetId: string; permissionIds: string }>
+}
+
 // ===========================================
 // API FUNCTIONS
 // ===========================================
@@ -56,6 +78,16 @@ export const getMyAccess = async () => {
   return res.data
 }
 
+export const getFolderPermissions = async (folderId: string) => {
+  const res = await axios.get<FolderPermissionsResponse>(apiUrls.permission.folder(folderId))
+  return res.data
+}
+
+export const saveFolderPermissions = async (data: SaveFolderPermissionsRequest) => {
+  const res = await axios.post<boolean>(apiUrls.permission.folderSave, data)
+  return res.data
+}
+
 export const savePermissions = async (data: SavePermissionRequest) => {
   const res = await axios.post<boolean>(apiUrls.permission.create, data)
   return res.data
@@ -74,6 +106,24 @@ export const useTargetPermissions = (targetType: TargetType, targetId: string | 
     queryFn: () => getTargetPermissions(targetType, targetId!),
     enabled: !!targetId,
   })
+
+export const useFolderPermissions = (folderId: string | null) =>
+  useQuery({
+    queryKey: ['folder-permissions', folderId],
+    queryFn: () => getFolderPermissions(folderId!),
+    enabled: !!folderId,
+  })
+
+export const useSaveFolderPermissions = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: saveFolderPermissions,
+    onSuccess: (_data, variables) => {
+      toast.success('Đã lưu phân quyền thư mục')
+      queryClient.invalidateQueries({ queryKey: ['folder-permissions', String(variables.folderId)] })
+    },
+  })
+}
 
 export const useSavePermissions = () => {
   const queryClient = useQueryClient()

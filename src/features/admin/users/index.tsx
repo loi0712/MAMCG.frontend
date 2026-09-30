@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Download, Loader2, Pencil, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/confirm-dialog'
@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AdminListToolbar } from '../components/admin-list-toolbar'
 import { AdminPagination } from '../components/admin-pagination'
 import { AdminTableState } from '../components/admin-table-state'
-import { type User, useDeleteUser, useUsers } from '../api/users'
+import { type User, useDeleteUser, useExportUsers, useUsers } from '../api/users'
 import { UserFormDialog } from './components/user-form-dialog'
 
 const PAGE_SIZE = 10
@@ -21,6 +21,7 @@ export function UsersView() {
 
   const { data, isLoading, isError } = useUsers({ pageNumber: page, pageSize: PAGE_SIZE, searchTerm })
   const deleteUser = useDeleteUser()
+  const exportUsers = useExportUsers()
   const users = data?.users ?? []
 
   const handleSearch = useCallback((term: string) => {
@@ -46,12 +47,21 @@ export function UsersView() {
 
   return (
     <div className='space-y-4'>
-      <AdminListToolbar
-        placeholder='Tìm theo tên, tên đăng nhập, email...'
-        onSearch={handleSearch}
-        addLabel='Thêm người dùng'
-        onAdd={openCreate}
-      />
+      <div className='flex items-center gap-2'>
+        <div className='flex-1'>
+          <AdminListToolbar
+            placeholder='Tìm theo tên, tên đăng nhập, email...'
+            onSearch={handleSearch}
+            addLabel='Thêm người dùng'
+            onAdd={openCreate}
+          />
+        </div>
+        {/* Xuất theo đúng bộ lọc tìm kiếm đang áp dụng */}
+        <Button variant='outline' disabled={exportUsers.isPending} onClick={() => exportUsers.mutate(searchTerm || undefined)}>
+          {exportUsers.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Download className='h-4 w-4' />}
+          Xuất CSV
+        </Button>
+      </div>
 
       <div className='rounded-md border'>
         <Table>

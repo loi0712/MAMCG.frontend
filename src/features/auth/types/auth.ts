@@ -29,4 +29,6 @@ export type AuthUser = {
 export type AuthResponse = {
     user: AuthUser;
     token: string;
+    // Refresh token xoay vòng (POST /api/Auth/refresh)
+    refreshToken?: string | null;
 };
