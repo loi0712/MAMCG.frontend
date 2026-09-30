@@ -7,7 +7,7 @@ test.describe('Tải lại trang', () => {
     ['/admin/users', 'Quản lý người dùng và quyền truy cập'],
     ['/admin/settings', 'Cấu hình các thiết lập hệ thống'],
     ['/admin/logs', 'Nhật ký hệ thống'],
-    ['/assets/details/details?id=102', 'Bảng tỉ số Thể thao 24/7'],
+    ['/assets/details/details?id=3', 'Thể thao 24h - bảng tỉ số'],
   ] as const) {
     test(`F5 tại ${path}`, async ({ page }) => {
       await login(page)

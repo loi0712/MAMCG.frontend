@@ -1,6 +1,8 @@
 import { accountHandlers } from './handlers/account'
 import { appHandlers } from './handlers/app'
 import { assetHandlers } from './handlers/assets'
+import { categoryHandlers } from './handlers/categories'
+import { cgSceneHandlers } from './handlers/cg-scenes'
 import { authHandlers } from './handlers/auth'
 import { backupHandlers } from './handlers/backup'
 import { cgServerHandlers } from './handlers/cg-servers'
@@ -44,7 +46,9 @@ export const handlers = [
   ...taskHandlers,
   ...notificationTypeHandlers,
   ...systemHandlers,
-  // Tài sản mẫu: trước appHandlers (danh sách rỗng)
+  // Thiết kế, chuyên mục, CG scene (đặt trước appHandlers để thay phản hồi rỗng)
   ...assetHandlers,
+  ...categoryHandlers,
+  ...cgSceneHandlers,
   ...appHandlers,
 ]

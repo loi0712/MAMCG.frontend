@@ -49,7 +49,9 @@ function AssetsContent() {
         searchTerm: search.searchTerm
     })
 
-    if (isLoading || isRefetching) {
+    // Chỉ thay cả bảng bằng vòng tải ở lần tải đầu: khi làm mới (sau xoá/duyệt hàng loạt) giữ bảng
+    // để các hộp thoại kết quả đang mở không bị huỷ
+    if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

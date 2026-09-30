@@ -1,6 +1,6 @@
 // src/features/asset/components/asset-cg-details.tsx
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { getRouteApi } from "@tanstack/react-router";
+import { getRouteApi, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
 import {
     Loader2,
     ChevronLeft,
+    Plus,
 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
@@ -171,7 +172,7 @@ export function AssetCgDetailPage() {
     const onSubmit = (data: FormData) => {
         const currentSceneData = data.scenes[currentSceneIndex];
         if (!currentSceneData) {
-            toast.error("No scene data available to preview.");
+            toast.error("Không có dữ liệu scene để xem trước.");
             return;
         }
 
@@ -480,7 +481,14 @@ export function AssetCgDetailPage() {
                     </Button>
                     <h1 className="text-lg font-semibold">Chi tiết đồ họa</h1>
                 </div>
+<div className="flex items-center gap-2">
                 <WorkflowHistoryButton itemId={cgDetail.asset.workflowItemId} title={cgDetail.asset.name} />
+                <Button variant="outline" size="sm" asChild>
+                    <Link to="/cg-scenes/create">
+                        <Plus className="h-4 w-4" /> Tạo CG scene từ template
+                    </Link>
+                </Button>
+</div>
             </div>
 
             {/* Main Content */}

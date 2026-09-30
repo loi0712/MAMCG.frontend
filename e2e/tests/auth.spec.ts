@@ -4,7 +4,7 @@ import { fillLogin, login } from './helpers'
 test.describe('Đăng nhập', () => {
   test('sai mật khẩu: báo lỗi và ở lại trang đăng nhập', async ({ page }) => {
     await fillLogin(page, 'admin', 'wrong')
-    await expect(page.getByText('Invalid username or password')).toBeVisible()
+    await expect(page.getByText('Tên đăng nhập hoặc mật khẩu không đúng')).toBeVisible()
     await expect(page).toHaveURL(/\/sign-in/)
   })
 
