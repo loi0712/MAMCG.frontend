@@ -379,6 +379,271 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Backup/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BackupConfigDto"];
+                        "text/json": components["schemas"]["BackupConfigDto"];
+                        "text/plain": components["schemas"]["BackupConfigDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/*+json": components["schemas"]["BackupConfigDto"];
+                    "application/json": components["schemas"]["BackupConfigDto"];
+                    "text/json": components["schemas"]["BackupConfigDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BackupConfigDto"];
+                        "text/json": components["schemas"]["BackupConfigDto"];
+                        "text/plain": components["schemas"]["BackupConfigDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Backup/databases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BackupDatabaseDto"][];
+                        "text/json": components["schemas"]["BackupDatabaseDto"][];
+                        "text/plain": components["schemas"]["BackupDatabaseDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Backup/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    BatchId?: string;
+                    ConnectionName?: string;
+                    From?: string;
+                    PageNumber?: number;
+                    PageSize?: number;
+                    Status?: string;
+                    To?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BackupHistoryDtoPagedResult"];
+                        "text/json": components["schemas"]["BackupHistoryDtoPagedResult"];
+                        "text/plain": components["schemas"]["BackupHistoryDtoPagedResult"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Backup/history/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BackupHistoryDto"];
+                        "text/json": components["schemas"]["BackupHistoryDto"];
+                        "text/plain": components["schemas"]["BackupHistoryDto"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Backup/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/*+json": components["schemas"]["RunBackupDto"];
+                    "application/json": components["schemas"]["RunBackupDto"];
+                    "text/json": components["schemas"]["RunBackupDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BackupRunResultDto"];
+                        "text/json": components["schemas"]["BackupRunResultDto"];
+                        "text/plain": components["schemas"]["BackupRunResultDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Backup/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BackupStatusDto"];
+                        "text/json": components["schemas"]["BackupStatusDto"];
+                        "text/plain": components["schemas"]["BackupStatusDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Category/{id}": {
         parameters: {
             query?: never;
@@ -1166,6 +1431,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/CGServer/heartbeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    "X-CG-Key"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/*+json": components["schemas"]["CGServerHeartbeatDto"];
+                    "application/json": components["schemas"]["CGServerHeartbeatDto"];
+                    "text/json": components["schemas"]["CGServerHeartbeatDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CGServerHeartbeatResultDto"];
+                        "text/json": components["schemas"]["CGServerHeartbeatResultDto"];
+                        "text/plain": components["schemas"]["CGServerHeartbeatResultDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/CGServer/metrics/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    from?: string;
+                    limit?: number;
+                    to?: string;
+                };
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CGServerMetricPointDto"][];
+                        "text/json": components["schemas"]["CGServerMetricPointDto"][];
+                        "text/plain": components["schemas"]["CGServerMetricPointDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/CGServer/paged": {
         parameters: {
             query?: never;
@@ -1769,6 +2122,492 @@ export interface paths {
                         "application/json": components["schemas"]["DepartmentDto"];
                         "text/json": components["schemas"]["DepartmentDto"];
                         "text/plain": components["schemas"]["DepartmentDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailLog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: {
+                    before?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailLog/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    EventCode?: string;
+                    From?: string;
+                    PageNumber?: number;
+                    PageSize?: number;
+                    SearchTerm?: string;
+                    Status?: string;
+                    To?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailLogDtoPagedResult"];
+                        "text/json": components["schemas"]["EmailLogDtoPagedResult"];
+                        "text/plain": components["schemas"]["EmailLogDtoPagedResult"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateDto"];
+                        "text/json": components["schemas"]["EmailTemplateDto"];
+                        "text/plain": components["schemas"]["EmailTemplateDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/*+json": components["schemas"]["EmailTemplateUpsertDto"];
+                    "application/json": components["schemas"]["EmailTemplateUpsertDto"];
+                    "text/json": components["schemas"]["EmailTemplateUpsertDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateDto"];
+                        "text/json": components["schemas"]["EmailTemplateDto"];
+                        "text/plain": components["schemas"]["EmailTemplateDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/delete/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EventVariablesDto"][];
+                        "text/json": components["schemas"]["EventVariablesDto"][];
+                        "text/plain": components["schemas"]["EventVariablesDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    pageNumber?: number;
+                    pageSize?: number;
+                    searchTerm?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateDtoPagedResult"];
+                        "text/json": components["schemas"]["EmailTemplateDtoPagedResult"];
+                        "text/plain": components["schemas"]["EmailTemplateDtoPagedResult"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/*+json": components["schemas"]["EmailPreviewDto"];
+                    "application/json": components["schemas"]["EmailPreviewDto"];
+                    "text/json": components["schemas"]["EmailPreviewDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailPreviewResult"];
+                        "text/json": components["schemas"]["EmailPreviewResult"];
+                        "text/plain": components["schemas"]["EmailPreviewResult"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/reset/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateDto"];
+                        "text/json": components["schemas"]["EmailTemplateDto"];
+                        "text/plain": components["schemas"]["EmailTemplateDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/send-test/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/*+json": components["schemas"]["EmailTemplateTestDto"];
+                    "application/json": components["schemas"]["EmailTemplateTestDto"];
+                    "text/json": components["schemas"]["EmailTemplateTestDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConnectionTestResult"];
+                        "text/json": components["schemas"]["ConnectionTestResult"];
+                        "text/plain": components["schemas"]["ConnectionTestResult"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/trigger-event/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    code: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotifyOutcome"];
+                        "text/json": components["schemas"]["NotifyOutcome"];
+                        "text/plain": components["schemas"]["NotifyOutcome"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/EmailTemplate/update/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/*+json": components["schemas"]["EmailTemplateUpsertDto"];
+                    "application/json": components["schemas"]["EmailTemplateUpsertDto"];
+                    "text/json": components["schemas"]["EmailTemplateUpsertDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateDto"];
+                        "text/json": components["schemas"]["EmailTemplateDto"];
+                        "text/plain": components["schemas"]["EmailTemplateDto"];
                     };
                 };
             };
@@ -2850,6 +3689,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/LdapConfiguration/sync/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: {
+                    dryRun?: boolean;
+                };
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LdapSyncResultDto"];
+                        "text/json": components["schemas"]["LdapSyncResultDto"];
+                        "text/plain": components["schemas"]["LdapSyncResultDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/LdapConfiguration/test/{id}": {
         parameters: {
             query?: never;
@@ -2935,6 +3815,128 @@ export interface paths {
         };
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/LdapConfiguration/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                };
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LdapUserRecord"][];
+                        "text/json": components["schemas"]["LdapUserRecord"][];
+                        "text/plain": components["schemas"]["LdapUserRecord"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Log/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: {
+                    before?: string;
+                };
+                header?: never;
+                path: {
+                    kind: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LogPurgeResultDto"];
+                        "text/json": components["schemas"]["LogPurgeResultDto"];
+                        "text/plain": components["schemas"]["LogPurgeResultDto"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Log/{kind}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    kind: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": boolean;
+                        "text/json": boolean;
+                        "text/plain": boolean;
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -5957,9 +6959,81 @@ export interface components {
             password: string;
             username: string;
         };
+        BackupConfigDto: {
+            compression?: boolean;
+            copyOnly?: boolean;
+            databases?: string[] | null;
+            days?: string[] | null;
+            enabled?: boolean;
+            path?: string | null;
+            /** Format: int32 */
+            retentionDays?: number;
+            time?: string | null;
+            verify?: boolean;
+        };
+        BackupDatabaseDto: {
+            connectionName?: string | null;
+            databaseName?: string | null;
+            selected?: boolean;
+            server?: string | null;
+        };
+        BackupHistoryDto: {
+            /** Format: uuid */
+            batchId?: string;
+            compressed?: boolean;
+            connectionName?: string | null;
+            databaseName?: string | null;
+            /** Format: int64 */
+            durationMs?: number | null;
+            filePath?: string | null;
+            /** Format: date-time */
+            finishedAt?: string | null;
+            /** Format: int64 */
+            id?: number;
+            message?: string | null;
+            /** Format: int64 */
+            sizeBytes?: number | null;
+            /** Format: date-time */
+            startedAt?: string;
+            status?: string | null;
+            trigger?: string | null;
+            triggeredBy?: string | null;
+        };
+        BackupHistoryDtoPagedResult: {
+            items?: components["schemas"]["BackupHistoryDto"][] | null;
+            /** Format: int32 */
+            totalCount?: number;
+        };
+        BackupRunResultDto: {
+            /** Format: uuid */
+            batchId?: string;
+            databases?: string[] | null;
+        };
+        BackupStatusDto: {
+            /** Format: uuid */
+            currentBatchId?: string | null;
+            /** Format: date-time */
+            lastFailureAt?: string | null;
+            /** Format: date-time */
+            lastSuccessAt?: string | null;
+            /** Format: date-time */
+            nextRunAt?: string | null;
+            running?: boolean;
+            scheduleEnabled?: boolean;
+        };
         BaseObject: {
             id?: string | null;
             name?: string | null;
+        };
+        CGChannelDto: {
+            format?: string | null;
+            /** Format: double */
+            fps?: number | null;
+            /** Format: int32 */
+            id?: number;
+            layer?: unknown;
+            name?: string | null;
+            state?: string | null;
         };
         CGJsonContentDto: {
             Background?: string | null;
@@ -6017,6 +7091,13 @@ export interface components {
             } | null;
         };
         CGServerAdminDto: {
+            /** Format: int32 */
+            activeChannels?: number | null;
+            /** Format: int32 */
+            channelCount?: number | null;
+            channels?: components["schemas"]["CGChannelDto"][] | null;
+            /** Format: double */
+            cpuPercent?: number | null;
             /** Format: date-time */
             createdAt?: string;
             /** Format: int32 */
@@ -6025,7 +7106,13 @@ export interface components {
             isBackupServer?: boolean;
             /** Format: date-time */
             lastChecked?: string | null;
+            /** Format: int32 */
+            latencyMs?: number | null;
             location?: string | null;
+            /** Format: double */
+            memoryMb?: number | null;
+            /** Format: date-time */
+            metricsUpdatedAt?: string | null;
             /** Format: date-time */
             modifiedAt?: string;
             /** Format: int32 */
@@ -6034,14 +7121,42 @@ export interface components {
             /** Format: int32 */
             statusId?: number;
             statusName?: string | null;
+            /** Format: double */
+            uptimeSeconds?: number | null;
             version?: string | null;
         };
         CGServerCheckResultDto: {
             /** Format: int64 */
             elapsedMs?: number;
+            /** Format: int32 */
+            latencyMs?: number | null;
             message?: string | null;
+            metricsAvailable?: boolean;
+            /** Format: int32 */
+            previousStatusId?: number | null;
             reachable?: boolean;
             server?: components["schemas"]["CGServerAdminDto"];
+        };
+        CGServerHeartbeatDto: {
+            channels?: components["schemas"]["CGChannelDto"][] | null;
+            /** Format: double */
+            cpuPercent?: number | null;
+            ipAddress?: string | null;
+            /** Format: double */
+            memoryMb?: number | null;
+            /** Format: int32 */
+            serverId?: number | null;
+            /** Format: double */
+            uptimeSeconds?: number | null;
+            version?: string | null;
+        };
+        CGServerHeartbeatResultDto: {
+            /** Format: date-time */
+            lastChecked?: string | null;
+            /** Format: int32 */
+            serverId?: number;
+            /** Format: int32 */
+            statusId?: number;
         };
         CGServerLogDto: {
             /** Format: date-time */
@@ -6056,6 +7171,21 @@ export interface components {
             items?: components["schemas"]["CGServerLogDto"][] | null;
             /** Format: int32 */
             totalCount?: number;
+        };
+        CGServerMetricPointDto: {
+            /** Format: int32 */
+            activeChannels?: number | null;
+            /** Format: double */
+            avgFps?: number | null;
+            /** Format: double */
+            cpuPercent?: number | null;
+            /** Format: int32 */
+            latencyMs?: number | null;
+            /** Format: double */
+            memoryMb?: number | null;
+            /** Format: date-time */
+            recordedAt?: string;
+            source?: string | null;
         };
         CGServerStatsDto: {
             /** Format: int32 */
@@ -6256,6 +7386,87 @@ export interface components {
             id?: number;
             name?: string | null;
         };
+        EmailLogDto: {
+            ccAddresses?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+            error?: string | null;
+            eventCode?: string | null;
+            /** Format: int64 */
+            id?: number;
+            status?: string | null;
+            subject?: string | null;
+            templateCode?: string | null;
+            toAddresses?: string | null;
+        };
+        EmailLogDtoPagedResult: {
+            items?: components["schemas"]["EmailLogDto"][] | null;
+            /** Format: int32 */
+            totalCount?: number;
+        };
+        EmailPreviewDto: {
+            body?: string | null;
+            code?: string | null;
+            isHtml?: boolean;
+            subject?: string | null;
+            variables?: {
+                [key: string]: string;
+            } | null;
+        };
+        EmailPreviewResult: {
+            body?: string | null;
+            isHtml?: boolean;
+            missingVariables?: string[] | null;
+            subject?: string | null;
+        };
+        EmailTemplateDto: {
+            body?: string | null;
+            code?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+            description?: string | null;
+            eventName?: string | null;
+            /** Format: int32 */
+            id?: number;
+            isActive?: boolean;
+            isHtml?: boolean;
+            isSystem?: boolean;
+            /** Format: date-time */
+            modifiedAt?: string;
+            name?: string | null;
+            subject?: string | null;
+            variables?: string[] | null;
+        };
+        EmailTemplateDtoPagedResult: {
+            items?: components["schemas"]["EmailTemplateDto"][] | null;
+            /** Format: int32 */
+            totalCount?: number;
+        };
+        EmailTemplateTestDto: {
+            to?: string | null;
+            variables?: {
+                [key: string]: string;
+            } | null;
+        };
+        EmailTemplateUpsertDto: {
+            body?: string | null;
+            code?: string | null;
+            description?: string | null;
+            isActive?: boolean;
+            isHtml?: boolean;
+            name?: string | null;
+            subject?: string | null;
+        };
+        EventVariablesDto: {
+            category?: string | null;
+            code?: string | null;
+            defaultSeverity?: string | null;
+            name?: string | null;
+            recipientGroup?: string | null;
+            variables?: {
+                [key: string]: string;
+            } | null;
+        };
         FieldGroupDetailDto: {
             /** Format: date-time */
             createdAt?: string;
@@ -6446,25 +7657,45 @@ export interface components {
             unreadCount?: number;
         };
         LdapConfigurationDto: {
+            attrDepartment?: string | null;
+            attrEmail?: string | null;
+            attrFullName?: string | null;
+            attrPhone?: string | null;
+            attrTitle?: string | null;
+            attrUsername?: string | null;
             baseDn?: string | null;
             bindDn?: string | null;
             bindPassword?: string | null;
             /** Format: date-time */
             createdAt?: string;
+            deactivateMissingUsers?: boolean;
             filterGroups?: string | null;
             filterUsers?: string | null;
             /** Format: int32 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
+            lastSyncAt?: string | null;
+            lastSyncStatus?: string | null;
+            /** Format: date-time */
             modifiedAt?: string;
             serverUrl?: string | null;
+            syncEnabled?: boolean;
+            syncFilter?: string | null;
+            /** Format: int32 */
+            syncIntervalMinutes?: number;
             useSsl?: boolean;
         };
         LdapConfigurationDtoPagedResult: {
             items?: components["schemas"]["LdapConfigurationDto"][] | null;
             /** Format: int32 */
             totalCount?: number;
+        };
+        LdapSyncChangeDto: {
+            action?: string | null;
+            detail?: string | null;
+            fullName?: string | null;
+            username?: string | null;
         };
         LdapSyncLogDto: {
             /** Format: int32 */
@@ -6483,8 +7714,49 @@ export interface components {
             /** Format: int32 */
             totalCount?: number;
         };
+        LdapSyncResultDto: {
+            changes?: components["schemas"]["LdapSyncChangeDto"][] | null;
+            /** Format: int32 */
+            configurationId?: number;
+            /** Format: int32 */
+            created?: number;
+            /** Format: int32 */
+            deactivated?: number;
+            /** Format: int32 */
+            departmentsCreated?: number;
+            dryRun?: boolean;
+            /** Format: int64 */
+            elapsedMs?: number;
+            /** Format: int32 */
+            found?: number;
+            message?: string | null;
+            /** Format: int32 */
+            positionsCreated?: number;
+            /** Format: int32 */
+            skipped?: number;
+            success?: boolean;
+            /** Format: int32 */
+            unchanged?: number;
+            /** Format: int32 */
+            updated?: number;
+        };
+        LdapUserRecord: {
+            department?: string | null;
+            disabled?: boolean;
+            distinguishedName?: string | null;
+            email?: string | null;
+            externalId?: string | null;
+            fullName?: string | null;
+            phone?: string | null;
+            title?: string | null;
+            username?: string | null;
+        };
         /** @enum {string} */
         LogicalGroupEnum: "AND" | "OR";
+        LogPurgeResultDto: {
+            /** Format: int32 */
+            deleted?: number;
+        };
         MediaStatsDto: {
             /** Format: int32 */
             audio?: number;
@@ -6500,6 +7772,10 @@ export interface components {
             totalSizeBytes?: number;
             /** Format: int32 */
             video?: number;
+        };
+        NotifyOutcome: {
+            reason?: string | null;
+            sent?: boolean;
         };
         /** @enum {string} */
         OperatorEnum: "EQUALS" | "NOT_EQUALS" | "CONTAINS" | "NOT_CONTAINS" | "GREATER_THAN" | "LESS_THAN" | "GREATER_THAN_OR_EQUAL" | "LESS_THAN_OR_EQUAL" | "STARTS_WITH" | "ENDS_WITH";
@@ -6582,6 +7858,9 @@ export interface components {
             time?: string;
             userName?: string | null;
         };
+        RunBackupDto: {
+            databases?: string[] | null;
+        };
         SaveCGServerDto: {
             ipAddress: string;
             isBackupServer?: boolean;
@@ -6601,13 +7880,24 @@ export interface components {
             type: string;
         };
         SaveLdapConfigurationDto: {
+            attrDepartment?: string | null;
+            attrEmail?: string | null;
+            attrFullName?: string | null;
+            attrPhone?: string | null;
+            attrTitle?: string | null;
+            attrUsername?: string | null;
             baseDn?: string | null;
             bindDn?: string | null;
             bindPassword?: string | null;
+            deactivateMissingUsers?: boolean;
             filterGroups?: string | null;
             filterUsers?: string | null;
             isActive?: boolean;
             serverUrl: string;
+            syncEnabled?: boolean;
+            syncFilter?: string | null;
+            /** Format: int32 */
+            syncIntervalMinutes?: number;
             useSsl?: boolean;
         };
         SaveServerDto: {

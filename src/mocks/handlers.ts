@@ -1,7 +1,9 @@
 import { appHandlers } from './handlers/app'
 import { authHandlers } from './handlers/auth'
+import { backupHandlers } from './handlers/backup'
 import { cgServerHandlers } from './handlers/cg-servers'
 import { configurationHandlers } from './handlers/configuration'
+import { emailTemplateHandlers } from './handlers/email-templates'
 import { fieldGroupHandlers } from './handlers/field-groups'
 import { fieldHandlers } from './handlers/fields'
 import { groupHandlers } from './handlers/groups'
@@ -23,6 +25,8 @@ export const handlers = [
   ...fieldGroupHandlers,
   ...panelHandlers,
   ...settingHandlers,
+  ...emailTemplateHandlers,
+  ...backupHandlers,
   ...configurationHandlers,
   ...cgServerHandlers,
   ...logHandlers,

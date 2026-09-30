@@ -71,7 +71,33 @@ export const apiUrls = {
         create: `${baseUrl}/LdapConfiguration/create`,
         update: (id: number) => `${baseUrl}/LdapConfiguration/update/${id}`,
         delete: (id: number) => `${baseUrl}/LdapConfiguration/delete/${id}`,
-        test: (id: number) => `${baseUrl}/LdapConfiguration/test/${id}`
+        test: (id: number) => `${baseUrl}/LdapConfiguration/test/${id}`,
+        sync: (id: number) => `${baseUrl}/LdapConfiguration/sync/${id}`,
+        users: (id: number) => `${baseUrl}/LdapConfiguration/users/${id}`
+    },
+    emailTemplate: {
+        list: `${baseUrl}/EmailTemplate/paged`,
+        details: (id: number) => `${baseUrl}/EmailTemplate/${id}`,
+        events: `${baseUrl}/EmailTemplate/events`,
+        create: `${baseUrl}/EmailTemplate/create`,
+        update: (id: number) => `${baseUrl}/EmailTemplate/update/${id}`,
+        delete: (id: number) => `${baseUrl}/EmailTemplate/delete/${id}`,
+        reset: (id: number) => `${baseUrl}/EmailTemplate/reset/${id}`,
+        preview: `${baseUrl}/EmailTemplate/preview`,
+        sendTest: (id: number) => `${baseUrl}/EmailTemplate/send-test/${id}`,
+        triggerEvent: (code: string) => `${baseUrl}/EmailTemplate/trigger-event/${code}`
+    },
+    emailLog: {
+        list: `${baseUrl}/EmailLog/paged`,
+        purge: `${baseUrl}/EmailLog`
+    },
+    backup: {
+        config: `${baseUrl}/Backup/config`,
+        databases: `${baseUrl}/Backup/databases`,
+        status: `${baseUrl}/Backup/status`,
+        history: `${baseUrl}/Backup/history`,
+        run: `${baseUrl}/Backup/run`,
+        delete: (id: number) => `${baseUrl}/Backup/history/${id}`
     },
     database: {
         list: `${baseUrl}/Database/paged`,
@@ -103,14 +129,17 @@ export const apiUrls = {
         create: `${baseUrl}/CGServer/create`,
         update: (id: number) => `${baseUrl}/CGServer/update/${id}`,
         delete: (id: number) => `${baseUrl}/CGServer/delete/${id}`,
-        check: (id: number) => `${baseUrl}/CGServer/check/${id}`
+        check: (id: number) => `${baseUrl}/CGServer/check/${id}`,
+        metrics: (id: number) => `${baseUrl}/CGServer/metrics/${id}`
     },
     log: {
         activities: `${baseUrl}/Log/activities`,
         actionTypes: `${baseUrl}/Log/action-types`,
         system: `${baseUrl}/Log/system`,
         cgServer: `${baseUrl}/Log/cg-server`,
-        ldapSync: `${baseUrl}/Log/ldap-sync`
+        ldapSync: `${baseUrl}/Log/ldap-sync`,
+        purge: (kind: string) => `${baseUrl}/Log/${kind}`,
+        deleteOne: (kind: string, id: number) => `${baseUrl}/Log/${kind}/${id}`
     },
     notification: {
         mine: `${baseUrl}/Notification/me`,
