@@ -5,6 +5,8 @@ import { aces, permissionTree } from '../db'
 import { api } from './utils'
 
 export const permissionHandlers = [
+  http.get(api(apiUrls.permission.me), () => HttpResponse.json({ isAdmin: true })),
+
   http.get(api(apiUrls.permission.tree), () => HttpResponse.json(permissionTree)),
 
   http.get(api(apiUrls.permission.byTarget), ({ request }) => {
@@ -20,9 +22,9 @@ export const permissionHandlers = [
 
   http.post(api(apiUrls.permission.create), async ({ request }) => {
     const data = (await request.json()) as SavePermissionRequest
-    // Backend dùng int.Parse cho từng id: chuỗi rỗng gây lỗi 500
-    if (!data.permissionIds || data.permissionIds.split(',').some((s) => !/^\d+$/.test(s.trim()))) {
-      return HttpResponse.json({ error: 'Input string was not in a correct format.' }, { status: 500 })
+    // Chuỗi rỗng = xoá hết quyền; ngoài ra chỉ nhận danh sách số
+    if (data.permissionIds && data.permissionIds.split(',').some((s) => !/^\d+$/.test(s.trim()))) {
+      return HttpResponse.json({ title: 'PermissionIds không hợp lệ', status: 400 }, { status: 400 })
     }
     aces.set(`${data.targetType}:${data.targetId}`, data.permissionIds)
     return HttpResponse.json(true)

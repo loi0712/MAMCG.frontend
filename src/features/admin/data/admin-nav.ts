@@ -50,6 +50,7 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Dashboard',
         url: '/admin/dashboard',
+        hasApi: true,
         icon: LayoutDashboard,
         pageTitle: 'MAMCG Dashboard',
         pageSubtitle: 'Tổng quan hệ thống quản lý media',
@@ -57,6 +58,7 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Nhật ký',
         url: '/admin/logs',
+        hasApi: true,
         icon: FileText,
         pageTitle: 'Nhật ký hệ thống',
         pageSubtitle: 'Xem nhật ký hoạt động của hệ thống',
@@ -64,6 +66,7 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Thông báo',
         url: '/admin/notifications',
+        hasApi: true,
         icon: Bell,
         pageTitle: 'Thông báo',
         pageSubtitle: 'Quản lý thông báo hệ thống',
@@ -71,6 +74,7 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Trạng thái Server',
         url: '/admin/server-status',
+        hasApi: true,
         icon: Server,
         pageTitle: 'Trạng thái Server',
         pageSubtitle: 'Giám sát trạng thái và hiệu suất server',
@@ -85,6 +89,7 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Cài đặt',
         url: '/admin/settings',
+        hasApi: true,
         icon: Settings,
         pageTitle: 'Cấu hình các thiết lập hệ thống',
       },
@@ -112,12 +117,14 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Database',
         url: '/admin/database',
+        hasApi: true,
         icon: Database,
         pageTitle: 'Quản lý kết nối cơ sở dữ liệu',
       },
       {
         title: 'Lưu trữ',
         url: '/admin/storage',
+        hasApi: true,
         icon: HardDrive,
         pageTitle: 'Quản lý hệ thống lưu trữ',
       },
@@ -131,6 +138,7 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Nhóm trường DL',
         url: '/admin/field-groups',
+        hasApi: true,
         icon: Grid3x3,
         pageTitle: 'Quản lý các nhóm trường dữ liệu',
       },
@@ -151,6 +159,7 @@ export const adminNav: AdminNavSection[] = [
       {
         title: 'Workflow',
         url: '/admin/workflow',
+        hasApi: true,
         icon: GitBranch,
         pageTitle: 'Quản lý quy trình xử lý tự động',
       },

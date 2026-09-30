@@ -1,642 +1,846 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ArrowLeft, Save, Play, ZoomIn, ZoomOut, Maximize2, Download, Upload, Undo2, Redo2, Grid3x3, Move, MousePointer2 } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card } from '@/components/ui/card';
-import { useState, useRef, useCallback } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { FlowchartNode, type NodeData } from './components/flowchart-node';
-import { NodeConfigPanel } from './components/node-config-panel';
-import { type FlowchartShapeType } from './components/flowchart-shapes';
-import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  Download,
+  Grid3x3,
+  Loader2,
+  Maximize2,
+  MousePointer2,
+  Move,
+  Redo2,
+  Save,
+  Undo2,
+  Upload,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { ConfirmDialog } from '@/components/confirm-dialog'
+import {
+  type WorkflowTransition,
+  useDeleteWorkflowStatus,
+  useDeleteWorkflowTransition,
+  useSaveWorkflowLayout,
+  useUpdateWorkflow,
+  useWorkflow,
+} from '../api/workflows'
+import { FlowchartNode, type NodeTag } from './components/flowchart-node'
+import {
+  type Connection,
+  type NodeData,
+  type NodeKind,
+  LAYOUT_VERSION,
+  connectionPath,
+  newId,
+  parseLayout,
+  reconcileLayout,
+  serializeLayout,
+} from './components/flowchart-layout'
+import { type FlowchartShapeType } from './components/flowchart-shapes'
+import { NodeConfigPanel } from './components/node-config-panel'
+import { TransitionConfigPanel } from './components/transition-config-panel'
 
 interface NodeTemplate {
-  id: string;
-  type: string;
-  label: string;
-  description: string;
-  category: string;
-  shapeType: FlowchartShapeType;
-  color: string;
-  strokeColor: string;
-  defaultWidth: number;
-  defaultHeight: number;
+  id: string
+  type: NodeKind
+  label: string
+  description: string
+  category: string
+  shapeType: FlowchartShapeType
+  color: string
+  strokeColor: string
+  defaultWidth: number
+  defaultHeight: number
 }
 
-interface Connection {
-  id: string;
-  from: string;
-  to: string;
-  fromSide: 'top' | 'right' | 'bottom' | 'left';
-  toSide: 'top' | 'right' | 'bottom' | 'left';
-  label?: string;
-}
-
+// Nút "Trạng thái" gắn với trạng thái backend; các hình khác nhau chỉ khác cách hiển thị
 const nodeTemplates: NodeTemplate[] = [
-  // Start/End
-  { id: 'start', type: 'start', label: 'Bắt đầu', description: 'Điểm bắt đầu workflow', category: 'Start/End', shapeType: 'oval', color: '#ec4899', strokeColor: '#be185d', defaultWidth: 120, defaultHeight: 60 },
-  { id: 'end', type: 'end', label: 'Kết thúc', description: 'Điểm kết thúc workflow', category: 'Start/End', shapeType: 'oval', color: '#ef4444', strokeColor: '#b91c1c', defaultWidth: 120, defaultHeight: 60 },
-  
-  // Process
-  { id: 'process', type: 'process', label: 'Xử lý', description: 'Thực thi một tác vụ', category: 'Process', shapeType: 'process', color: '#fbbf24', strokeColor: '#d97706', defaultWidth: 140, defaultHeight: 70 },
-  { id: 'process_auto', type: 'process', label: 'Tự động hóa', description: 'Xử lý tự động', category: 'Process', shapeType: 'predefinedProcess', color: '#818cf8', strokeColor: '#4f46e5', defaultWidth: 140, defaultHeight: 70 },
-  { id: 'process_manual', type: 'process', label: 'Thao tác thủ công', description: 'Cần can thiệp thủ công', category: 'Process', shapeType: 'manualOperation', color: '#f472b6', strokeColor: '#db2777', defaultWidth: 140, defaultHeight: 70 },
-  
-  // Decision
-  { id: 'decision', type: 'decision', label: 'Quyết định', description: 'Rẽ nhánh theo điều kiện', category: 'Decision', shapeType: 'decision', color: '#fb923c', strokeColor: '#ea580c', defaultWidth: 140, defaultHeight: 90 },
-  
-  // Input/Output
-  { id: 'input', type: 'input', label: 'Đầu vào', description: 'Nhận dữ liệu', category: 'Data', shapeType: 'inputOutput', color: '#60a5fa', strokeColor: '#2563eb', defaultWidth: 140, defaultHeight: 70 },
-  { id: 'output', type: 'output', label: 'Đầu ra', description: 'Xuất dữ liệu', category: 'Data', shapeType: 'inputOutput', color: '#3b82f6', strokeColor: '#1d4ed8', defaultWidth: 140, defaultHeight: 70 },
-  { id: 'document', type: 'output', label: 'Tài liệu', description: 'File/Document', category: 'Data', shapeType: 'document', color: '#a78bfa', strokeColor: '#7c3aed', defaultWidth: 130, defaultHeight: 80 },
-  { id: 'database', type: 'database', label: 'Database', description: 'Lưu trữ dữ liệu', category: 'Data', shapeType: 'database', color: '#34d399', strokeColor: '#059669', defaultWidth: 110, defaultHeight: 90 },
-  
-  // Display
-  { id: 'display', type: 'output', label: 'Hiển thị', description: 'Xuất ra màn hình', category: 'Output', shapeType: 'display', color: '#5eead4', strokeColor: '#14b8a6', defaultWidth: 130, defaultHeight: 80 },
-  
-  // Special
-  { id: 'delay', type: 'process', label: 'Chờ/Trì hoãn', description: 'Delay/Wait', category: 'Special', shapeType: 'delay', color: '#fcd34d', strokeColor: '#f59e0b', defaultWidth: 130, defaultHeight: 70 },
-  { id: 'merge', type: 'process', label: 'Gộp/Merge', description: 'Hợp nhất luồng', category: 'Special', shapeType: 'merge', color: '#c084fc', strokeColor: '#9333ea', defaultWidth: 110, defaultHeight: 90 },
-  { id: 'connector', type: 'connector', label: 'Kết nối', description: 'Connector', category: 'Special', shapeType: 'connector', color: '#94a3b8', strokeColor: '#475569', defaultWidth: 60, defaultHeight: 60 },
-  { id: 'offpage', type: 'connector', label: 'Ngoài trang', description: 'Off-page reference', category: 'Special', shapeType: 'offPageConnector', color: '#fb7185', strokeColor: '#e11d48', defaultWidth: 110, defaultHeight: 90 },
-  
-  // Notification
-  { id: 'notification', type: 'notification', label: 'Thông báo', description: 'Gửi thông báo', category: 'Action', shapeType: 'process', color: '#f97316', strokeColor: '#c2410c', defaultWidth: 140, defaultHeight: 70 },
-];
+  { id: 'start', type: 'start', label: 'Bắt đầu', description: 'Điểm vào: nối tới trạng thái đầu tiên', category: 'Bắt đầu / Kết thúc', shapeType: 'oval', color: '#ec4899', strokeColor: '#be185d', defaultWidth: 120, defaultHeight: 60 },
+  { id: 'end', type: 'end', label: 'Kết thúc', description: 'Điểm kết thúc (minh hoạ)', category: 'Bắt đầu / Kết thúc', shapeType: 'oval', color: '#ef4444', strokeColor: '#b91c1c', defaultWidth: 120, defaultHeight: 60 },
+
+  { id: 'status', type: 'status', label: 'Trạng thái', description: 'Bước xử lý của nội dung', category: 'Trạng thái', shapeType: 'process', color: '#fbbf24', strokeColor: '#d97706', defaultWidth: 140, defaultHeight: 70 },
+  { id: 'status_review', type: 'status', label: 'Chờ duyệt', description: 'Bước duyệt / quyết định', category: 'Trạng thái', shapeType: 'decision', color: '#fb923c', strokeColor: '#ea580c', defaultWidth: 140, defaultHeight: 90 },
+  { id: 'status_auto', type: 'status', label: 'Xử lý tự động', description: 'Hệ thống tự xử lý', category: 'Trạng thái', shapeType: 'predefinedProcess', color: '#818cf8', strokeColor: '#4f46e5', defaultWidth: 140, defaultHeight: 70 },
+  { id: 'status_manual', type: 'status', label: 'Thao tác thủ công', description: 'Cần người thực hiện', category: 'Trạng thái', shapeType: 'manualOperation', color: '#f472b6', strokeColor: '#db2777', defaultWidth: 140, defaultHeight: 70 },
+  { id: 'status_wait', type: 'status', label: 'Chờ', description: 'Chờ / tạm hoãn', category: 'Trạng thái', shapeType: 'delay', color: '#fcd34d', strokeColor: '#f59e0b', defaultWidth: 130, defaultHeight: 70 },
+  { id: 'status_document', type: 'status', label: 'Tài liệu', description: 'Soạn / bổ sung tài liệu', category: 'Trạng thái', shapeType: 'document', color: '#a78bfa', strokeColor: '#7c3aed', defaultWidth: 130, defaultHeight: 80 },
+  { id: 'status_archive', type: 'status', label: 'Lưu trữ', description: 'Đã lưu trữ', category: 'Trạng thái', shapeType: 'database', color: '#34d399', strokeColor: '#059669', defaultWidth: 110, defaultHeight: 90 },
+  { id: 'status_publish', type: 'status', label: 'Phát sóng', description: 'Hiển thị / phát sóng', category: 'Trạng thái', shapeType: 'display', color: '#5eead4', strokeColor: '#14b8a6', defaultWidth: 130, defaultHeight: 80 },
+]
+
+const categories = Array.from(new Set(nodeTemplates.map((n) => n.category)))
+
+type Snapshot = { nodes: NodeData[]; connections: Connection[] }
+type PendingDelete = { kind: 'node' | 'connection'; id: string } | null
+
+const HISTORY_LIMIT = 50
+
+const CONNECTION_COLORS = {
+  bound: '#06b6d4',
+  pending: '#f97316',
+  visual: '#94a3b8',
+  selected: '#facc15',
+} as const
 
 interface WorkflowEditorViewProps {
-  workflowId?: string;
-  onBack?: () => void;
+  workflowId?: string
+  onBack?: () => void
 }
 
 export function WorkflowEditorView({ workflowId, onBack }: WorkflowEditorViewProps) {
-  const [workflowName, setWorkflowName] = useState(workflowId === 'new' ? 'Workflow mới' : 'Quy trình xử lý video tin tức');
-  const [nodes, setNodes] = useState<NodeData[]>([]);
-  const [connections, setConnections] = useState<Connection[]>([]);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
-  const [scale, setScale] = useState(1);
-  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [showGrid, setShowGrid] = useState(true);
-  const [tool, setTool] = useState<'select' | 'pan'>('select');
-  const [history, setHistory] = useState<{ nodes: NodeData[], connections: Connection[] }[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const dragNodeRef = useRef<{ nodeId: string, offsetX: number, offsetY: number } | null>(null);
+  const parsedId = Number(workflowId)
+  const id = Number.isInteger(parsedId) && parsedId > 0 ? parsedId : null
+  const detailQuery = useWorkflow(id)
+  const detail = detailQuery.data
 
-  const categories = Array.from(new Set(nodeTemplates.map(n => n.category)));
+  const updateWorkflow = useUpdateWorkflow()
+  const saveLayout = useSaveWorkflowLayout()
+  const deleteStatus = useDeleteWorkflowStatus()
+  const deleteTransition = useDeleteWorkflowTransition()
 
-  // Save to history
-  const saveToHistory = useCallback(() => {
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push({ nodes: [...nodes], connections: [...connections] });
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  }, [nodes, connections, history, historyIndex]);
+  const [workflowName, setWorkflowName] = useState('')
+  const [nodes, setNodes] = useState<NodeData[]>([])
+  const [connections, setConnections] = useState<Connection[]>([])
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const [selectedConnectionId, setSelectedConnectionId] = useState<string | null>(null)
+  const [connectingFrom, setConnectingFrom] = useState<string | null>(null)
+  const [scale, setScale] = useState(1)
+  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 })
+  const [showGrid, setShowGrid] = useState(true)
+  const [tool, setTool] = useState<'select' | 'pan'>('select')
+  const [history, setHistory] = useState<{ stack: Snapshot[]; index: number }>({ stack: [], index: -1 })
+  const [dirty, setDirty] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete>(null)
+  const [leaveOpen, setLeaveOpen] = useState(false)
+  const [initializedFor, setInitializedFor] = useState<number | null>(null)
 
-  // Undo
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const prevState = history[historyIndex - 1];
-      setNodes(prevState.nodes);
-      setConnections(prevState.connections);
-      setHistoryIndex(historyIndex - 1);
-    }
-  };
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const importRef = useRef<HTMLInputElement>(null)
+  const dragNodeRef = useRef<{ nodeId: string; offsetX: number; offsetY: number } | null>(null)
+  // Giá trị mới nhất cho các callback chạy sau await / sự kiện chuột toàn cục
+  const nodesRef = useRef(nodes)
+  const connectionsRef = useRef(connections)
+  useEffect(() => {
+    nodesRef.current = nodes
+    connectionsRef.current = connections
+  }, [nodes, connections])
 
-  // Redo
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      const nextState = history[historyIndex + 1];
-      setNodes(nextState.nodes);
-      setConnections(nextState.connections);
-      setHistoryIndex(historyIndex + 1);
-    }
-  };
+  // Lần đầu có dữ liệu: dựng sơ đồ từ layoutJson, bổ sung trạng thái/bước chuyển chưa có trên sơ đồ
+  if (detail && initializedFor !== detail.id) {
+    const layout = reconcileLayout(parseLayout(detail.layoutJson), detail, true)
+    setInitializedFor(detail.id)
+    setWorkflowName(detail.name)
+    setNodes(layout.nodes)
+    setConnections(layout.connections)
+    setHistory({ stack: [layout], index: 0 })
+    setDirty(false)
+  }
 
-  // Drag from palette
+  const statusById = useMemo(() => new Map((detail?.statuses ?? []).map((s) => [s.id, s])), [detail])
+  const transitionById = useMemo(() => new Map((detail?.transitions ?? []).map((t) => [t.id, t])), [detail])
+  const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
+  const boundStatusIds = useMemo(
+    () => new Set(nodes.flatMap((n) => (n.config?.statusId !== undefined ? [n.config.statusId] : []))),
+    [nodes]
+  )
+
+  const unboundCount =
+    nodes.filter((n) => n.type === 'status' && !statusById.has(n.config?.statusId ?? -1)).length +
+    connections.filter((c) => c.transitionId === undefined && nodeById.get(c.to)?.type !== 'end').length
+
+  // ---------- Lịch sử (undo/redo) ----------
+
+  const commit = (nextNodes: NodeData[], nextConnections: Connection[]) => {
+    nodesRef.current = nextNodes
+    connectionsRef.current = nextConnections
+    setNodes(nextNodes)
+    setConnections(nextConnections)
+    setDirty(true)
+    setHistory((h) => {
+      const stack = [...h.stack.slice(0, h.index + 1), { nodes: nextNodes, connections: nextConnections }].slice(
+        -HISTORY_LIMIT
+      )
+      return { stack, index: stack.length - 1 }
+    })
+  }
+
+  const restore = (index: number) => {
+    const snap = history.stack[index]
+    if (!snap) return
+    // Liên kết tới trạng thái/bước chuyển đã bị xoá ở máy chủ sẽ được gỡ bỏ
+    const state = detail ? reconcileLayout(snap, detail, false) : snap
+    setNodes(state.nodes)
+    setConnections(state.connections)
+    setHistory((h) => ({ ...h, index }))
+    setSelectedNodeId(null)
+    setSelectedConnectionId(null)
+    setDirty(true)
+  }
+
+  // ---------- Kéo thả từ thư viện ----------
+
   const handleDragStart = (e: React.DragEvent, template: NodeTemplate) => {
-    e.dataTransfer.setData('nodeTemplate', JSON.stringify(template));
-  };
+    e.dataTransfer.setData('nodeTemplate', template.id)
+  }
 
-  // Drop on canvas
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const templateData = e.dataTransfer.getData('nodeTemplate');
-    if (!templateData) return;
-    
-    const template = JSON.parse(templateData) as NodeTemplate;
-    
-    if (canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left - canvasOffset.x) / scale;
-      const y = (e.clientY - rect.top - canvasOffset.y) / scale;
-      
-      const newNode: NodeData = {
-        id: `node_${Date.now()}`,
-        type: template.type,
-        label: template.label,
-        description: template.description,
-        shapeType: template.shapeType,
-        color: template.color,
-        strokeColor: template.strokeColor,
-        x: showGrid ? Math.round(x / 20) * 20 : x,
-        y: showGrid ? Math.round(y / 20) * 20 : y,
-        width: template.defaultWidth,
-        height: template.defaultHeight,
-      };
-      
-      setNodes([...nodes, newNode]);
-      saveToHistory();
-      toast.success('Đã thêm node mới');
+    e.preventDefault()
+    const template = nodeTemplates.find((t) => t.id === e.dataTransfer.getData('nodeTemplate'))
+    if (!template || !canvasRef.current) return
+    if (template.type === 'start' && nodes.some((n) => n.type === 'start')) {
+      toast.error('Sơ đồ chỉ có một nút Bắt đầu')
+      return
     }
-  };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
+    const rect = canvasRef.current.getBoundingClientRect()
+    const x = (e.clientX - rect.left - canvasOffset.x) / scale
+    const y = (e.clientY - rect.top - canvasOffset.y) / scale
+    const newNode: NodeData = {
+      id: newId('node'),
+      type: template.type,
+      label: template.label,
+      description: template.description,
+      shapeType: template.shapeType,
+      color: template.color,
+      strokeColor: template.strokeColor,
+      x: showGrid ? Math.round(x / 20) * 20 : x,
+      y: showGrid ? Math.round(y / 20) * 20 : y,
+      width: template.defaultWidth,
+      height: template.defaultHeight,
+      config: {},
+    }
+    commit([...nodes, newNode], connections)
+    setSelectedConnectionId(null)
+    setSelectedNodeId(newNode.id)
+    if (newNode.type === 'status') toast.info('Đã thêm nút — hãy tạo hoặc chọn trạng thái ở bảng bên phải')
+  }
 
-  // Node drag on canvas
+  // ---------- Di chuyển nút ----------
+
   const handleNodeDragStart = (e: React.MouseEvent, nodeId: string) => {
-    e.stopPropagation();
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return;
-    
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    
+    e.stopPropagation()
+    const node = nodes.find((n) => n.id === nodeId)
+    const rect = canvasRef.current?.getBoundingClientRect()
+    if (!node || !rect) return
+
     dragNodeRef.current = {
       nodeId,
       offsetX: (e.clientX - rect.left - canvasOffset.x) / scale - node.x,
       offsetY: (e.clientY - rect.top - canvasOffset.y) / scale - node.y,
-    };
-    
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (!dragNodeRef.current || !canvasRef.current) return;
-      
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = (moveEvent.clientX - rect.left - canvasOffset.x) / scale - dragNodeRef.current.offsetX;
-      const y = (moveEvent.clientY - rect.top - canvasOffset.y) / scale - dragNodeRef.current.offsetY;
-      
-      setNodes(prevNodes => prevNodes.map(n => 
-        n.id === dragNodeRef.current?.nodeId 
-          ? { ...n, x: showGrid ? Math.round(x / 20) * 20 : x, y: showGrid ? Math.round(y / 20) * 20 : y }
-          : n
-      ));
-    };
-    
-    const handleMouseUp = () => {
-      if (dragNodeRef.current) {
-        saveToHistory();
-        dragNodeRef.current = null;
-      }
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  // Pan canvas
-  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only pan if clicking directly on canvas background, not on nodes
-    if ((tool === 'pan' || e.button === 1) && e.target === e.currentTarget) {
-      e.preventDefault();
-      setIsPanning(true);
-      setPanStart({ x: e.clientX - canvasOffset.x, y: e.clientY - canvasOffset.y });
-    } else if (tool === 'select' && e.target === e.currentTarget) {
-      // Deselect when clicking on canvas
-      setSelectedNodeId(null);
     }
-  };
+    let last: { x: number; y: number } | null = null
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const drag = dragNodeRef.current
+      if (!drag || !canvasRef.current) return
+      const r = canvasRef.current.getBoundingClientRect()
+      const x = (moveEvent.clientX - r.left - canvasOffset.x) / scale - drag.offsetX
+      const y = (moveEvent.clientY - r.top - canvasOffset.y) / scale - drag.offsetY
+      const pos = { x: showGrid ? Math.round(x / 20) * 20 : x, y: showGrid ? Math.round(y / 20) * 20 : y }
+      last = pos
+      setNodes((prev) => prev.map((n) => (n.id === drag.nodeId ? { ...n, ...pos } : n)))
+    }
+
+    const handleMouseUp = () => {
+      dragNodeRef.current = null
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      // Ghi vị trí cuối vào lịch sử
+      const pos = last
+      if (pos) commit(nodesRef.current.map((n) => (n.id === nodeId ? { ...n, ...pos } : n)), connectionsRef.current)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  // ---------- Canvas: kéo, thu phóng ----------
+
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((tool === 'pan' || e.button === 1) && e.target === e.currentTarget) {
+      e.preventDefault()
+      setIsPanning(true)
+      setPanStart({ x: e.clientX - canvasOffset.x, y: e.clientY - canvasOffset.y })
+    } else if (tool === 'select' && e.target === e.currentTarget) {
+      setSelectedNodeId(null)
+      setSelectedConnectionId(null)
+    }
+  }
 
   const handleCanvasMouseMove = (e: React.MouseEvent) => {
-    if (isPanning) {
-      setCanvasOffset({
-        x: e.clientX - panStart.x,
-        y: e.clientY - panStart.y,
-      });
-    }
-  };
+    if (isPanning) setCanvasOffset({ x: e.clientX - panStart.x, y: e.clientY - panStart.y })
+  }
 
-  const handleCanvasMouseUp = () => {
-    setIsPanning(false);
-  };
-
-  // Zoom
-  const handleZoomIn = () => {
-    setScale(Math.min(scale * 1.2, 3));
-  };
-
-  const handleZoomOut = () => {
-    setScale(Math.max(scale / 1.2, 0.3));
-  };
-
+  const handleCanvasMouseUp = () => setIsPanning(false)
+  const handleZoomIn = () => setScale(Math.min(scale * 1.2, 3))
+  const handleZoomOut = () => setScale(Math.max(scale / 1.2, 0.3))
   const handleZoomReset = () => {
-    setScale(1);
-    setCanvasOffset({ x: 0, y: 0 });
-  };
+    setScale(1)
+    setCanvasOffset({ x: 0, y: 0 })
+  }
 
-  // Node actions
+  // ---------- Nút & đường nối ----------
+
+  const selectConnection = (connectionId: string) => {
+    setSelectedNodeId(null)
+    setSelectedConnectionId(connectionId)
+  }
+
   const handleNodeClick = (nodeId: string) => {
     if (connectingFrom === null) {
-      setSelectedNodeId(nodeId);
-    } else {
-      if (connectingFrom !== nodeId) {
-        const newConnection: Connection = {
-          id: `conn_${Date.now()}`,
-          from: connectingFrom,
-          to: nodeId,
-          fromSide: 'bottom',
-          toSide: 'top',
-        };
-        setConnections([...connections, newConnection]);
-        saveToHistory();
-        toast.success('Đã tạo kết nối');
-      }
-      setConnectingFrom(null);
+      setSelectedConnectionId(null)
+      setSelectedNodeId(nodeId)
+      return
     }
-  };
+    const from = nodeById.get(connectingFrom)
+    const to = nodeById.get(nodeId)
+    setConnectingFrom(null)
+    if (!from || !to || from.id === to.id) return
+
+    if (to.type === 'start') return void toast.error('Không thể nối vào nút Bắt đầu')
+    if (from.type === 'end') return void toast.error('Không thể nối từ nút Kết thúc')
+    if (from.type === 'start' && to.type === 'end') return void toast.error('Nút Bắt đầu phải nối tới một trạng thái')
+    if (from.type === 'start' && connections.some((c) => c.from === from.id))
+      return void toast.error('Quy trình chỉ có một bước khởi tạo (một đường nối từ nút Bắt đầu)')
+
+    const connection: Connection = { id: newId('conn'), from: from.id, to: to.id }
+    commit(nodes, [...connections, connection])
+    selectConnection(connection.id)
+    toast.success(
+      to.type === 'end' ? 'Đã tạo đường nối minh hoạ' : 'Đã tạo đường nối — chọn hành động để lưu bước chuyển'
+    )
+  }
 
   const handleStartConnection = (nodeId: string) => {
-    setConnectingFrom(nodeId);
-    setSelectedNodeId(null);
-  };
-
-  const handleDeleteNode = (nodeId: string) => {
-    setNodes(nodes.filter(n => n.id !== nodeId));
-    setConnections(connections.filter(c => c.from !== nodeId && c.to !== nodeId));
-    setSelectedNodeId(null);
-    saveToHistory();
-    toast.success('Đã xóa node');
-  };
+    setConnectingFrom(nodeId)
+    setSelectedNodeId(null)
+    setSelectedConnectionId(null)
+  }
 
   const handleDuplicateNode = (nodeId: string) => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return;
-    
-    const newNode: NodeData = {
+    const node = nodes.find((n) => n.id === nodeId)
+    if (!node) return
+    if (node.type === 'start') return void toast.error('Sơ đồ chỉ có một nút Bắt đầu')
+    // Bản sao không gắn trạng thái (mỗi trạng thái chỉ có một nút)
+    const copy: NodeData = {
       ...node,
-      id: `node_${Date.now()}`,
+      id: newId('node'),
       x: node.x + 20,
       y: node.y + 20,
-      label: `${node.label} (copy)`,
-    };
-    
-    setNodes([...nodes, newNode]);
-    saveToHistory();
-    toast.success('Đã nhân bản node');
-  };
+      label: `${node.label} (bản sao)`,
+      config: {},
+    }
+    commit([...nodes, copy], connections)
+    setSelectedNodeId(copy.id)
+  }
 
   const handleUpdateNode = (nodeId: string, updates: Partial<NodeData>) => {
-    setNodes(nodes.map(n => n.id === nodeId ? { ...n, ...updates } : n));
-  };
+    commit(
+      nodesRef.current.map((n) => (n.id === nodeId ? { ...n, ...updates } : n)),
+      connectionsRef.current
+    )
+  }
 
-  const getConnectionPoint = (nodeId: string, side: 'top' | 'right' | 'bottom' | 'left') => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return null;
-    
-    switch (side) {
-      case 'top': return { x: node.x + node.width / 2, y: node.y };
-      case 'right': return { x: node.x + node.width, y: node.y + node.height / 2 };
-      case 'bottom': return { x: node.x + node.width / 2, y: node.y + node.height };
-      case 'left': return { x: node.x, y: node.y + node.height / 2 };
+  const handleBindTransition = (connectionId: string, transition: WorkflowTransition) => {
+    commit(
+      nodesRef.current,
+      connectionsRef.current.map((c) =>
+        c.id === connectionId
+          ? {
+              ...c,
+              transitionId: transition.id,
+              actionId: transition.actionId ?? undefined,
+              label: transition.actionName ?? undefined,
+            }
+          : c
+      )
+    )
+  }
+
+  const removeLocally = (kind: 'node' | 'connection', targetId: string) => {
+    if (kind === 'node') {
+      commit(
+        nodesRef.current.filter((n) => n.id !== targetId),
+        connectionsRef.current.filter((c) => c.from !== targetId && c.to !== targetId)
+      )
+      if (selectedNodeId === targetId) setSelectedNodeId(null)
+    } else {
+      commit(nodesRef.current, connectionsRef.current.filter((c) => c.id !== targetId))
+      if (selectedConnectionId === targetId) setSelectedConnectionId(null)
     }
-  };
+  }
 
-  // Render connection
+  const boundConnectionsOf = (nodeId: string) =>
+    connections.filter((c) => (c.from === nodeId || c.to === nodeId) && c.transitionId !== undefined)
+
+  const requestDeleteNode = (nodeId: string) => {
+    const node = nodeById.get(nodeId)
+    if (!node) return
+    const hasStatus = node.config?.statusId !== undefined && statusById.has(node.config.statusId)
+    if (hasStatus || boundConnectionsOf(nodeId).length > 0) setPendingDelete({ kind: 'node', id: nodeId })
+    else removeLocally('node', nodeId)
+  }
+
+  const requestDeleteConnection = (connectionId: string) => {
+    const connection = connections.find((c) => c.id === connectionId)
+    if (!connection) return
+    if (connection.transitionId !== undefined && transitionById.has(connection.transitionId))
+      setPendingDelete({ kind: 'connection', id: connectionId })
+    else removeLocally('connection', connectionId)
+  }
+
+  const confirmPendingDelete = async () => {
+    if (!pendingDelete) return
+    try {
+      if (pendingDelete.kind === 'connection') {
+        const tid = connections.find((c) => c.id === pendingDelete.id)?.transitionId
+        if (tid !== undefined) await deleteTransition.mutateAsync(tid)
+      } else {
+        const node = nodeById.get(pendingDelete.id)
+        const sid = node?.config?.statusId
+        if (sid !== undefined && statusById.has(sid)) {
+          // Backend xoá luôn các bước chuyển đi/đến trạng thái này
+          await deleteStatus.mutateAsync(sid)
+        } else {
+          for (const c of boundConnectionsOf(pendingDelete.id)) {
+            if (c.transitionId !== undefined) await deleteTransition.mutateAsync(c.transitionId)
+          }
+        }
+      }
+      removeLocally(pendingDelete.kind, pendingDelete.id)
+    } catch {
+      // Lỗi 409 (đang được sử dụng) đã được thông báo chung; giữ nguyên sơ đồ
+    }
+    setPendingDelete(null)
+  }
+
+  const pendingDeleteText = (() => {
+    if (!pendingDelete) return ''
+    if (pendingDelete.kind === 'connection') {
+      const c = connections.find((x) => x.id === pendingDelete.id)
+      const t = c?.transitionId !== undefined ? transitionById.get(c.transitionId) : undefined
+      return `Xoá bước chuyển "${t?.actionName ?? ''}" (${t?.fromStatusName ?? 'Bắt đầu'} → ${t?.toStatusName ?? ''}) trên máy chủ? Không thể xoá nếu bước chuyển đã có trong lịch sử xử lý nội dung.`
+    }
+    const node = nodeById.get(pendingDelete.id)
+    const status = node?.config?.statusId !== undefined ? statusById.get(node.config.statusId) : undefined
+    if (status)
+      return `Xoá trạng thái "${status.name}" cùng mọi bước chuyển đi/đến trạng thái này trên máy chủ? Không thể xoá nếu trạng thái đã được nội dung sử dụng.`
+    return `Xoá nút "${node?.label ?? ''}" và các bước chuyển gắn với nó trên máy chủ?`
+  })()
+
+  // ---------- Lưu, xuất / nhập ----------
+
+  const handleSave = async () => {
+    if (!detail || !id) return
+    const name = workflowName.trim()
+    if (!name) return void toast.error('Tên workflow không được để trống')
+    try {
+      if (name !== detail.name)
+        await updateWorkflow.mutateAsync({
+          id,
+          data: { name, description: detail.description, isActive: detail.isActive },
+        })
+      await saveLayout.mutateAsync({ id, layoutJson: serializeLayout(nodesRef.current, connectionsRef.current) })
+      setDirty(false)
+      if (unboundCount > 0)
+        toast.warning(`Còn ${unboundCount} nút/đường nối chưa gắn trạng thái hoặc bước chuyển`, {
+          description: 'Chúng chỉ được lưu trong sơ đồ, chưa có hiệu lực trong quy trình.',
+        })
+    } catch {
+      // Lỗi đã được thông báo chung
+    }
+  }
+
+  const handleExport = () => {
+    const data = { name: workflowName, version: LAYOUT_VERSION, nodes, connections }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${(workflowName || 'workflow').replace(/\s+/g, '_')}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success('Đã xuất sơ đồ workflow')
+  }
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !detail) return
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const text = event.target?.result
+      const layout = typeof text === 'string' ? parseLayout(text) : null
+      if (!layout) return void toast.error('File không hợp lệ')
+      // Chỉ giữ liên kết tới trạng thái/bước chuyển của workflow này; bổ sung phần còn thiếu
+      const state = reconcileLayout(layout, detail, true)
+      if (layout.name) setWorkflowName(layout.name)
+      commit(state.nodes, state.connections)
+      setSelectedNodeId(null)
+      setSelectedConnectionId(null)
+      toast.success('Đã nhập sơ đồ — bấm Lưu để lưu lại')
+    }
+    reader.readAsText(file)
+  }
+
+  const handleBack = () => (dirty ? setLeaveOpen(true) : onBack?.())
+
+  // ---------- Hiển thị ----------
+
+  const nodeTags = (node: NodeData): NodeTag[] => {
+    if (node.type !== 'status') return []
+    const status = node.config?.statusId !== undefined ? statusById.get(node.config.statusId) : undefined
+    if (!status) return [{ label: 'Chưa gắn trạng thái', className: 'bg-yellow-400 text-black' }]
+    const tags: NodeTag[] = []
+    if (status.isInitial) tags.push({ label: 'Bắt đầu', className: 'bg-pink-500 text-white' })
+    if (status.isFinal) tags.push({ label: 'Kết thúc', className: 'bg-red-500 text-white' })
+    if (status.itemCount > 0) tags.push({ label: `${status.itemCount} nội dung`, className: 'bg-slate-700 text-white' })
+    return tags
+  }
+
   const renderConnection = (connection: Connection) => {
-    const fromPos = getConnectionPoint(connection.from, connection.fromSide);
-    const toPos = getConnectionPoint(connection.to, connection.toSide);
-    
-    if (!fromPos || !toPos) return null;
-    
-    // Create curved path
-    const midX = (fromPos.x + toPos.x) / 2;
-    const midY = (fromPos.y + toPos.y) / 2;
-    const dx = toPos.x - fromPos.x;
-    const dy = toPos.y - fromPos.y;
-    const offset = Math.min(Math.abs(dx), Math.abs(dy)) * 0.3;
-    
-    const path = `M ${fromPos.x} ${fromPos.y} C ${fromPos.x} ${fromPos.y + offset}, ${toPos.x} ${toPos.y - offset}, ${toPos.x} ${toPos.y}`;
-    
+    const from = nodeById.get(connection.from)
+    const to = nodeById.get(connection.to)
+    if (!from || !to) return null
+    const { d, mid } = connectionPath(from, to)
+    const selected = selectedConnectionId === connection.id
+    const kind = selected
+      ? 'selected'
+      : to.type === 'end'
+        ? 'visual'
+        : connection.transitionId !== undefined
+          ? 'bound'
+          : 'pending'
+    const color = CONNECTION_COLORS[kind]
+    const label = kind === 'visual' ? undefined : connection.transitionId !== undefined ? connection.label : 'Chưa lưu'
+
     return (
       <g key={connection.id}>
+        {/* Vùng bấm rộng hơn nét vẽ */}
         <path
-          d={path}
-          stroke="#06b6d4"
-          strokeWidth={2 / scale}
-          fill="none"
-          markerEnd="url(#arrowhead)"
+          d={d}
+          stroke='transparent'
+          strokeWidth={14}
+          fill='none'
+          style={{ pointerEvents: 'stroke', cursor: 'pointer' }}
+          onMouseDown={(e) => {
+            e.stopPropagation()
+            if (tool === 'select') selectConnection(connection.id)
+          }}
         />
-        {connection.label && (
+        <path
+          d={d}
+          stroke={color}
+          strokeWidth={selected ? 3 : 2}
+          strokeDasharray={kind === 'pending' || kind === 'visual' ? '6 4' : undefined}
+          fill='none'
+          markerEnd={`url(#arrow-${kind})`}
+          className='pointer-events-none'
+        />
+        {label && (
           <text
-            x={midX}
-            y={midY}
-            fill="#06b6d4"
-            fontSize={12 / scale}
-            textAnchor="middle"
-            className="pointer-events-none"
+            x={mid.x}
+            y={mid.y - 4}
+            fill={color}
+            fontSize={12}
+            textAnchor='middle'
+            stroke='var(--background)'
+            strokeWidth={4}
+            paintOrder='stroke'
+            className='pointer-events-none select-none'
           >
-            {connection.label}
+            {label}
           </text>
         )}
       </g>
-    );
-  };
+    )
+  }
 
-  // Export workflow
-  const handleExport = () => {
-    const data = {
-      name: workflowName,
-      nodes,
-      connections,
-      version: '1.0',
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${workflowName.replace(/\s+/g, '_')}.json`;
-    a.click();
-    toast.success('Đã xuất workflow');
-  };
+  if (id == null || detailQuery.isError || (detailQuery.isFetched && !detail)) {
+    return (
+      <div className='bg-background flex h-screen flex-col items-center justify-center gap-4'>
+        <AlertCircle className='text-destructive h-10 w-10' />
+        <div className='text-foreground'>
+          {id == null ? 'Không tìm thấy workflow' : 'Không tải được workflow. Vui lòng thử lại.'}
+        </div>
+        <div className='flex gap-2'>
+          <Button variant='outline' onClick={onBack}>
+            <ArrowLeft className='mr-2 h-4 w-4' /> Quay lại
+          </Button>
+          {id != null && <Button onClick={() => detailQuery.refetch()}>Thử lại</Button>}
+        </div>
+      </div>
+    )
+  }
 
-  // Import workflow
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target?.result as string);
-        setWorkflowName(data.name || 'Imported Workflow');
-        setNodes(data.nodes || []);
-        setConnections(data.connections || []);
-        saveToHistory();
-        toast.success('Đã nhập workflow');
-      } catch {
-        toast.error('File không hợp lệ');
-      }
-    };
-    reader.readAsText(file);
-  };
+  if (!detail) {
+    return (
+      <div className='bg-background text-muted-foreground flex h-screen items-center justify-center gap-2'>
+        <Loader2 className='h-5 w-5 animate-spin' /> Đang tải workflow...
+      </div>
+    )
+  }
 
-  const selectedNode = nodes.find(n => n.id === selectedNodeId) || null;
+  const selectedNode = selectedNodeId ? (nodeById.get(selectedNodeId) ?? null) : null
+  const selectedConnection = selectedConnectionId
+    ? (connections.find((c) => c.id === selectedConnectionId) ?? null)
+    : null
+  const saving = saveLayout.isPending || updateWorkflow.isPending
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className='bg-background flex h-screen flex-col'>
       {/* Top Toolbar */}
-      <div className="bg-card border-b border-border p-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 flex-1">
-            <Button
-              variant="ghost"
-              onClick={onBack}
-              className="text-muted-foreground hover:text-foreground"
-              size="sm"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+      <div className='bg-card border-border border-b p-3'>
+        <div className='flex items-center justify-between'>
+          <div className='flex flex-1 items-center gap-3'>
+            <Button variant='ghost' onClick={handleBack} className='text-muted-foreground hover:text-foreground' size='sm'>
+              <ArrowLeft className='mr-2 h-4 w-4' />
               Quay lại
             </Button>
-            <Separator orientation="vertical" className="h-6 bg-muted" />
-            <div className="flex-1 max-w-sm">
+            <Separator orientation='vertical' className='bg-muted h-6' />
+            <div className='max-w-sm flex-1'>
               <Input
                 value={workflowName}
-                onChange={(e) => setWorkflowName(e.target.value)}
-                placeholder="Tên workflow..."
-                className="bg-muted border-border text-foreground h-9"
+                onChange={(e) => {
+                  setWorkflowName(e.target.value)
+                  setDirty(true)
+                }}
+                placeholder='Tên workflow...'
+                className='bg-muted border-border text-foreground h-9'
               />
             </div>
-            <Badge variant="outline" className="border-border text-muted-foreground">
-              {nodes.length} nodes
+            <Badge
+              variant='outline'
+              className={detail.isActive ? 'border-green-500 text-green-400' : 'border-border text-muted-foreground'}
+            >
+              {detail.isActive ? 'Hoạt động' : 'Tạm dừng'}
             </Badge>
-            <Badge variant="outline" className="border-border text-muted-foreground">
-              {connections.length} connections
+            <Badge variant='outline' className='border-border text-muted-foreground'>
+              {detail.statuses.length} trạng thái
             </Badge>
+            <Badge variant='outline' className='border-border text-muted-foreground'>
+              {detail.transitions.length} bước chuyển
+            </Badge>
+            {unboundCount > 0 && (
+              <Badge variant='outline' className='border-yellow-500 text-yellow-400'>
+                {unboundCount} chưa gắn
+              </Badge>
+            )}
+            {detailQuery.isFetching && <Loader2 className='text-muted-foreground h-4 w-4 animate-spin' />}
           </div>
-          
-          <div className="flex items-center gap-2">
-            {/* Undo/Redo */}
+
+          <div className='flex items-center gap-2'>
             <Button
-              variant="outline"
-              size="sm"
-              onClick={handleUndo}
-              disabled={historyIndex <= 0}
-              className="border-border text-foreground hover:bg-accent"
-              title="Undo"
+              variant='outline'
+              size='sm'
+              onClick={() => restore(history.index - 1)}
+              disabled={history.index <= 0}
+              className='border-border text-foreground hover:bg-accent'
+              title='Hoàn tác (chỉ bố cục sơ đồ)'
             >
-              <Undo2 className="w-4 h-4" />
+              <Undo2 className='h-4 w-4' />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRedo}
-              disabled={historyIndex >= history.length - 1}
-              className="border-border text-foreground hover:bg-accent"
-              title="Redo"
+              variant='outline'
+              size='sm'
+              onClick={() => restore(history.index + 1)}
+              disabled={history.index >= history.stack.length - 1}
+              className='border-border text-foreground hover:bg-accent'
+              title='Làm lại'
             >
-              <Redo2 className="w-4 h-4" />
+              <Redo2 className='h-4 w-4' />
             </Button>
-            
-            <Separator orientation="vertical" className="h-6 bg-muted" />
-            
-            {/* Tool selection */}
-            <div className="flex gap-1 bg-muted border border-border rounded p-1">
+
+            <Separator orientation='vertical' className='bg-muted h-6' />
+
+            <div className='bg-muted border-border flex gap-1 rounded border p-1'>
               <Button
-                variant="ghost"
-                size="sm"
+                variant='ghost'
+                size='sm'
                 onClick={() => setTool('select')}
                 className={tool === 'select' ? 'bg-accent text-primary' : 'text-muted-foreground'}
-                title="Select tool"
+                title='Chọn'
               >
-                <MousePointer2 className="w-4 h-4" />
+                <MousePointer2 className='h-4 w-4' />
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
+                variant='ghost'
+                size='sm'
                 onClick={() => setTool('pan')}
                 className={tool === 'pan' ? 'bg-accent text-primary' : 'text-muted-foreground'}
-                title="Pan tool"
+                title='Kéo canvas'
               >
-                <Move className="w-4 h-4" />
+                <Move className='h-4 w-4' />
               </Button>
             </div>
-            
+
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => setShowGrid(!showGrid)}
               className={`border-border ${showGrid ? 'text-primary bg-primary/10' : 'text-muted-foreground'} hover:bg-accent`}
-              title="Toggle grid"
+              title='Bật/tắt lưới'
             >
-              <Grid3x3 className="w-4 h-4" />
+              <Grid3x3 className='h-4 w-4' />
             </Button>
-            
-            <Separator orientation="vertical" className="h-6 bg-muted" />
-            
-            {/* Zoom controls */}
+
+            <Separator orientation='vertical' className='bg-muted h-6' />
+
+            <Button variant='outline' size='sm' onClick={handleZoomOut} className='border-border text-foreground hover:bg-accent' title='Thu nhỏ'>
+              <ZoomOut className='h-4 w-4' />
+            </Button>
+            <span className='text-muted-foreground w-12 text-center text-xs'>{Math.round(scale * 100)}%</span>
+            <Button variant='outline' size='sm' onClick={handleZoomIn} className='border-border text-foreground hover:bg-accent' title='Phóng to'>
+              <ZoomIn className='h-4 w-4' />
+            </Button>
+            <Button variant='outline' size='sm' onClick={handleZoomReset} className='border-border text-foreground hover:bg-accent' title='Đặt lại thu phóng'>
+              <Maximize2 className='h-4 w-4' />
+            </Button>
+
+            <Separator orientation='vertical' className='bg-muted h-6' />
+
             <Button
-              variant="outline"
-              size="sm"
-              onClick={handleZoomOut}
-              className="border-border text-foreground hover:bg-accent"
-              title="Zoom out"
+              variant='outline'
+              size='sm'
+              onClick={() => importRef.current?.click()}
+              className='border-border text-foreground hover:bg-accent'
+              title='Nhập sơ đồ (JSON)'
             >
-              <ZoomOut className="w-4 h-4" />
+              <Upload className='h-4 w-4' />
             </Button>
-            <span className="text-xs text-muted-foreground w-12 text-center">{Math.round(scale * 100)}%</span>
+            <input ref={importRef} type='file' accept='.json' onChange={handleImport} className='hidden' />
             <Button
-              variant="outline"
-              size="sm"
-              onClick={handleZoomIn}
-              className="border-border text-foreground hover:bg-accent"
-              title="Zoom in"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleZoomReset}
-              className="border-border text-foreground hover:bg-accent"
-              title="Reset zoom"
-            >
-              <Maximize2 className="w-4 h-4" />
-            </Button>
-            
-            <Separator orientation="vertical" className="h-6 bg-muted" />
-            
-            {/* Import/Export */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => document.getElementById('import-file')?.click()}
-              className="border-border text-foreground hover:bg-accent"
-              title="Import"
-            >
-              <Upload className="w-4 h-4" />
-            </Button>
-            <input
-              id="import-file"
-              type="file"
-              accept=".json"
-              onChange={handleImport}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleExport}
-              className="border-border text-foreground hover:bg-accent"
-              title="Export"
+              className='border-border text-foreground hover:bg-accent'
+              title='Xuất sơ đồ (JSON)'
             >
-              <Download className="w-4 h-4" />
+              <Download className='h-4 w-4' />
             </Button>
-            
-            <Separator orientation="vertical" className="h-6 bg-muted" />
-            
-            {/* Actions */}
+
+            <Separator orientation='vertical' className='bg-muted h-6' />
+
             <Button
-              variant="outline"
-              size="sm"
-              className="border-border text-foreground hover:bg-accent"
+              size='sm'
+              onClick={handleSave}
+              disabled={saving}
+              className='bg-primary hover:bg-primary/90 text-primary-foreground'
+              title='Lưu tên và bố cục sơ đồ'
             >
-              <Play className="w-4 h-4 mr-2" />
-              Chạy thử
-            </Button>
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Lưu
+              {saving ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <Save className='mr-2 h-4 w-4' />}
+              Lưu{dirty ? ' *' : ''}
             </Button>
           </div>
         </div>
-        
+
         {/* Connection mode indicator */}
         {connectingFrom && (
-          <div className="mt-2 flex items-center gap-3 p-2 bg-primary/10 border border-primary/50 rounded">
-            <span className="text-primary text-sm">Đang kết nối từ node: <strong>{nodes.find(n => n.id === connectingFrom)?.label}</strong></span>
-            <span className="text-muted-foreground text-xs">→ Click vào node đích để tạo kết nối</span>
+          <div className='bg-primary/10 border-primary/50 mt-2 flex items-center gap-3 rounded border p-2'>
+            <span className='text-primary text-sm'>
+              Đang nối từ: <strong>{nodeById.get(connectingFrom)?.label}</strong>
+            </span>
+            <span className='text-muted-foreground text-xs'>→ Click vào nút đích để tạo đường nối</span>
             <Button
-              size="sm"
-              variant="outline"
+              size='sm'
+              variant='outline'
               onClick={() => setConnectingFrom(null)}
-              className="ml-auto border-red-500 text-red-400 hover:bg-red-900/20"
+              className='ml-auto border-red-500 text-red-400 hover:bg-red-900/20'
             >
-              Hủy
+              Huỷ
             </Button>
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className='flex flex-1 overflow-hidden'>
         {/* Left Sidebar - Node Palette */}
-        <div className="w-64 bg-card border-r border-border flex flex-col overflow-hidden">
-          <div className="p-3 border-b border-border flex-shrink-0">
-            <h3 className="text-primary text-sm">Thư viện Node</h3>
-            <p className="text-xs text-muted-foreground mt-1">Kéo thả vào canvas</p>
+        <div className='bg-card border-border flex w-64 flex-col overflow-hidden border-r'>
+          <div className='border-border flex-shrink-0 border-b p-3'>
+            <h3 className='text-primary text-sm'>Thư viện nút</h3>
+            <p className='text-muted-foreground mt-1 text-xs'>Kéo thả vào canvas</p>
           </div>
-          
-          <ScrollArea className="flex-1 h-full">
-            <div className="p-3 space-y-4">
-              {categories.map(category => (
+
+          <ScrollArea className='h-full flex-1'>
+            <div className='space-y-4 p-3'>
+              {categories.map((category) => (
                 <div key={category}>
-                  <div className="text-xs text-muted-foreground mb-2 flex items-center gap-2">
-                    <div className="h-px flex-1 bg-admin" />
+                  <div className='text-muted-foreground mb-2 flex items-center gap-2 text-xs'>
+                    <div className='bg-admin h-px flex-1' />
                     <span>{category}</span>
-                    <div className="h-px flex-1 bg-admin" />
+                    <div className='bg-admin h-px flex-1' />
                   </div>
-                  <div className="space-y-1.5">
-                    {nodeTemplates.filter(n => n.category === category).map(template => (
-                      <Card
-                        key={template.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, template)}
-                        className="border-border p-2.5 cursor-move hover:bg-accent transition-colors"
-                      >
-                        <div className="flex items-start gap-2">
-                          <div 
-                            className="w-8 h-8 rounded flex-shrink-0 flex items-center justify-center text-white text-xs"
-                            style={{ backgroundColor: template.color }}
-                          >
-                            {template.label.charAt(0)}
+                  <div className='space-y-1.5'>
+                    {nodeTemplates
+                      .filter((n) => n.category === category)
+                      .map((template) => (
+                        <Card
+                          key={template.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, template)}
+                          className='border-border hover:bg-accent cursor-move p-2.5 transition-colors'
+                        >
+                          <div className='flex items-start gap-2'>
+                            <div
+                              className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded text-xs text-white'
+                              style={{ backgroundColor: template.color }}
+                            >
+                              {template.label.charAt(0)}
+                            </div>
+                            <div className='min-w-0 flex-1'>
+                              <div className='text-foreground text-xs leading-tight'>{template.label}</div>
+                              <div className='text-muted-foreground mt-0.5 truncate text-[10px] leading-tight'>
+                                {template.description}
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-xs text-foreground leading-tight">{template.label}</div>
-                            <div className="text-[10px] text-muted-foreground leading-tight mt-0.5 truncate">{template.description}</div>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
+                        </Card>
+                      ))}
                   </div>
                 </div>
               ))}
+
+              <div className='text-muted-foreground space-y-1.5 border-t pt-3 text-[11px] leading-snug'>
+                <div className='flex items-center gap-2'>
+                  <span className='h-0.5 w-6' style={{ backgroundColor: CONNECTION_COLORS.bound }} /> Bước chuyển đã lưu
+                </div>
+                <div className='flex items-center gap-2'>
+                  <span className='h-0 w-6 border-t-2 border-dashed' style={{ borderColor: CONNECTION_COLORS.pending }} />
+                  Chưa lưu bước chuyển
+                </div>
+                <div className='flex items-center gap-2'>
+                  <span className='h-0 w-6 border-t-2 border-dashed' style={{ borderColor: CONNECTION_COLORS.visual }} />
+                  Minh hoạ (tới Kết thúc)
+                </div>
+                <p className='pt-1'>
+                  Trạng thái và bước chuyển được lưu ngay khi bấm nút trong bảng thuộc tính; nút "Lưu" lưu tên và bố cục
+                  sơ đồ.
+                </p>
+              </div>
             </div>
           </ScrollArea>
         </div>
 
         {/* Canvas */}
-        <div 
-          className="flex-1 relative bg-muted overflow-hidden"
-        >
+        <div className='bg-muted relative flex-1 overflow-hidden'>
           <div
             ref={canvasRef}
             onDrop={handleDrop}
-            onDragOver={handleDragOver}
+            onDragOver={(e) => e.preventDefault()}
             onMouseDown={handleCanvasMouseDown}
             onMouseMove={handleCanvasMouseMove}
             onMouseUp={handleCanvasMouseUp}
             onMouseLeave={handleCanvasMouseUp}
-            className="absolute inset-0 w-full h-full"
+            className='absolute inset-0 h-full w-full'
             style={{
               transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${scale})`,
               transformOrigin: '0 0',
@@ -646,59 +850,55 @@ export function WorkflowEditorView({ workflowId, onBack }: WorkflowEditorViewPro
             }}
           >
             {/* SVG for connections */}
-            <svg className="absolute inset-0 w-[10000px] h-[10000px] pointer-events-none overflow-visible">
+            <svg className='pointer-events-none absolute inset-0 h-[10000px] w-[10000px] overflow-visible'>
               <defs>
-                <marker
-                  id="arrowhead"
-                  markerWidth="10"
-                  markerHeight="10"
-                  refX="9"
-                  refY="3"
-                  orient="auto"
-                >
-                  <polygon points="0 0, 10 3, 0 6" fill="#06b6d4" />
-                </marker>
+                {Object.entries(CONNECTION_COLORS).map(([kind, color]) => (
+                  <marker key={kind} id={`arrow-${kind}`} markerWidth='10' markerHeight='10' refX='9' refY='3' orient='auto'>
+                    <polygon points='0 0, 10 3, 0 6' fill={color} />
+                  </marker>
+                ))}
               </defs>
-              {connections.map(connection => renderConnection(connection))}
+              {connections.map(renderConnection)}
             </svg>
 
             {/* Nodes */}
-            {nodes.map(node => (
+            {nodes.map((node) => (
               <FlowchartNode
                 key={node.id}
                 node={node}
                 isSelected={selectedNodeId === node.id}
                 isConnecting={connectingFrom === node.id}
                 onClick={() => handleNodeClick(node.id)}
-                onDelete={() => handleDeleteNode(node.id)}
+                onDelete={() => requestDeleteNode(node.id)}
                 onDuplicate={() => handleDuplicateNode(node.id)}
                 onStartConnection={() => handleStartConnection(node.id)}
                 onDragStart={(e) => handleNodeDragStart(e, node.id)}
                 scale={scale}
+                tags={nodeTags(node)}
               />
             ))}
 
             {/* Empty state */}
             {nodes.length === 0 && (
-              <div 
-                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              <div
+                className='pointer-events-none absolute inset-0 flex items-center justify-center'
                 style={{ transform: `scale(${1 / scale})` }}
               >
-                <div className="text-center text-muted-foreground">
-                  <div className="text-6xl mb-4">🎯</div>
-                  <div className="text-xl mb-2">Kéo thả các node vào đây</div>
-                  <div className="text-sm">Bắt đầu thiết kế workflow của bạn</div>
+                <div className='text-muted-foreground text-center'>
+                  <div className='mb-4 text-6xl'>🎯</div>
+                  <div className='mb-2 text-xl'>Kéo thả các nút vào đây</div>
+                  <div className='text-sm'>Thêm nút Bắt đầu và các trạng thái, rồi nối chúng bằng bước chuyển</div>
                 </div>
               </div>
             )}
           </div>
 
           {/* Mini-map */}
-          <div className="absolute bottom-4 right-4 w-48 h-32 bg-background/90 border border-border rounded overflow-hidden">
-            <div className="relative w-full h-full">
-              <div className="text-xs text-muted-foreground absolute top-1 left-1 z-10">Mini-map</div>
-              <svg className="w-full h-full">
-                {nodes.map(node => (
+          <div className='bg-background/90 border-border absolute right-4 bottom-4 h-32 w-48 overflow-hidden rounded border'>
+            <div className='relative h-full w-full'>
+              <div className='text-muted-foreground absolute top-1 left-1 z-10 text-xs'>Mini-map</div>
+              <svg className='h-full w-full'>
+                {nodes.map((node) => (
                   <rect
                     key={node.id}
                     x={node.x / 20}
@@ -715,20 +915,64 @@ export function WorkflowEditorView({ workflowId, onBack }: WorkflowEditorViewPro
         </div>
 
         {/* Right Sidebar - Properties */}
-        <div className="w-80 bg-card border-l border-border flex flex-col overflow-hidden">
-          <div className="p-3 border-b border-border flex-shrink-0">
-            <h3 className="text-primary text-sm">Thuộc tính Node</h3>
+        <div className='bg-card border-border flex w-80 flex-col overflow-hidden border-l'>
+          <div className='border-border flex-shrink-0 border-b p-3'>
+            <h3 className='text-primary text-sm'>Thuộc tính</h3>
           </div>
-          
-          <div className="flex-1 overflow-hidden">
-            <NodeConfigPanel
-              node={selectedNode}
-              onUpdate={handleUpdateNode}
-              onDelete={handleDeleteNode}
-            />
+          <div className='flex-1 overflow-hidden'>
+            {selectedConnection ? (
+              <TransitionConfigPanel
+                workflowId={detail.id}
+                connection={selectedConnection}
+                fromNode={nodeById.get(selectedConnection.from)}
+                toNode={nodeById.get(selectedConnection.to)}
+                transition={
+                  selectedConnection.transitionId !== undefined
+                    ? transitionById.get(selectedConnection.transitionId)
+                    : undefined
+                }
+                onBind={handleBindTransition}
+                onDelete={requestDeleteConnection}
+              />
+            ) : (
+              <NodeConfigPanel
+                workflowId={detail.id}
+                node={selectedNode}
+                statuses={detail.statuses}
+                boundStatusIds={boundStatusIds}
+                onUpdate={handleUpdateNode}
+                onDelete={requestDeleteNode}
+              />
+            )}
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+        title={pendingDelete?.kind === 'connection' ? 'Xoá bước chuyển' : 'Xoá nút'}
+        desc={pendingDeleteText}
+        cancelBtnText='Huỷ'
+        confirmText='Xoá'
+        destructive
+        isLoading={deleteStatus.isPending || deleteTransition.isPending}
+        handleConfirm={confirmPendingDelete}
+      />
+
+      <ConfirmDialog
+        open={leaveOpen}
+        onOpenChange={setLeaveOpen}
+        title='Rời trình thiết kế?'
+        desc='Tên hoặc bố cục sơ đồ chưa được lưu. Trạng thái và bước chuyển đã tạo vẫn được giữ trên máy chủ.'
+        cancelBtnText='Ở lại'
+        confirmText='Rời đi'
+        destructive
+        handleConfirm={() => {
+          setLeaveOpen(false)
+          onBack?.()
+        }}
+      />
     </div>
-  );
+  )
 }
