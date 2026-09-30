@@ -165,6 +165,22 @@ export const apiUrls = {
         actions: `${baseUrl}/WorkflowDefinition/actions`,
         action: (id: number) => `${baseUrl}/WorkflowDefinition/actions/${id}`
     },
+    // Nhóm C: công việc của tôi, lịch sử/phiên bản nội dung, loại thông báo, hub realtime
+    workflowTask: {
+        myTasks: `${baseUrl}/Workflow/my-tasks`,
+        summary: `${baseUrl}/Workflow/my-tasks/summary`,
+        history: (itemId: number) => `${baseUrl}/Workflow/item/${itemId}/history`,
+        versions: (itemId: number) => `${baseUrl}/Workflow/item/${itemId}/versions`,
+        version: (itemId: number, version: number) => `${baseUrl}/Workflow/item/${itemId}/versions/${version}`
+    },
+    notificationType: {
+        list: `${baseUrl}/NotificationType/paged`,
+        create: `${baseUrl}/NotificationType`,
+        details: (id: number) => `${baseUrl}/NotificationType/${id}`
+    },
+    realtime: {
+        notificationsHub: '/hubs/notifications'
+    },
     systemStatus: {
         dashboard: `${baseUrl}/SystemStatus/dashboard`,
         server: `${baseUrl}/SystemStatus/server`,

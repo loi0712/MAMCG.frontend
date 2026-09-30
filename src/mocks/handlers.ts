@@ -9,10 +9,12 @@ import { fieldHandlers } from './handlers/fields'
 import { groupHandlers } from './handlers/groups'
 import { logHandlers } from './handlers/logs'
 import { notificationHandlers } from './handlers/notifications'
+import { notificationTypeHandlers } from './handlers/notification-types'
 import { panelHandlers } from './handlers/panels'
 import { permissionHandlers } from './handlers/permissions'
 import { settingHandlers } from './handlers/settings'
 import { systemHandlers } from './handlers/system'
+import { taskHandlers } from './handlers/tasks'
 import { userHandlers } from './handlers/users'
 import { workflowHandlers } from './handlers/workflows'
 
@@ -32,6 +34,9 @@ export const handlers = [
   ...logHandlers,
   ...notificationHandlers,
   ...workflowHandlers,
+  // Nhóm C: công việc của tôi, lịch sử/phiên bản, loại thông báo
+  ...taskHandlers,
+  ...notificationTypeHandlers,
   ...systemHandlers,
   ...appHandlers,
 ]

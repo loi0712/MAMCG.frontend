@@ -19,6 +19,8 @@ import {
   useMarkNotificationRead,
   useMyNotifications,
 } from '../api/notifications'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { NotificationTypesTab } from './components/notification-types-tab'
 import { SendNotificationDialog } from './components/send-notification-dialog'
 
 const PAGE_SIZE = 10
@@ -41,6 +43,23 @@ const formatDateTime = (value?: string) => (value ? new Date(value).toLocaleStri
 const safeUrl = (url?: string | null) => (url && /^(\/|https?:\/\/)/i.test(url) ? url : null)
 
 export function NotificationsView() {
+  return (
+    <Tabs defaultValue='inbox' className='space-y-2'>
+      <TabsList>
+        <TabsTrigger value='inbox'>Hộp thư</TabsTrigger>
+        <TabsTrigger value='types'>Loại thông báo</TabsTrigger>
+      </TabsList>
+      <TabsContent value='inbox'>
+        <InboxTab />
+      </TabsContent>
+      <TabsContent value='types'>
+        <NotificationTypesTab />
+      </TabsContent>
+    </Tabs>
+  )
+}
+
+function InboxTab() {
   const [page, setPage] = useState(1)
   const [term, setTerm] = useState('')
   const [searchTerm, setSearchTerm] = useState('')

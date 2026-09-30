@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { getCgDetail } from "../api/get-cg";
 import { usePreviewCg } from "../api/preview-cg";
 import { mediaUrl } from '@/utils/media-url'
+import { WorkflowHistoryButton } from "@/features/tasks/components/workflow-history-dialog";
 
 // Get route API
 const routeApi = getRouteApi("/_authenticated/assets/cg/details");
@@ -479,6 +480,7 @@ export function AssetCgDetailPage() {
                     </Button>
                     <h1 className="text-lg font-semibold">Chi tiết đồ họa</h1>
                 </div>
+                <WorkflowHistoryButton itemId={cgDetail.asset.workflowItemId} title={cgDetail.asset.name} />
             </div>
 
             {/* Main Content */}

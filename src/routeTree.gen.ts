@@ -19,6 +19,7 @@ import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AuthenticatedCategoryRouteImport } from './routes/_authenticated/category'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminDataFieldsRouteImport } from './routes/admin/data-fields'
@@ -87,6 +88,11 @@ const errors503Route = errors503RouteImport.update({
 const AuthenticatedCategoryRoute = AuthenticatedCategoryRouteImport.update({
   id: '/category',
   path: '/category',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/category': typeof AuthenticatedCategoryRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
   '/admin/database': typeof AdminDatabaseRoute
@@ -234,6 +241,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/category': typeof AuthenticatedCategoryRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
   '/admin/database': typeof AdminDatabaseRoute
@@ -267,6 +275,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/category': typeof AuthenticatedCategoryRoute
+  '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/data-fields': typeof AdminDataFieldsRoute
   '/admin/database': typeof AdminDatabaseRoute
@@ -300,6 +309,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/category'
+    | '/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
     | '/admin/database'
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/category'
+    | '/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
     | '/admin/database'
@@ -362,6 +373,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/category'
+    | '/_authenticated/tasks'
     | '/admin/dashboard'
     | '/admin/data-fields'
     | '/admin/database'
@@ -467,6 +479,13 @@ declare module '@tanstack/react-router' {
       path: '/category'
       fullPath: '/category'
       preLoaderRoute: typeof AuthenticatedCategoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tasks': {
+      id: '/_authenticated/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/admin/': {
@@ -614,6 +633,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCategoryRoute: typeof AuthenticatedCategoryRoute
+  AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAssetsIndexRoute: typeof AuthenticatedAssetsIndexRoute
   AuthenticatedAssetsCgDetailsRoute: typeof AuthenticatedAssetsCgDetailsRoute
@@ -622,6 +642,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCategoryRoute: AuthenticatedCategoryRoute,
+  AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAssetsIndexRoute: AuthenticatedAssetsIndexRoute,
   AuthenticatedAssetsCgDetailsRoute: AuthenticatedAssetsCgDetailsRoute,

@@ -22,6 +22,7 @@ import { SelectDropdown } from "@/components/select-dropdown"
 import { DynamicForm as DynamicFormArray } from '@/components/dynamic-form'
 import { getServerErrorMessage } from '@/utils/handle-server-error'
 import { mediaUrl } from '@/utils/media-url'
+import { WorkflowHistoryButton } from '@/features/tasks/components/workflow-history-dialog'
 
 // Get route API for the details route
 const routeApi = getRouteApi('/_authenticated/assets/details/details')
@@ -951,7 +952,10 @@ export function AssetDetailPage() {
                             {/* History Section - 25% */}
                             <div className="basis-[25%] overflow-y-auto text-xs mt-6 pb-6">
                                 <div className="h-full flex flex-col">
-                                    <h4 className="mb-1 font-medium">Lịch sử dự án</h4>
+                                    <div className="mb-1 flex items-center justify-between gap-2">
+                                        <h4 className="font-medium">Lịch sử dự án</h4>
+                                        <WorkflowHistoryButton itemId={assetDetail.asset.workflowItem?.id} title={assetName} />
+                                    </div>
                                     <div className="flex-1 overflow-y-auto rounded-lg shadow-sm border">
                                         <table className="w-full overflow-y-auto">
                                             <thead className="sticky top-0 border-b bg-background">
