@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 import { type LoginCredentialsDTO, loginWithEmailAndPassword } from '../api/sign-in'
+import { getServerErrorMessage } from '@/utils/handle-server-error'
 
 const formSchema = z.object({
   userName: z.string().min(1, 'Vui lòng nhập tên đăng nhập'),
@@ -70,15 +71,16 @@ export function UserAuthForm({
         ? decodeURIComponent(redirectTo) 
         : '/assets'
       
-      // Kiểm tra để tránh redirect loop
-      if (destination.includes('/sign-in')) {
+      // Chỉ cho phép đường dẫn nội bộ (chặn open redirect) và tránh redirect loop
+      const isInternal = destination.startsWith('/') && !destination.startsWith('//') && !destination.startsWith('/\\')
+      if (!isInternal || destination.includes('/sign-in')) {
         console.warn('Redirect loop detected, redirecting to /assets instead')
         navigate({ to: '/assets', replace: true })
       } else {
         navigate({ to: destination, replace: true })
       }
     } catch (err: any) {
-      toast.error(err?.message || 'Đăng nhập thất bại')
+      toast.error(getServerErrorMessage(err, 'Đăng nhập thất bại'))
     } finally {
       setIsLoading(false)
     }

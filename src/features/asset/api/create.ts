@@ -2,6 +2,7 @@ import { apiUrls } from '@/api/config/endpoints'
 import { axios } from '@/shared/lib/axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner';
+import { handleServerError } from '@/utils/handle-server-error';
 
 // ===========================================
 // TYPES
@@ -215,13 +216,8 @@ export const useCreateAsset = () => {
             queryClient.invalidateQueries({ queryKey: ['assets'] });
             queryClient.invalidateQueries({ queryKey: ['dynamic-fields-create'] });
         },
-        onError: (error: any) => {
-            console.error('Error creating asset:', error);
-            // Log detailed error information
-            if (error.response) {
-                console.error('Error response:', error.response.data);
-                console.error('Error status:', error.response.status);
-            }
+        onError: (error) => {
+            handleServerError(error);
         }
     });
 };

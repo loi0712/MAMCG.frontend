@@ -35,7 +35,6 @@ import {
     useDynamicFieldsForCreateForm,
     useCreateAsset
 } from '../api/create'
-import { toast } from 'sonner'
 import { DynamicForm as DynamicFormArray } from '@/components/dynamic-form'
 import { FileUploadSection } from '@/components/file-upload-section'
 
@@ -417,15 +416,13 @@ export function AssetsCreateNewDialog({
 
             const transformedData = transformFormValues(values, fields)
 
+            // Thông báo thành công/thất bại do useCreateAsset hiển thị
             await createAssetMutation.mutateAsync(transformedData)
-
-            toast.success("Thiết kế đã được tạo thành công!")
 
             onAssetCreated?.()
             onOpenChange(false)
         } catch (error: any) {
             console.error('Submit error:', error)
-            toast.error(error?.message || "Có lỗi xảy ra khi tạo thiết kế")
             throw error
         }
     }

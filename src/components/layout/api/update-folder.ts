@@ -7,7 +7,7 @@ import { apiUrls } from '@/api/config/endpoints'
 import { axios } from '@/shared/lib/axios'
 import { cleanObject } from '@/utils/clean-object';
 import { type TCreateFolder } from '../types/folders';
-import { handleApiError } from '@/utils/error-handler';
+import { handleServerError } from '@/utils/handle-server-error';
 
 interface ApiErrorResponse {
   error: string;
@@ -31,7 +31,7 @@ export const useUpdateFolder = () => {
   return useMutation({
     mutationFn: updateFolder,
     onError: (error:  AxiosError<ApiErrorResponse>) => {
-      handleApiError(error, 'Update Folder');
+      handleServerError(error);
     },
   });
 };

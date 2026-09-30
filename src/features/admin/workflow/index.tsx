@@ -15,6 +15,7 @@ import {
   useDeleteWorkflow,
   useUpdateWorkflow,
   useWorkflows,
+  workflowUsageLabel,
 } from '../api/workflows'
 import { WorkflowFormDialog } from './components/workflow-form-dialog'
 
@@ -125,7 +126,14 @@ export function WorkflowView({ onEditWorkflow }: WorkflowViewProps) {
                   <TableRow key={workflow.id} className='border-border hover:bg-accent'>
                     <TableCell className='text-muted-foreground'>{(page - 1) * PAGE_SIZE + index + 1}</TableCell>
                     <TableCell>
-                      <div className='text-foreground'>{workflow.name}</div>
+                      <div className='text-foreground flex flex-wrap items-center gap-2'>
+                        {workflow.name}
+                        {workflowUsageLabel(workflow.usageKey) && (
+                          <Badge variant='outline' className='border-cyan-500 text-cyan-400'>
+                            Dùng cho: {workflowUsageLabel(workflow.usageKey)}
+                          </Badge>
+                        )}
+                      </div>
                       <div className='text-muted-foreground mt-1 text-xs'>Tạo: {formatDate(workflow.createdAt)}</div>
                     </TableCell>
                     <TableCell className='text-muted-foreground text-sm'>{workflow.description ?? '—'}</TableCell>

@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "@tanstack/react-router";
+import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { getCookie } from "@/shared/lib/cookies";
 import { cn } from "@/shared/lib/utils";
 import { LayoutProvider } from "@/context/Layout-provider";
@@ -48,6 +48,9 @@ import { TreeNode } from "../ui/tree-node";
 const DEFAULT_MENU = "Đồ hoạ";
 const CG_MENU = "CG";
 const WORK_MENU = "Công việc";
+const CG_SEARCH_TERM = JSON.stringify([
+  { FieldId: 4, Operator: "EQUALS", Value: "6", LogicalGroup: "AND" },
+]);
 
 type ContextMenuType = "node" | "empty";
 
@@ -271,32 +274,16 @@ function AuthenticatedLayoutContent({
     setTreeFolder(data ? mapFoldersToTreeData(data) : []);
   }, [data]);
 
+  // Đồng bộ menu theo URL (mở link trực tiếp/F5) — không tự điều hướng khi mount
+  const location = useRouterState({ select: (st) => st.location });
   useEffect(() => {
-    if (menu === CG_MENU) {
-      const searchTerm = JSON.stringify([
-        { FieldId: 4, Operator: "EQUALS", Value: "6", LogicalGroup: "AND" },
-      ]);
-      navigate({
-        to: "/assets",
-        search: {
-          folderId: "0",
-          page: 1,
-          pageSize: 10,
-          searchTerm: searchTerm,
-        },
-      });
-    }
-    if (menu === DEFAULT_MENU) {
-      navigate({
-        to: "/assets",
-        search: {
-          folderId: "0",
-          page: 1,
-          pageSize: 10,
-        },
-      });
-    }
-  }, [menu, navigate]);
+    if (location.pathname !== "/assets") return;
+    const term = String((location.search as { searchTerm?: unknown }).searchTerm ?? "");
+    const isCg = term === CG_SEARCH_TERM;
+    const current = useMenuStore.getState().menu;
+    if (isCg && current !== CG_MENU) setMenu(CG_MENU);
+    else if (!isCg && current === CG_MENU) setMenu(DEFAULT_MENU);
+  }, [location, setMenu]);
 
   const handleEmptyAreaContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -348,9 +335,7 @@ function AuthenticatedLayoutContent({
       };
 
       if (menu === CG_MENU) {
-        search.searchTerm = JSON.stringify([
-          { FieldId: 4, Operator: "EQUALS", Value: "6", LogicalGroup: "AND" },
-        ]);
+        search.searchTerm = CG_SEARCH_TERM;
       }
 
       navigate({
@@ -361,11 +346,23 @@ function AuthenticatedLayoutContent({
     [navigate, menu]
   );
 
+  // Chỉ điều hướng khi người dùng đổi menu
   const changeMenu = useCallback(
     (newMenu: string) => {
       setMenu(newMenu);
+      if (newMenu === CG_MENU || newMenu === DEFAULT_MENU) {
+        navigate({
+          to: "/assets",
+          search: {
+            folderId: "0",
+            page: 1,
+            pageSize: 10,
+            ...(newMenu === CG_MENU ? { searchTerm: CG_SEARCH_TERM } : {}),
+          },
+        });
+      }
     },
-    [setMenu]
+    [setMenu, navigate]
   );
 
   const menuContextValue = useMemo(

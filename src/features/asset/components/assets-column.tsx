@@ -9,7 +9,7 @@ import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '@/components/long-text'
 import { type Asset, type ParsedAsset } from '../api/get-assets'
 import { AssetTableRowActions } from './asset-table-row-actions'
-import { env } from "@/config/env";
+import { mediaUrl } from '@/utils/media-url'
 
 // Get all unique field names from assets for dynamic column generation
 export const extractUniqueFieldNames = (assets: Asset[]): string[] => {
@@ -43,7 +43,7 @@ const renderCellByFieldName = (value: any, fieldName: string, color?: string) =>
             <div className='flex items-center justify-center w-36 py-1'>
                 <div className='relative'>
                     <img
-                        src={env.apiUrl +""+ value}
+                        src={mediaUrl(String(value))}
                         alt={`${fieldName} thumbnail`}
                         className='w-32 h-18 object-cover border border-gray-200 shadow-sm rounded-sm'
                     />

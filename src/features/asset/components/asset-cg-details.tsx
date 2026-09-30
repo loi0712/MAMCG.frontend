@@ -15,11 +15,11 @@ import {
     Loader2,
     ChevronLeft,
 } from "lucide-react";
-import { env } from "@/config/env";
 import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
 import { getCgDetail } from "../api/get-cg";
 import { usePreviewCg } from "../api/preview-cg";
+import { mediaUrl } from '@/utils/media-url'
 
 // Get route API
 const routeApi = getRouteApi("/_authenticated/assets/cg/details");
@@ -370,7 +370,7 @@ export function AssetCgDetailPage() {
                 </div>
             );
         }
-        const mediaUrl = `${env.apiUrl}${currentScene.previewPath}${cacheBustRef.current ? `?t=${cacheBustRef.current}` : ''}`;
+        const previewUrl = mediaUrl(currentScene.previewPath, { t: cacheBustRef.current || undefined });
 
         if (mediaLoadError) {
             return (
@@ -385,7 +385,7 @@ export function AssetCgDetailPage() {
         if (mediaType === "image") {
             return (
                 <img
-                    src={mediaUrl}
+                    src={previewUrl}
                     alt={currentScene.sceneName}
                     className="h-full object-contain"
                     onError={() => {
@@ -400,7 +400,7 @@ export function AssetCgDetailPage() {
         if (mediaType === "video") {
             return (
                 <video
-                    src={mediaUrl}
+                    src={previewUrl}
                     controls
                     className="max-w-full max-h-full object-contain"
                     onError={() => {
@@ -526,7 +526,7 @@ export function AssetCgDetailPage() {
                                     >
                                         
                                         <img
-                                            src={`${env.apiUrl}${scene.previewPath}${cacheBustRef.current ? `?t=${cacheBustRef.current}` : ''}`}
+                                            src={mediaUrl(scene.previewPath, { t: cacheBustRef.current || undefined })}
                                             alt={scene.sceneName}
                                             className="w-full h-full object-cover"
                                             loading="lazy"
