@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Download, Search, Trash2 } from 'lucide-react'
-import { toast } from 'sonner'
+import { Download, Loader2, Search, Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { LOG_KIND_LABELS, type LogKind, useDeleteLog } from '../../api/logs'
+import { LOG_KIND_LABELS, type LogExportParams, type LogKind, useDeleteLog, useExportLogs } from '../../api/logs'
 
 export const LOG_PAGE_SIZE = 20
 
@@ -104,37 +103,19 @@ export function ExpandableText({ text, className = '' }: { text?: string | null;
 }
 
 // ===========================================
-// EXPORT CSV (trang hiện tại)
+// EXPORT CSV (phía máy chủ, theo bộ lọc hiện tại)
 // ===========================================
 
-type CsvValue = string | number | boolean | null | undefined
-
-const csvCell = (value: CsvValue) => {
-  const s = value === null || value === undefined ? '' : String(value)
-  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-}
-
-export function downloadCsv(fileName: string, headers: string[], rows: CsvValue[][]) {
-  const csv = [headers, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')
-  // BOM để Excel đọc đúng tiếng Việt
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${fileName}_${new Date().toISOString().split('T')[0]}.csv`
-  link.click()
-  URL.revokeObjectURL(url)
-  toast.success('Đã xuất file nhật ký', { description: `${rows.length} dòng của trang hiện tại` })
-}
-
-export function ExportButton({ disabled, onClick }: { disabled?: boolean; onClick: () => void }) {
+// Xuất mọi dòng khớp bộ lọc (không chỉ trang hiện tại); máy chủ giới hạn số dòng và chống CSV injection
+export function ExportButton({ kind, params, disabled }: { kind: LogKind; params: LogExportParams; disabled?: boolean }) {
+  const exportLogs = useExportLogs()
   return (
     <Button
       className='bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-2'
-      disabled={disabled}
-      onClick={onClick}
+      disabled={disabled || exportLogs.isPending}
+      onClick={() => exportLogs.mutate({ kind, params })}
     >
-      <Download className='h-4 w-4' />
+      {exportLogs.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Download className='h-4 w-4' />}
       Xuất CSV
     </Button>
   )

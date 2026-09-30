@@ -25,7 +25,7 @@ yarn dev
 | `VITE_API_URL` | Địa chỉ MAMCG.Backend, không có `/` ở cuối. Bắt buộc. |
 | `VITE_DOMAIN_URL` | Địa chỉ frontend; cổng dùng cho `yarn preview` (mặc định 6060). |
 | `VITE_DEBUG_MODE` | Bật log debug phía client. |
-| `VITE_ENABLE_MOCKS` | Bật API giả lập (MSW) khi chạy dev, dùng khi không có backend. |
+| `VITE_ENABLE_MOCKS` | Bật API giả lập (MSW) khi không có backend (dev, hoặc bản build cho E2E). Không đặt khi build bản triển khai. |
 
 Các biến `VITE_*` được nhúng vào bundle **lúc build**, không đọc lúc chạy container.
 
@@ -40,6 +40,8 @@ Các biến `VITE_*` được nhúng vào bundle **lúc build**, không đọc l
 | `yarn preview` | Chạy thử bản build |
 | `yarn api:types [url\|file]` | Lấy Swagger của backend, lưu `openapi/mamcg-api.json`, sinh `src/api/generated/schema.ts` |
 | `yarn api:types:check` | Báo lỗi nếu kiểu API lệch với spec đã commit |
+| `yarn e2e` | Chạy E2E Playwright trên bản build có API giả lập (`E2E_PORT`, mặc định 4173) |
+| `yarn e2e:report` | Mở báo cáo HTML của lần chạy E2E gần nhất |
 
 ## Cấu trúc thư mục
 
@@ -62,9 +64,13 @@ Gọi API: khai báo đường dẫn trong `src/api/config/endpoints.ts`, viết
 
 - Đăng nhập bằng tên bất kỳ có trong dữ liệu giả (ví dụ `admin`) và mật khẩu bất kỳ; mật khẩu `wrong` để thử đăng nhập sai.
 - Tải lại trang sẽ khôi phục dữ liệu gốc.
-- Chỉ hoạt động khi chạy dev; bản build production không chứa mã giả lập.
+- Chỉ hoạt động khi `VITE_ENABLE_MOCKS=true`; bản build production (không đặt biến) không chứa mã giả lập.
 
 Màn hình quản trị đã nối API: Tài khoản, Nhóm quyền, Phân quyền, Trường dữ liệu, Panel hiển thị. Các màn hình còn lại hiện thông báo "Dữ liệu minh hoạ" cho tới khi backend có API.
+
+## E2E (Playwright)
+
+`yarn e2e` build bản có API giả lập (`VITE_ENABLE_MOCKS=true`, `dist-e2e/`), chạy `vite preview` rồi chạy các kịch bản trong `e2e/tests`: đăng nhập sai/đúng, danh sách tài sản + chi tiết, các màn quản trị (người dùng, quy trình tạo/sửa, cài đặt, nhật ký kiểm toán + xuất CSV), F5 giữ trang. Lần đầu cần cài trình duyệt: `npx playwright install chromium`. Kết quả lỗi (ảnh, trace) ở `e2e/test-results`, báo cáo HTML ở `e2e/playwright-report` (`yarn e2e:report`). Dữ liệu giả reset khi tải lại trang, vì vậy kịch bản tạo/sửa điều hướng trong app thay vì `page.goto`.
 
 ## Kiểu dữ liệu API từ Swagger
 
@@ -89,4 +95,4 @@ Image chạy nginx bằng user không phải root trên cổng 8080, có SPA fal
 
 ## CI
 
-GitHub Actions (`.github/workflows/ci.yml`) chạy trên PR và `main`: lint, kiểm tra kiểu API, build (gồm `tsc`), build image Docker và smoke test.
+GitHub Actions (`.github/workflows/ci.yml`) chạy trên PR và `main`: lint, kiểm tra kiểu API, build (gồm `tsc`), E2E Playwright (job `e2e`, cài chromium bằng `npx playwright install --with-deps chromium`, tải báo cáo `playwright-report` lên artifact khi lỗi), build image Docker và smoke test.

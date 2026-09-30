@@ -9,7 +9,6 @@ import { type ActivityLogParams, useActionTypes, useActivityLogs } from '../../a
 import {
   type DateRange,
   DateRangeFilter,
-  downloadCsv,
   ExportButton,
   formatDateTime,
   LOG_PAGE_SIZE,
@@ -58,39 +57,20 @@ export function ActivityLogsTab({ active }: { active: boolean }) {
   const [range, setRange] = useState<DateRange>({ from: '', to: '' })
 
   const { data: actionTypes } = useActionTypes()
-  const { data, isLoading, isError } = useActivityLogs(
-    {
-      pageNumber: page,
-      pageSize: LOG_PAGE_SIZE,
-      searchTerm,
-      actionTypeId: actionTypeId === 'all' ? undefined : Number(actionTypeId),
-      outcome: outcome === 'all' ? undefined : outcome,
-      ...toRangeParams(range),
-    },
-    active
-  )
+  // Bộ lọc dùng chung cho danh sách và xuất CSV
+  const filters = {
+    searchTerm,
+    actionTypeId: actionTypeId === 'all' ? undefined : Number(actionTypeId),
+    outcome: outcome === 'all' ? undefined : outcome,
+    ...toRangeParams(range),
+  }
+  const { data, isLoading, isError } = useActivityLogs({ pageNumber: page, pageSize: LOG_PAGE_SIZE, ...filters }, active)
   const logs = data?.items ?? []
 
   const handleSearch = useCallback((term: string) => {
     setSearchTerm(term)
     setPage(1)
   }, [])
-
-  const handleExport = () =>
-    downloadCsv(
-      'nhat-ky-hoat-dong',
-      ['Thời gian', 'Người dùng', 'Loại thao tác', 'Chi tiết', 'Kết quả', 'Thời lượng (ms)', 'IP', 'Thiết bị'],
-      logs.map((l) => [
-        formatDateTime(l.createdAt),
-        l.userName,
-        l.actionTypeName,
-        l.actionDetail,
-        l.outcome,
-        l.durationMs,
-        l.ipAddress,
-        l.deviceInfo,
-      ])
-    )
 
   return (
     <div className='space-y-4'>
@@ -142,7 +122,7 @@ export function ActivityLogsTab({ active }: { active: boolean }) {
           }}
         />
 
-        <ExportButton disabled={logs.length === 0} onClick={handleExport} />
+        <ExportButton kind='activities' params={filters} disabled={logs.length === 0} />
       </LogFilterCard>
 
       <LogTableCard>
