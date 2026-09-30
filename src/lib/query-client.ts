@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios'
 import { QueryCache, QueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { handleServerError } from '@/utils/handle-server-error'
+import { getServerErrorMessage, handleServerError } from '@/utils/handle-server-error'
 
 /**
  * Create QueryClient với global error handling
@@ -40,16 +40,14 @@ export function createQueryClientInstance() {
       },
     },
     queryCache: new QueryCache({
-      onError: async (error) => {
+      onError: (error) => {
         if (error instanceof AxiosError) {
           // 401 được xử lý tập trung trong interceptor của axios (shared/lib/axios.ts)
 
-          // Handle 500 - Server error
-          if (error.response?.status === 500) {
-            toast.error('Lỗi máy chủ nội bộ!')
-
-            const { router } = await import('@/main')
-            router.navigate({ to: '/500' })
+          // Lỗi máy chủ khi tải dữ liệu: báo lỗi, không rời trang đang xem
+          const status = error.response?.status ?? 0
+          if (status >= 500 || !error.response) {
+            toast.error(getServerErrorMessage(error), { id: 'query-server-error' })
           }
         }
       },

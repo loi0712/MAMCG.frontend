@@ -26,6 +26,7 @@ interface MockWorkflow {
   name: string
   description: string | null
   isActive: boolean
+  usageKey: string | null
   layoutJson: string | null
   createdAt: string
   modifiedAt: string
@@ -43,8 +44,8 @@ const actions: WorkflowAction[] = [
 ]
 
 const workflows: MockWorkflow[] = [
-  { id: 1, name: 'Quy trình duyệt tin', description: 'Biên tập → duyệt → xuất bản', isActive: true, layoutJson: null, createdAt: now(), modifiedAt: now(), activeItemCount: 2 },
-  { id: 2, name: 'Quy trình lưu trữ', description: null, isActive: false, layoutJson: null, createdAt: now(), modifiedAt: now(), activeItemCount: 0 },
+  { id: 1, name: 'Quy trình duyệt tin', description: 'Biên tập → duyệt → xuất bản', isActive: true, usageKey: 'asset', layoutJson: null, createdAt: now(), modifiedAt: now(), activeItemCount: 2 },
+  { id: 2, name: 'Quy trình lưu trữ', description: null, isActive: false, usageKey: null, layoutJson: null, createdAt: now(), modifiedAt: now(), activeItemCount: 0 },
 ]
 
 const statuses: MockStatus[] = [
@@ -75,11 +76,29 @@ const toTransitionDto = (t: MockTransition): WorkflowTransition => ({
 
 const toStatusDto = (s: MockStatus): WorkflowStatus => ({ ...s, itemCount: itemCount(s.id) })
 
+// Giống backend: mục đích hợp lệ, quy trình phải hoạt động, mỗi mục đích chỉ một quy trình
+const validateUsage = (key: string | null | undefined, isActive: boolean, excludeId?: number) => {
+  const usage = key?.trim().toLowerCase() || null
+  if (!usage) return null
+  if (!['asset', 'cg-scene'].includes(usage)) return error(400, 'Mục đích sử dụng không hợp lệ. Giá trị cho phép: asset, cg-scene.')
+  if (!isActive)
+    return error(
+      400,
+      workflows.find((x) => x.id === excludeId)?.usageKey === usage
+        ? `Quy trình đang được dùng cho "${usage}" nên không thể ngừng hoạt động; gán quy trình khác trước.`
+        : `Chỉ gán được quy trình đang hoạt động cho "${usage}"; hãy bật Hoạt động.`
+    )
+  const other = workflows.find((x) => x.usageKey === usage && x.id !== excludeId)
+  if (other) return error(409, `Mục đích "${usage}" đang được gán cho quy trình "${other.name}"; bỏ gán ở quy trình đó trước.`)
+  return usage
+}
+
 const toListItem = (w: MockWorkflow): WorkflowListItem => ({
   id: w.id,
   name: w.name,
   description: w.description,
   isActive: w.isActive,
+  usageKey: w.usageKey,
   statusCount: statuses.filter((s) => s.workflowId === w.id).length,
   transitionCount: transitions.filter((t) => t.workflowId === w.id).length,
   activeItemCount: w.activeItemCount,
@@ -92,6 +111,7 @@ const toDetail = (w: MockWorkflow): WorkflowDetail => ({
   name: w.name,
   description: w.description,
   isActive: w.isActive,
+  usageKey: w.usageKey,
   layoutJson: w.layoutJson,
   createdAt: w.createdAt,
   modifiedAt: w.modifiedAt,
@@ -235,11 +255,14 @@ export const workflowHandlers = [
     const data = (await request.json()) as WorkflowRequest
     const invalid = validateWorkflow(data)
     if (invalid) return invalid
+    const usage = validateUsage(data.usageKey, data.isActive ?? true)
+    if (typeof usage !== 'string' && usage !== null) return usage
     const created: MockWorkflow = {
       id: nextId(),
       name: data.name.trim(),
       description: clean(data.description),
       isActive: data.isActive ?? true,
+      usageKey: usage,
       layoutJson: null,
       createdAt: now(),
       modifiedAt: now(),
@@ -255,7 +278,10 @@ export const workflowHandlers = [
     const data = (await request.json()) as WorkflowRequest
     const invalid = validateWorkflow(data, workflow.id)
     if (invalid) return invalid
+    const usage = validateUsage(data.usageKey ?? workflow.usageKey, data.isActive, workflow.id)
+    if (typeof usage !== 'string' && usage !== null) return usage
     Object.assign(workflow, {
+      usageKey: usage,
       name: data.name.trim(),
       description: clean(data.description),
       isActive: data.isActive,
@@ -283,6 +309,8 @@ export const workflowHandlers = [
   http.delete(api(w.delete(id)), ({ params }) => {
     const index = workflows.findIndex((x) => x.id === Number(params.id))
     if (index < 0) return notFound()
+    if (workflows[index].usageKey)
+      return error(409, `Quy trình đang được dùng cho "${workflows[index].usageKey}"; hãy gán quy trình khác trước khi xoá.`)
     const running = workflows[index].activeItemCount
     if (running > 0)
       return error(
@@ -303,7 +331,7 @@ export const workflowHandlers = [
     for (let i = 2; !requested && workflows.some((x) => x.name === name); i++) name = `${source.name} (bản sao ${i})`
     if (workflows.some((x) => x.name === name)) return error(409, `Tên quy trình '${name}' đã tồn tại.`)
 
-    const copy: MockWorkflow = { ...source, id: nextId(), name, isActive: false, createdAt: now(), modifiedAt: now(), activeItemCount: 0 }
+    const copy: MockWorkflow = { ...source, id: nextId(), name, isActive: false, usageKey: null, createdAt: now(), modifiedAt: now(), activeItemCount: 0 }
     workflows.push(copy)
     const map = new Map<number, number>()
     statuses

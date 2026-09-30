@@ -13,6 +13,8 @@ export interface WorkflowListItem {
   name: string
   description: string | null
   isActive: boolean
+  // Mục đích dùng quy trình: 'asset' | 'cg-scene' | null
+  usageKey?: string | null
   statusCount: number
   transitionCount: number
   // Số nội dung đang chạy (chưa tới trạng thái kết thúc)
@@ -61,6 +63,7 @@ export interface WorkflowDetail {
   name: string
   description: string | null
   isActive: boolean
+  usageKey?: string | null
   // JSON bố cục sơ đồ (nodes/connections) do giao diện tự quản lý
   layoutJson: string | null
   createdAt: string
@@ -82,7 +85,17 @@ export interface WorkflowRequest {
   name: string
   description?: string | null
   isActive: boolean
+  // Bỏ qua (undefined/null) = giữ nguyên khi cập nhật; '' = bỏ gán
+  usageKey?: string | null
 }
+
+export const WORKFLOW_USAGES = [
+  { value: 'asset', label: 'Tài sản (đồ hoạ tải lên)' },
+  { value: 'cg-scene', label: 'CG scene' },
+] as const
+
+export const workflowUsageLabel = (key?: string | null) =>
+  WORKFLOW_USAGES.find((u) => u.value === key)?.label ?? null
 
 export interface WorkflowStatusRequest {
   name: string

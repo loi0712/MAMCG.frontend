@@ -1,7 +1,7 @@
 import { apiUrls } from '@/api/config/endpoints'
-import { env } from '@/config/env';
 import { axios } from '@/shared/lib/axios'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { mediaUrl } from '@/utils/media-url'
 
 // ===========================================
 // TYPES
@@ -92,7 +92,7 @@ export const parseAsset = (asset: Asset): ParsedAsset => {
         
         // Parsed field values
         fileName: getFieldVal('FileName'),
-        thumbnail: env.apiUrl + getFieldVal('Thumbnail'),
+        thumbnail: mediaUrl(getFieldVal('Thumbnail')),
         status: getFieldVal('Status'),
         author: getFieldVal('Author'),
         assignedTo: getFieldVal('AssignedTo'),

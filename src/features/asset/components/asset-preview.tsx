@@ -12,9 +12,9 @@ import { ArrowRightFromLine, Loader2, Maximize2 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { type AssetDetailResponse, fetchAssetDetail, type Field, getDisplayValue, type WorkflowHistory } from "../api/get-asset"
 import { parseDatasource } from "../api/create"
-import { env } from "@/config/env"
 import { useNavigate } from "@tanstack/react-router"
 import { DynamicForm as DynamicFormArray } from '@/components/dynamic-form'
+import { mediaUrl } from '@/utils/media-url'
 
 interface PreviewDrawerProps {
     isOpen: boolean
@@ -307,7 +307,7 @@ const PreviewDrawer = ({
                                 <div className="bg-black rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
                                     {thumbnailField ? (
                                         <img
-                                            src={env.apiUrl + '' + thumbnailField}
+                                            src={mediaUrl(thumbnailField)}
                                             alt="Asset preview"
                                             className="w-full h-full object-contain"
                                         />

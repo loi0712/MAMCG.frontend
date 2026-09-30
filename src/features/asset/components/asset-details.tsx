@@ -14,13 +14,14 @@ import {
     type WorkflowHistory,
 } from "../api/get-asset"
 import { parseDatasource } from "../api/create"
-import { env } from "@/config/env"
 import { cn } from "@/shared/lib/utils"
 import { transformFormValuesForUpdate, useUpdateAssetWithCallbacks } from "../api/update-asset"
 import { toast } from "sonner"
 import JSZip from "jszip"
 import { SelectDropdown } from "@/components/select-dropdown"
 import { DynamicForm as DynamicFormArray } from '@/components/dynamic-form'
+import { getServerErrorMessage } from '@/utils/handle-server-error'
+import { mediaUrl } from '@/utils/media-url'
 
 // Get route API for the details route
 const routeApi = getRouteApi('/_authenticated/assets/details/details')
@@ -415,7 +416,7 @@ export function AssetDetailPage() {
                 const type: 'image' | 'video' = detectedType === 'video' ? 'video' : 'image'
 
                 return {
-                    url: `${env.apiUrl}${cleanPath}`,
+                    url: mediaUrl(cleanPath),
                     type,
                     name: cleanPath.split('/').pop() || `Asset-${index + 1}`,
                     file: null
@@ -494,8 +495,7 @@ export function AssetDetailPage() {
             }
         },
         (error) => {
-            const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra'
-            toast.error(`Không thể gửi dữ liệu. ${errorMessage}`)
+            toast.error(`Không thể gửi dữ liệu. ${getServerErrorMessage(error, 'Có lỗi xảy ra')}`)
             console.error('Update failed:', error)
         }
     )
@@ -816,7 +816,7 @@ export function AssetDetailPage() {
                                     <div className="w-full h-full flex items-center justify-center">
                                         {(() => {
                                             const mediaType = getMediaTypeFromUrl(thumbnailField)
-                                            const fullUrl = `${env.apiUrl}${thumbnailField}`
+                                            const fullUrl = mediaUrl(thumbnailField)
 
                                             if (mediaType === 'video') {
                                                 return (

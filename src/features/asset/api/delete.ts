@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { apiUrls } from "@/api/config/endpoints";
 import { axios } from "@/shared/lib/axios";
-import { handleApiError } from "@/utils/error-handler";
+import { handleServerError } from '@/utils/handle-server-error';
 import { toast } from "sonner";
 
 interface ApiErrorResponse {
@@ -28,7 +28,7 @@ export const useDeleteAsset = () => {
     return useMutation({
         mutationFn: deleteAsset,
         onError: (error: AxiosError<ApiErrorResponse>) => {
-            handleApiError(error, "Delete Asset");
+            handleServerError(error);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['assets'] });
